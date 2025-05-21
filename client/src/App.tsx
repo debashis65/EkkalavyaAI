@@ -11,7 +11,7 @@ import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
 import ArTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-fixed";
-import Login from "@/pages/login";
+import Login from "@/pages/login-improved";
 import Register from "@/pages/register";
 import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
