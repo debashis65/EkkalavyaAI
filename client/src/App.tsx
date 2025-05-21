@@ -12,12 +12,12 @@ import Training from "@/pages/training";
 import ArTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-working";
 import Login from "@/pages/login-improved";
-import Register from "@/pages/register";
+import Register from "@/pages/register-improved";
 import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/shell";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context-improved";
 import { useEffect } from "react";
 
 // Simple authentication wrapper component

@@ -3,7 +3,7 @@ import App from "./App";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./context/theme-provider";
-import { AuthProvider } from "./context/auth-context";
+import { AuthProvider } from "./context/auth-context-improved";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
