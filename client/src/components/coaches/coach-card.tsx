@@ -3,14 +3,20 @@ import { Button } from "@/components/ui/button";
 import { StarIcon } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import { User } from "@/types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface CoachCardProps {
   coach: User;
 }
 
 export function CoachCard({ coach }: CoachCardProps) {
+  const navigate = useNavigate();
   const { id, name, rating = 0, sports, students = 0, experience = "" } = coach;
+  
+  const handleViewProfile = () => {
+    console.log("Navigating to coach profile:", `/coach/${id}`);
+    navigate(`/coach/${id}`);
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -61,8 +67,12 @@ export function CoachCard({ coach }: CoachCardProps) {
           </div>
           
           <div className="mt-4 flex gap-2 w-full">
-            <Button asChild variant="secondary" className="flex-1">
-              <Link to={`/coach/${id}`}>View Profile</Link>
+            <Button 
+              variant="secondary" 
+              className="flex-1"
+              onClick={handleViewProfile}
+            >
+              View Profile
             </Button>
             <Button className="flex-1">
               Book Session
