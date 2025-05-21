@@ -10,7 +10,7 @@ import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
 import ArTools from "@/pages/ar-tools";
-import Profile from "@/pages/profile";
+import Profile from "@/pages/profile-fixed";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import AthleteProfile from "@/pages/athlete-profile";
