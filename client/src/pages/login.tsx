@@ -38,10 +38,14 @@ export default function Login() {
     },
   });
 
-  async function onSubmit(data: LoginFormValues) {
+  function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
-    try {
-      // For demo purposes, create a fixed user for each role
+    
+    // Simple hardcoded authentication for demo
+    if ((data.email === "coach@example.com" || data.email === "athlete@example.com") && 
+        data.password === "password123") {
+      
+      // Determine if coach or athlete
       const isCoach = data.email === "coach@example.com";
       
       // Create a user object directly
@@ -62,7 +66,7 @@ export default function Login() {
           : ["Regional Gold Medal 2022"]
       };
       
-      // Store user in localStorage directly
+      // Store user data in localStorage
       localStorage.setItem("ekalavya_user", JSON.stringify(user));
       
       toast({
@@ -70,16 +74,16 @@ export default function Login() {
         description: "Welcome to Ekalavya!",
       });
       
-      // Force a hard reload to ensure the app reinitializes with the stored user data
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Login failed:", error);
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
+    } else {
       toast({
         variant: "destructive",
         title: "Login failed",
         description: "Please check your credentials and try again.",
       });
-    } finally {
       setIsLoading(false);
     }
   }
