@@ -242,8 +242,8 @@ export default function CoachProfile() {
         </Button>
       </div>
 
-      <div className="bg-white border-b mt-2">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="bg-white border-b mt-2">
           <TabsList className="bg-transparent border-b w-full justify-start rounded-none h-auto">
             <TabsTrigger
               value="overview"
@@ -270,10 +270,9 @@ export default function CoachProfile() {
               Reviews
             </TabsTrigger>
           </TabsList>
-        </Tabs>
-      </div>
-
-      <div className="p-4">
+        </div>
+        
+        <div className="p-4">
         <TabsContent value="overview" className="mt-0">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {/* Earnings */}

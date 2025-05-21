@@ -45,8 +45,9 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
   const { user } = useAuth();
-  // Temporarily remove theme usage until we fix the provider
-  // const { theme, setTheme } = useTheme();
+  // Add default theme values instead of using the provider
+  const theme = "light";
+  const setTheme = (t: string) => console.log("Theme would change to:", t);
   const [activeTab, setActiveTab] = useState("general");
 
   const form = useForm<ProfileFormValues>({
