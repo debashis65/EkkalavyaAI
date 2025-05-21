@@ -443,16 +443,22 @@ export default function ProfileWorking() {
                   <h3 className="text-lg font-medium mb-2">Change Password</h3>
                   <div className="space-y-4">
                     <div>
-                      <FormLabel>Current Password</FormLabel>
-                      <Input type="password" />
+                      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Current Password
+                      </label>
+                      <Input type="password" className="mt-1" />
                     </div>
                     <div>
-                      <FormLabel>New Password</FormLabel>
-                      <Input type="password" />
+                      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        New Password
+                      </label>
+                      <Input type="password" className="mt-1" />
                     </div>
                     <div>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <Input type="password" />
+                      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Confirm New Password
+                      </label>
+                      <Input type="password" className="mt-1" />
                     </div>
                     <Button>Update Password</Button>
                   </div>
