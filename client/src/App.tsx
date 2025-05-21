@@ -14,7 +14,7 @@ import Profile from "@/pages/profile";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import AthleteProfile from "@/pages/athlete-profile";
-import CoachProfile from "@/pages/coach-profile";
+import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/shell";
 import { useAuth } from "@/context/auth-context";
