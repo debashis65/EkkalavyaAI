@@ -76,10 +76,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticated(true);
       localStorage.setItem("ekalavya_user", JSON.stringify(userData));
       
-      // Add a small delay before navigation to ensure state is updated
-      setTimeout(() => {
-        navigate("/");
-      }, 100);
+      // Navigate immediately after state update
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
