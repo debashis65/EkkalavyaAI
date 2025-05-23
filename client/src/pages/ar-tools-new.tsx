@@ -13,7 +13,7 @@ export default function ARTools() {
       <div className="bg-orange-600 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img 
-            src="/attached_assets/llogo.jpeg" 
+            src="/logo.jpeg" 
             alt="Ekalavya AI Logo" 
             className="w-8 h-8 object-contain rounded bg-white p-1"
           />

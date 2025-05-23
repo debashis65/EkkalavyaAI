@@ -43,7 +43,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
       <div className="p-6">
         <div className="flex items-center gap-3">
           <img 
-            src="/attached_assets/llogo.jpeg" 
+            src="/logo.jpeg" 
             alt="Ekalavya AI Logo" 
             className="w-10 h-10 object-contain rounded-lg bg-white p-1"
           />

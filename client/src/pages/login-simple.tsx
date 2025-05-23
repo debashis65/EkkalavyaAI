@@ -61,7 +61,7 @@ export default function LoginSimple() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <img 
-            src="/attached_assets/llogo.jpeg" 
+            src="/logo.jpeg" 
             alt="Ekalavya AI Logo" 
             className="w-20 h-20 mx-auto mb-4 object-contain rounded-lg"
           />
