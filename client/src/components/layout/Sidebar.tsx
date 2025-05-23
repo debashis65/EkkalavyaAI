@@ -32,8 +32,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
     { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "students", label: "Students", icon: Users },
     { id: "training-plans", label: "Training Plans", icon: Dumbbell },
-    { id: "messages", label: "Messages", icon: MessageSquare },
-    { id: "settings", label: "Settings", icon: Settings },
+    { id: "profile", label: "Profile", icon: User },
   ];
 
   const navItems = user.role === 'athlete' ? playerNavItems : coachNavItems;
