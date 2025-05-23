@@ -125,37 +125,141 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing, activeTab, setActiveT
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">AI Motion Analysis</h3>
           
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                ✓
+          {activeTab === 'shooting' && (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="font-medium text-green-400">Follow through is excellent</h4>
+                  <p className="text-sm text-gray-300">Full extension with proper wrist snap creates optimal backspin. Continue to emphasize this technique.</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-green-400">Follow through is excellent</h4>
-                <p className="text-sm text-gray-300">Full extension with proper wrist snap creates optimal backspin. Continue to emphasize this technique.</p>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                ⚠
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ⚠
+                </div>
+                <div>
+                  <h4 className="font-medium text-yellow-400">Elbow alignment needs adjustment</h4>
+                  <p className="text-sm text-gray-300">Your shooting elbow is slightly out at a +2° angle. Try to keep it at 45° for better accuracy and consistency.</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-yellow-400">Elbow alignment needs adjustment</h4>
-                <p className="text-sm text-gray-300">Your shooting elbow is slightly out at a +2° angle. Try to keep it at 45° for better accuracy and consistency.</p>
-              </div>
-            </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                ✗
-              </div>
-              <div>
-                <h4 className="font-medium text-red-400">Balance is shifting during release</h4>
-                <p className="text-sm text-gray-300">Your weight distribution is uneven (70%). Focus on maintaining a stable base through the entire shot motion.</p>
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✗
+                </div>
+                <div>
+                  <h4 className="font-medium text-red-400">Balance is shifting during release</h4>
+                  <p className="text-sm text-gray-300">Your weight distribution is uneven (70%). Focus on maintaining a stable base through the entire shot motion.</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === 'dribbling' && (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="font-medium text-green-400">Ball control is strong</h4>
+                  <p className="text-sm text-gray-300">Consistent dribble height and rhythm. Good use of fingertips for ball control.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ⚠
+                </div>
+                <div>
+                  <h4 className="font-medium text-yellow-400">Head position needs work</h4>
+                  <p className="text-sm text-gray-300">Looking down at the ball 65% of the time. Practice keeping your head up to see the court.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✗
+                </div>
+                <div>
+                  <h4 className="font-medium text-red-400">Weak hand development needed</h4>
+                  <p className="text-sm text-gray-300">Left hand dribbling is 40% less controlled. Focus on non-dominant hand training.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'movement' && (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="font-medium text-green-400">Explosive first step</h4>
+                  <p className="text-sm text-gray-300">Quick acceleration from standstill. Good use of triple threat position.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ⚠
+                </div>
+                <div>
+                  <h4 className="font-medium text-yellow-400">Footwork timing inconsistent</h4>
+                  <p className="text-sm text-gray-300">Sometimes rushing pivots. Focus on controlled, deliberate foot placement.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✗
+                </div>
+                <div>
+                  <h4 className="font-medium text-red-400">Lateral movement speed</h4>
+                  <p className="text-sm text-gray-300">Side-to-side agility is 25% below optimal. Work on defensive slide drills.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'defense' && (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="font-medium text-green-400">Active hands positioning</h4>
+                  <p className="text-sm text-gray-300">Good deflection rate and hand activity in passing lanes.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ⚠
+                </div>
+                <div>
+                  <h4 className="font-medium text-yellow-400">Stance width varies</h4>
+                  <p className="text-sm text-gray-300">Defensive stance gets too narrow under pressure. Maintain wide base.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  ✗
+                </div>
+                <div>
+                  <h4 className="font-medium text-red-400">Help defense positioning</h4>
+                  <p className="text-sm text-gray-300">Slow to rotate on help defense. Need better court awareness and anticipation.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Recommended Drills */}
@@ -181,31 +285,31 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing, activeTab, setActiveT
               </div>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-600 p-4">
+            <Card className="bg-gradient-to-r from-blue-900 to-blue-800 border-blue-600 p-4 shadow-lg">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-lg">
                   ⚡
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium">Balance Training</h4>
-                  <p className="text-sm text-gray-400">Improve shooting stance stability</p>
+                  <h4 className="font-semibold text-white">Balance Training</h4>
+                  <p className="text-sm text-blue-200">Improve shooting stance stability - Critical improvement</p>
                 </div>
-                <Button size="sm" variant="outline" className="border-gray-500 text-gray-300 hover:bg-gray-700">
+                <Button size="sm" className="bg-blue-500 hover:bg-blue-400 text-white font-medium px-4">
                   Add to Plan
                 </Button>
               </div>
             </Card>
 
-            <Card className="bg-gray-800 border-gray-600 p-4">
+            <Card className="bg-gradient-to-r from-green-900 to-green-800 border-green-600 p-4 shadow-lg">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-lg">
                   🎯
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium">Release Technique</h4>
-                  <p className="text-sm text-gray-400">Perfect your follow-through motion</p>
+                  <h4 className="font-semibold text-white">Release Technique</h4>
+                  <p className="text-sm text-green-200">Perfect your follow-through motion - Essential skill</p>
                 </div>
-                <Button size="sm" variant="outline" className="border-gray-500 text-gray-300 hover:bg-gray-700">
+                <Button size="sm" className="bg-green-500 hover:bg-green-400 text-white font-medium px-4">
                   Add to Plan
                 </Button>
               </div>

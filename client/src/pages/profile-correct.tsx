@@ -284,23 +284,243 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="training" className="p-6">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-semibold mb-2">Training Content</h3>
-              <p className="text-gray-600">Training plans and schedule management coming soon...</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Current Training Plan</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Shooting Fundamentals</h4>
+                        <p className="text-sm text-gray-600">Week 3 of 6</p>
+                      </div>
+                      <Badge className="bg-orange-600">Active</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Conditioning Program</h4>
+                        <p className="text-sm text-gray-600">Week 5 of 8</p>
+                      </div>
+                      <Badge variant="secondary">In Progress</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <div>
+                        <h4 className="font-medium">Defensive Drills</h4>
+                        <p className="text-sm text-gray-600">Starting next week</p>
+                      </div>
+                      <Badge variant="outline">Upcoming</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Weekly Schedule</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-2 border-l-4 border-orange-500">
+                      <div className="text-sm font-medium">Monday</div>
+                      <div className="text-sm text-gray-600">Shooting Practice - 4:00 PM</div>
+                    </div>
+                    <div className="flex items-center gap-3 p-2 border-l-4 border-blue-500">
+                      <div className="text-sm font-medium">Wednesday</div>
+                      <div className="text-sm text-gray-600">Conditioning - 5:30 PM</div>
+                    </div>
+                    <div className="flex items-center gap-3 p-2 border-l-4 border-green-500">
+                      <div className="text-sm font-medium">Friday</div>
+                      <div className="text-sm text-gray-600">Skills Training - 4:30 PM</div>
+                    </div>
+                    <div className="flex items-center gap-3 p-2 border-l-4 border-purple-500">
+                      <div className="text-sm font-medium">Saturday</div>
+                      <div className="text-sm text-gray-600">Team Practice - 10:00 AM</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="videos" className="p-6">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-semibold mb-2">Video Analysis</h3>
-              <p className="text-gray-600">Video recordings and analysis tools coming soon...</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Recent Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-orange-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                          <span className="text-white text-sm">▶</span>
+                        </div>
+                        <p className="text-xs text-gray-600">Free Throw Analysis</p>
+                        <p className="text-xs text-gray-500">Mar 25, 2024</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-orange-600">87%</div>
+                      <div className="text-xs text-gray-500">Accuracy Score</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Form Check</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                          <span className="text-white text-sm">▶</span>
+                        </div>
+                        <p className="text-xs text-gray-600">Shooting Form</p>
+                        <p className="text-xs text-gray-500">Mar 23, 2024</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-600">B+</div>
+                      <div className="text-xs text-gray-500">Form Grade</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Movement Study</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="bg-gray-100 rounded-lg p-4 h-32 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                          <span className="text-white text-sm">▶</span>
+                        </div>
+                        <p className="text-xs text-gray-600">Footwork Drill</p>
+                        <p className="text-xs text-gray-500">Mar 20, 2024</p>
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">92%</div>
+                      <div className="text-xs text-gray-500">Technique Score</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="reports" className="p-6">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-semibold mb-2">Performance Reports</h3>
-              <p className="text-gray-600">Detailed performance reports and analytics coming soon...</p>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Monthly Performance Report</CardTitle>
+                  <p className="text-sm text-gray-600">March 2024 Summary</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-orange-50 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">24</div>
+                      <div className="text-sm text-gray-600">Training Sessions</div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">89%</div>
+                      <div className="text-sm text-gray-600">Attendance Rate</div>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">+15%</div>
+                      <div className="text-sm text-gray-600">Skill Improvement</div>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">4.7</div>
+                      <div className="text-sm text-gray-600">Coach Rating</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Skill Breakdown</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm">Shooting Accuracy</span>
+                          <span className="font-bold">85%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-orange-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm">Ball Handling</span>
+                          <span className="font-bold">78%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm">Defense</span>
+                          <span className="font-bold">72%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-green-500 h-2 rounded-full" style={{ width: '72%' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Goals Progress</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">Achieve 80% free throw accuracy</p>
+                          <p className="text-sm text-gray-500">Completed</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-xs">⚡</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">Improve defensive stance</p>
+                          <p className="text-sm text-gray-500">75% complete</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-xs">→</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">Master crossover dribble</p>
+                          <p className="text-sm text-gray-500">In progress</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
