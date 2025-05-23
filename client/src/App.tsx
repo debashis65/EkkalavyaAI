@@ -9,6 +9,12 @@ import Login from "@/pages/login-simple";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
 import Sidebar from "@/components/layout/Sidebar";
+import Analytics from "@/pages/analytics";
+import Schedule from "@/pages/schedule";
+import Coaches from "@/pages/coaches";
+import Training from "@/pages/training";
+import ARTools from "@/pages/ar-tools";
+import Profile from "@/pages/profile";
 
 // Simple user type
 interface User {
@@ -41,21 +47,51 @@ function App() {
   };
 
   const renderContent = () => {
-    if (activeTab === "dashboard") {
-      if (user?.role === 'coach') {
-        return <CoachDashboard user={user} setUser={setUser} />;
-      } else {
-        return <PlayerDashboard user={user} setUser={setUser} />;
-      }
+    switch (activeTab) {
+      case "dashboard":
+        if (user?.role === 'coach') {
+          return <CoachDashboard user={user} setUser={setUser} />;
+        } else {
+          return <PlayerDashboard user={user} setUser={setUser} />;
+        }
+      case "analytics":
+        return <Analytics />;
+      case "schedule":
+        return <Schedule />;
+      case "coaches":
+        return <Coaches />;
+      case "training":
+        return <Training />;
+      case "ar-tools":
+        return <ARTools />;
+      case "profile":
+        return <Profile />;
+      case "students":
+        return <Coaches />; // Reuse coaches component for students view
+      case "training-plans":
+        return <Training />; // Reuse training component for training plans
+      case "messages":
+        return (
+          <div className="p-8 bg-gray-50 min-h-screen">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Messages</h2>
+            <p className="text-gray-600">Message functionality coming soon...</p>
+          </div>
+        );
+      case "settings":
+        return (
+          <div className="p-8 bg-gray-50 min-h-screen">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Settings</h2>
+            <p className="text-gray-600">Settings panel coming soon...</p>
+          </div>
+        );
+      default:
+        return (
+          <div className="p-8 bg-gray-50 min-h-screen">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 capitalize">{activeTab.replace('-', ' ')}</h2>
+            <p className="text-gray-600">This section is coming soon...</p>
+          </div>
+        );
     }
-    
-    // Placeholder for other tabs
-    return (
-      <div className="p-8 bg-gray-50 min-h-screen">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 capitalize">{activeTab.replace('-', ' ')}</h2>
-        <p className="text-gray-600">This section is coming soon...</p>
-      </div>
-    );
   };
 
   // If user is logged in, show sidebar with content
