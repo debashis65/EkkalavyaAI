@@ -17,7 +17,7 @@ import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/shell";
-import { useAuth } from "@/context/auth";
+import { useAuth } from "@/context/auth-context";
 
 // Role-specific dashboard components
 const CoachDashboard: React.FC = () => (
@@ -107,10 +107,10 @@ const DashboardPage: React.FC = () => {
 };
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // If user is logged in, show authenticated routes
-  if (user) {
+  if (isAuthenticated && user) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>

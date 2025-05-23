@@ -2,66 +2,75 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Demo accounts
+const DEMO_ACCOUNTS = {
+  "coach@example.com": {
+    password: "password123",
+    user: {
+      id: "1",
+      email: "coach@example.com",
+      role: "coach" as const,
+      name: "Guru Drona"
+    }
+  },
+  "athlete@example.com": {
+    password: "password123", 
+    user: {
+      id: "2",
+      email: "athlete@example.com", 
+      role: "athlete" as const,
+      name: "Arjuna"
+    }
+  }
+};
 
 export default function LoginSimple() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    if ((email === "coach@example.com" || email === "athlete@example.com") && password === "password123") {
-      const isCoach = email === "coach@example.com";
-      const user = {
-        id: isCoach ? 1 : 2,
-        name: isCoach ? "Guru Drona" : "Arjun Sharma",
-        email: email,
-        role: isCoach ? "coach" : "athlete"
-      };
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-      localStorage.setItem("ekalavya_user", JSON.stringify(user));
+    const account = DEMO_ACCOUNTS[email as keyof typeof DEMO_ACCOUNTS];
+    
+    if (account && account.password === password) {
+      // Store user in localStorage
+      localStorage.setItem("ekalavya_user", JSON.stringify(account.user));
       
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${user.name}!`,
-      });
-
-      // Direct navigation
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+      // Reload the page to trigger the app's user check
+      window.location.reload();
     } else {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-      });
+      setError("Invalid email or password");
     }
     
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="bg-green-500 text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
-            E
-          </div>
-          <CardTitle className="text-2xl font-bold">Ekalavya</CardTitle>
-          <p className="text-gray-600">Sports Training & Mentorship Platform</p>
+          <CardTitle className="text-2xl font-bold">Welcome to Ekalavya</CardTitle>
+          <CardDescription>
+            Sign in to your sports training platform
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <Input 
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -69,9 +78,11 @@ export default function LoginSimple() {
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
-              <Input 
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -79,38 +90,27 @@ export default function LoginSimple() {
                 required
               />
             </div>
+
+            {error && (
+              <div className="text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
+
             <Button 
               type="submit" 
-              className="w-full bg-green-500 hover:bg-green-600"
+              className="w-full"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">Demo Accounts:</p>
-            <div className="space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setEmail("coach@example.com");
-                  setPassword("password123");
-                }}
-              >
-                Coach Login
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setEmail("athlete@example.com");
-                  setPassword("password123");
-                }}
-              >
-                Athlete Login
-              </Button>
+
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600 font-medium mb-2">Demo Accounts:</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>Coach: coach@example.com / password123</div>
+              <div>Athlete: athlete@example.com / password123</div>
             </div>
           </div>
         </CardContent>
