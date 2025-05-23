@@ -13,8 +13,8 @@ import Analytics from "@/pages/analytics";
 import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
-import ARTools from "@/pages/ar-tools";
-import Profile from "@/pages/profile";
+import ARTools from "@/pages/ar-tools-new";
+import Profile from "@/pages/profile-simple";
 
 // Simple user type
 interface User {
