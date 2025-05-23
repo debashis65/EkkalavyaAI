@@ -123,6 +123,81 @@ export const achievements = pgTable("achievements", {
   category: text("category"),
 });
 
+// Subscription Plans table
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // "Freemium", "AI Training", "Pro Coach", etc.
+  userType: userRoleEnum("user_type").notNull(), // athlete or coach
+  price: integer("price").notNull(), // Price in rupees
+  currency: text("currency").default("INR"),
+  billingCycle: text("billing_cycle").notNull(), // monthly, yearly
+  features: text("features").array(), // List of features included
+  maxAnalysisPerMonth: integer("max_analysis_per_month"), // Analysis limit
+  hasLiveCoaching: boolean("has_live_coaching").default(false),
+  hasAdvancedMetrics: boolean("has_advanced_metrics").default(false),
+  hasLeaderboardAccess: boolean("has_leaderboard_access").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Subscriptions table
+export const userSubscriptions = pgTable("user_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  planId: integer("plan_id").notNull().references(() => subscriptionPlans.id),
+  status: text("status").notNull(), // active, cancelled, expired, paused
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  autoRenew: boolean("auto_renew").default(true),
+  paymentMethod: text("payment_method"), // UPI, card, etc.
+  transactionId: text("transaction_id"),
+  amountPaid: integer("amount_paid").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment Transactions table
+export const paymentTransactions = pgTable("payment_transactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  subscriptionId: integer("subscription_id").references(() => userSubscriptions.id),
+  amount: integer("amount").notNull(),
+  currency: text("currency").default("INR"),
+  transactionType: text("transaction_type").notNull(), // subscription, analysis, coaching_session, leaderboard_entry
+  paymentMethod: text("payment_method").notNull(),
+  transactionId: text("transaction_id").notNull(),
+  status: text("status").notNull(), // success, failed, pending, refunded
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Leaderboard Challenges table
+export const leaderboardChallenges = pgTable("leaderboard_challenges", {
+  id: serial("id").primaryKey(),
+  sport: sportEnum("sport").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  entryFee: integer("entry_fee").notNull(), // In rupees (5-20)
+  prizePool: integer("prize_pool").notNull(), // Total prize money
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  maxParticipants: integer("max_participants"),
+  currentParticipants: integer("current_participants").default(0),
+  status: text("status").default("upcoming"), // upcoming, active, completed, cancelled
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Challenge Participants table
+export const challengeParticipants = pgTable("challenge_participants", {
+  id: serial("id").primaryKey(),
+  challengeId: integer("challenge_id").notNull().references(() => leaderboardChallenges.id, { onDelete: 'cascade' }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  entryFeePaid: integer("entry_fee_paid").notNull(),
+  currentScore: integer("current_score").default(0),
+  currentRank: integer("current_rank"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
