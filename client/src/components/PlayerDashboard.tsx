@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Upload, Video, Trophy, MessageSquare, User } from "lucide-react";
+import { Search, Upload, Video, Trophy, MessageSquare, User, Camera, Zap, ArrowRight } from "lucide-react";
 
 interface User {
   id: string;
@@ -19,6 +19,31 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* AR Tool Banner - Prominent CTA */}
+      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white p-6 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-full">
+                <Camera className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold mb-1">AI Performance Analysis</h2>
+                <p className="text-blue-100">Upload your training videos and get instant AI-powered technique feedback</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setActiveTab('ar-tools')}
+              className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Start AI Analysis
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Green Header */}
       <div className="bg-green-600 text-white p-6">
         <div className="flex items-center justify-between mb-4">
