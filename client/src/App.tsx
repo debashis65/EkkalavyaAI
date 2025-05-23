@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, useEffect } from "react";
 
 import Login from "@/pages/login-simple";
+import CoachDashboard from "@/components/CoachDashboard";
+import PlayerDashboard from "@/components/PlayerDashboard";
 
 // Simple user type
 interface User {
@@ -30,28 +32,13 @@ function App() {
     }
   }, []);
 
-  // If user is logged in, show dashboard message
+  // If user is logged in, show role-based dashboard
   if (user) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <div className="min-h-screen bg-background flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold mb-4">Welcome to Ekalavya!</h1>
-              <p className="text-xl mb-4">Hello, {user.name}!</p>
-              <p className="text-muted-foreground mb-6">Role: {user.role}</p>
-              <button 
-                onClick={() => {
-                  setUser(null);
-                  localStorage.removeItem("ekalavya_user");
-                }}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
+          {user.role === 'coach' ? <CoachDashboard user={user} setUser={setUser} /> : <PlayerDashboard user={user} setUser={setUser} />}
         </TooltipProvider>
       </QueryClientProvider>
     );
