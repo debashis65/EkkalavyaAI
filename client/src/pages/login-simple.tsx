@@ -111,6 +111,26 @@ export default function LoginSimple() {
             </Button>
           </form>
 
+          <div className="mt-4 text-center space-y-2">
+            <button 
+              type="button"
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              onClick={() => alert('Forgot password functionality coming soon')}
+            >
+              Forgot Password?
+            </button>
+            <div className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <button 
+                type="button"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                onClick={() => alert('Registration functionality coming soon')}
+              >
+                Sign up here
+              </button>
+            </div>
+          </div>
+
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 font-medium mb-2">Demo Accounts:</p>
             <div className="text-xs text-gray-500 space-y-1">
