@@ -3,10 +3,28 @@ import { Sidebar } from "./sidebar";
 import { MobileNav } from "./mobile-nav";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useAuth } from "@/context/auth-context";
+import { useEffect, useState } from "react";
 
 export function Shell() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { user, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Check if user data is loaded from localStorage
+  useEffect(() => {
+    const checkAuth = () => {
+      const userData = localStorage.getItem("ekalavya_user");
+      setIsLoading(false);
+    };
+    
+    // Small delay to ensure auth context has loaded
+    setTimeout(checkAuth, 100);
+  }, []);
+  
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
   
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
