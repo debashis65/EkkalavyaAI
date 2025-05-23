@@ -47,26 +47,62 @@ export default function LoginImproved() {
     setIsLoading(true);
     
     try {
-      // Use the auth context login function
-      await login(data.email, data.password);
-      
-      // If remember me is checked, store this preference
-      if (data.rememberMe) {
-        localStorage.setItem("ekalavya_remember", "true");
+      // Simple hardcoded authentication for demo
+      if ((data.email === "coach@example.com" || data.email === "athlete@example.com") && 
+          data.password === "password123") {
+        
+        // Determine if coach or athlete
+        const isCoach = data.email === "coach@example.com";
+        
+        // Create a user object directly
+        const user = {
+          id: isCoach ? 1 : 2,
+          name: isCoach ? "Guru Drona" : "Arjun Sharma",
+          email: data.email,
+          role: isCoach ? "coach" : "athlete",
+          sports: ["archery"],
+          rating: isCoach ? 4.9 : undefined,
+          students: isCoach ? 48 : undefined,
+          bio: isCoach 
+            ? "Elite archery coach with over 15 years of experience." 
+            : "Passionate about improving my archery skills.",
+          experience: isCoach ? "15+ Years" : undefined,
+          achievements: isCoach 
+            ? ["National Coach Award 2020"] 
+            : ["Regional Gold Medal 2022"]
+        };
+        
+        // If remember me is checked, store this preference
+        if (data.rememberMe) {
+          localStorage.setItem("ekalavya_remember", "true");
+        } else {
+          localStorage.removeItem("ekalavya_remember");
+        }
+        
+        // Store user data in localStorage
+        localStorage.setItem("ekalavya_user", JSON.stringify(user));
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${user.name}!`,
+        });
+        
+        // Use window.location to force navigation
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
       } else {
-        localStorage.removeItem("ekalavya_remember");
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: "Please check your credentials and try again.",
+        });
       }
-      
-      toast({
-        title: "Login successful",
-        description: `Welcome back!`,
-      });
-      
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
       });
       console.error("Login error:", error);
     } finally {
