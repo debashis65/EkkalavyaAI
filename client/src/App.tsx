@@ -63,7 +63,7 @@ function App() {
       case "schedule":
         return <Schedule />;
       case "coaches":
-        return <Coaches />;
+        return <Coaches user={user} />;
       case "training":
         return <Training />;
       case "ar-tools":
