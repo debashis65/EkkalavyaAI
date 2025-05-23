@@ -381,6 +381,362 @@ class BasketballAnalysis:
         
         return feedback
 
+class ParaSportsAnalysis:
+    """Para sports analysis system with adaptive pose detection"""
+    
+    def __init__(self):
+        self.pose = mp_pose.Pose(
+            static_image_mode=False,
+            model_complexity=2,
+            enable_segmentation=False,
+            min_detection_confidence=0.6,  # Lower threshold for adaptive equipment
+            min_tracking_confidence=0.4
+        )
+    
+    def analyze_wheelchair_basketball(self, landmarks, equipment_detected=None) -> Dict:
+        """Analyze wheelchair basketball shooting technique"""
+        try:
+            # Focus on upper body mechanics since lower body is seated
+            left_shoulder = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER]
+            right_shoulder = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+            left_elbow = landmarks[mp_pose.PoseLandmark.LEFT_ELBOW]
+            right_elbow = landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW]
+            left_wrist = landmarks[mp_pose.PoseLandmark.LEFT_WRIST]
+            right_wrist = landmarks[mp_pose.PoseLandmark.RIGHT_WRIST]
+            
+            analysis = {
+                "shooting_hand_alignment": self._check_shooting_alignment(right_shoulder, right_elbow, right_wrist),
+                "upper_body_stability": self._check_seated_stability(left_shoulder, right_shoulder),
+                "compensatory_movement": self._check_compensatory_patterns(left_shoulder, right_shoulder, left_elbow, right_elbow),
+                "shot_release": self._check_seated_shot_release(right_elbow, right_wrist),
+                "trunk_control": self._check_trunk_control(left_shoulder, right_shoulder)
+            }
+            
+            score = sum(analysis.values()) / len(analysis) * 100
+            
+            return {
+                "score": round(score, 2),
+                "metrics": analysis,
+                "feedback": self._generate_wheelchair_basketball_feedback(analysis)
+            }
+            
+        except Exception as e:
+            logger.error(f"Wheelchair basketball analysis error: {e}")
+            return {"score": 0, "metrics": {}, "feedback": ["Analysis failed"]}
+    
+    def analyze_para_archery(self, landmarks, classification="Open", equipment=None) -> Dict:
+        """Analyze para archery with classification-specific adaptations"""
+        try:
+            analysis = {}
+            
+            if classification in ["W1", "W2"]:  # Wheelchair classes
+                analysis = {
+                    "wheelchair_positioning": self._check_wheelchair_position(landmarks),
+                    "upper_body_alignment": self._check_seated_archery_form(landmarks),
+                    "adaptive_draw": self._check_adaptive_draw_technique(landmarks, equipment),
+                    "trunk_stability": self._check_seated_trunk_stability(landmarks),
+                    "release_consistency": self._check_para_release(landmarks, equipment)
+                }
+            elif classification in ["ARST", "ARW1", "ARW2"]:  # Standing/wheelchair
+                analysis = {
+                    "stance_adaptation": self._check_adaptive_stance(landmarks),
+                    "equipment_integration": self._check_adaptive_equipment(landmarks, equipment),
+                    "modified_draw": self._check_modified_draw(landmarks),
+                    "balance_compensation": self._check_balance_adaptation(landmarks),
+                    "release_timing": self._check_adaptive_release(landmarks)
+                }
+            
+            score = sum(analysis.values()) / len(analysis) * 100 if analysis else 0
+            
+            return {
+                "score": round(score, 2),
+                "metrics": analysis,
+                "feedback": self._generate_para_archery_feedback(analysis, classification)
+            }
+            
+        except Exception as e:
+            logger.error(f"Para archery analysis error: {e}")
+            return {"score": 0, "metrics": {}, "feedback": ["Analysis failed"]}
+    
+    def analyze_para_cricket(self, landmarks, classification="Open", role="batting") -> Dict:
+        """Analyze para cricket technique"""
+        try:
+            if role == "batting":
+                if classification in ["B1", "B2", "B3"]:  # Blind cricket
+                    analysis = {
+                        "stance_stability": self._check_blind_cricket_stance(landmarks),
+                        "bat_positioning": self._check_adaptive_bat_position(landmarks),
+                        "balance_control": self._check_blind_balance(landmarks),
+                        "swing_mechanics": self._check_adaptive_swing(landmarks),
+                        "audio_cue_response": self._check_reaction_timing(landmarks)
+                    }
+                else:  # Other classifications
+                    analysis = {
+                        "adaptive_stance": self._check_para_cricket_stance(landmarks),
+                        "equipment_handling": self._check_adaptive_equipment_cricket(landmarks),
+                        "compensatory_mechanics": self._check_cricket_compensation(landmarks),
+                        "shot_execution": self._check_para_shot_technique(landmarks),
+                        "movement_efficiency": self._check_para_movement(landmarks)
+                    }
+            
+            score = sum(analysis.values()) / len(analysis) * 100 if analysis else 0
+            
+            return {
+                "score": round(score, 2),
+                "metrics": analysis,
+                "feedback": self._generate_para_cricket_feedback(analysis, classification, role)
+            }
+            
+        except Exception as e:
+            logger.error(f"Para cricket analysis error: {e}")
+            return {"score": 0, "metrics": {}, "feedback": ["Analysis failed"]}
+    
+    def analyze_para_football(self, landmarks, classification="Open", position="player") -> Dict:
+        """Analyze para football technique"""
+        try:
+            if classification == "B1":  # Blind football
+                analysis = {
+                    "spatial_awareness": self._check_blind_football_positioning(landmarks),
+                    "ball_control": self._check_blind_ball_handling(landmarks),
+                    "movement_patterns": self._check_blind_movement(landmarks),
+                    "communication_response": self._check_audio_response(landmarks),
+                    "protective_technique": self._check_safety_positioning(landmarks)
+                }
+            elif classification in ["CP1", "CP2", "CP3", "CP4"]:  # Cerebral palsy
+                analysis = {
+                    "adaptive_gait": self._check_cp_movement_patterns(landmarks),
+                    "ball_striking": self._check_cp_ball_technique(landmarks),
+                    "balance_control": self._check_cp_balance(landmarks),
+                    "coordination": self._check_cp_coordination(landmarks),
+                    "movement_efficiency": self._check_cp_efficiency(landmarks)
+                }
+            elif classification in ["Les Autres"]:  # Limb deficiencies
+                analysis = {
+                    "compensatory_movement": self._check_limb_compensation(landmarks),
+                    "adaptive_technique": self._check_adaptive_football_skills(landmarks),
+                    "prosthetic_integration": self._check_prosthetic_use(landmarks),
+                    "modified_mechanics": self._check_modified_football_technique(landmarks),
+                    "efficiency_optimization": self._check_movement_optimization(landmarks)
+                }
+            
+            score = sum(analysis.values()) / len(analysis) * 100 if analysis else 0
+            
+            return {
+                "score": round(score, 2),
+                "metrics": analysis,
+                "feedback": self._generate_para_football_feedback(analysis, classification)
+            }
+            
+        except Exception as e:
+            logger.error(f"Para football analysis error: {e}")
+            return {"score": 0, "metrics": {}, "feedback": ["Analysis failed"]}
+    
+    # Helper methods for para sports analysis
+    def _check_seated_stability(self, left_shoulder, right_shoulder) -> float:
+        """Check upper body stability for wheelchair athletes"""
+        try:
+            shoulder_level = 1 - abs(left_shoulder.y - right_shoulder.y) * 3
+            return max(0, min(1, shoulder_level))
+        except:
+            return 0.5
+    
+    def _check_compensatory_patterns(self, left_shoulder, right_shoulder, left_elbow, right_elbow) -> float:
+        """Check for effective compensatory movement patterns"""
+        try:
+            # Analyze asymmetric patterns that are beneficial for para athletes
+            shoulder_compensation = abs(left_shoulder.y - right_shoulder.y)
+            elbow_compensation = abs(left_elbow.y - right_elbow.y)
+            
+            # Some compensation is expected and beneficial
+            optimal_compensation = 0.1
+            compensation_score = 1 - abs(shoulder_compensation - optimal_compensation) * 5
+            
+            return max(0, min(1, compensation_score))
+        except:
+            return 0.5
+    
+    def _generate_wheelchair_basketball_feedback(self, analysis: Dict) -> List[str]:
+        """Generate wheelchair basketball specific feedback"""
+        feedback = []
+        
+        if analysis["shooting_hand_alignment"] < 0.7:
+            feedback.append("Focus on shooting hand alignment - use trunk rotation to assist")
+        
+        if analysis["upper_body_stability"] < 0.7:
+            feedback.append("Improve upper body stability through core strengthening")
+        
+        if analysis["compensatory_movement"] < 0.7:
+            feedback.append("Develop effective compensatory movement patterns")
+        
+        if analysis["trunk_control"] < 0.7:
+            feedback.append("Work on trunk control for better shooting consistency")
+        
+        if not feedback:
+            feedback.append("Excellent wheelchair basketball technique! Great adaptations")
+        
+        return feedback
+    
+    def _generate_para_archery_feedback(self, analysis: Dict, classification: str) -> List[str]:
+        """Generate para archery specific feedback"""
+        feedback = []
+        
+        if classification in ["W1", "W2"]:
+            feedback.append(f"Classification {classification}: Focus on upper body mechanics")
+            if "wheelchair_positioning" in analysis and analysis["wheelchair_positioning"] < 0.7:
+                feedback.append("Optimize wheelchair position for stability")
+        
+        if "adaptive_draw" in analysis and analysis["adaptive_draw"] < 0.7:
+            feedback.append("Refine adaptive drawing technique with equipment")
+        
+        if not feedback:
+            feedback.append(f"Excellent para archery form for {classification} classification!")
+        
+        return feedback
+    
+    def _generate_para_cricket_feedback(self, analysis: Dict, classification: str, role: str) -> List[str]:
+        """Generate para cricket specific feedback"""
+        feedback = []
+        
+        if classification in ["B1", "B2", "B3"]:
+            feedback.append("Focus on audio cue recognition and spatial awareness")
+            if "stance_stability" in analysis and analysis["stance_stability"] < 0.7:
+                feedback.append("Work on stable stance without visual input")
+        
+        if "adaptive_stance" in analysis and analysis["adaptive_stance"] < 0.7:
+            feedback.append("Optimize adaptive batting stance for your classification")
+        
+        if not feedback:
+            feedback.append(f"Great {role} technique for {classification} classification!")
+        
+        return feedback
+    
+    def _generate_para_football_feedback(self, analysis: Dict, classification: str) -> List[str]:
+        """Generate para football specific feedback"""
+        feedback = []
+        
+        if classification == "B1":
+            feedback.append("Enhance spatial awareness through sound localization")
+            if "ball_control" in analysis and analysis["ball_control"] < 0.7:
+                feedback.append("Practice ball control with audio feedback")
+        
+        if classification.startswith("CP"):
+            feedback.append("Focus on coordination and movement efficiency")
+            if "adaptive_gait" in analysis and analysis["adaptive_gait"] < 0.7:
+                feedback.append("Work on adaptive movement patterns")
+        
+        if not feedback:
+            feedback.append(f"Excellent technique for {classification} classification!")
+        
+        return feedback
+    
+    # Placeholder methods for specific analysis functions
+    def _check_wheelchair_position(self, landmarks) -> float:
+        return 0.8  # Placeholder - would implement actual wheelchair positioning analysis
+    
+    def _check_seated_archery_form(self, landmarks) -> float:
+        return 0.75  # Placeholder - would implement seated archery form analysis
+    
+    def _check_adaptive_draw_technique(self, landmarks, equipment) -> float:
+        return 0.85  # Placeholder - would implement adaptive draw analysis
+    
+    # ... (Additional placeholder methods for all para sports analysis functions)
+    def _check_blind_cricket_stance(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_cp_movement_patterns(self, landmarks) -> float:
+        return 0.75
+    
+    def _check_prosthetic_use(self, landmarks) -> float:
+        return 0.85
+    
+    # Add all other placeholder methods...
+    def _check_seated_trunk_stability(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_para_release(self, landmarks, equipment) -> float:
+        return 0.85
+    
+    def _check_adaptive_stance(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_adaptive_equipment(self, landmarks, equipment) -> float:
+        return 0.75
+    
+    def _check_modified_draw(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_balance_adaptation(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_adaptive_release(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_adaptive_bat_position(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_blind_balance(self, landmarks) -> float:
+        return 0.75
+    
+    def _check_adaptive_swing(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_reaction_timing(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_para_cricket_stance(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_adaptive_equipment_cricket(self, landmarks) -> float:
+        return 0.75
+    
+    def _check_cricket_compensation(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_para_shot_technique(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_para_movement(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_blind_football_positioning(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_blind_ball_handling(self, landmarks) -> float:
+        return 0.75
+    
+    def _check_blind_movement(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_audio_response(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_safety_positioning(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_cp_ball_technique(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_cp_balance(self, landmarks) -> float:
+        return 0.75
+    
+    def _check_cp_coordination(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_cp_efficiency(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_limb_compensation(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_adaptive_football_skills(self, landmarks) -> float:
+        return 0.8
+    
+    def _check_modified_football_technique(self, landmarks) -> float:
+        return 0.85
+    
+    def _check_movement_optimization(self, landmarks) -> float:
+        return 0.8
+
 class ArcheryAnalysis:
     """Archery form and technique analysis"""
     
@@ -520,6 +876,7 @@ class ArcheryAnalysis:
 # Initialize analysis engines
 basketball_analyzer = BasketballAnalysis()
 archery_analyzer = ArcheryAnalysis()
+para_sports_analyzer = ParaSportsAnalysis()
 
 # WebSocket connection manager
 class ConnectionManager:
