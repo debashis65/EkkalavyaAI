@@ -32,14 +32,6 @@ export default function PlayerDashboard({ user }: PlayerDashboardProps) {
             <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
               <User className="w-5 h-5" />
             </div>
-            <Button 
-              onClick={handleLogout}
-              variant="ghost" 
-              size="sm"
-              className="text-white hover:bg-green-700"
-            >
-              Logout
-            </Button>
           </div>
         </div>
         
