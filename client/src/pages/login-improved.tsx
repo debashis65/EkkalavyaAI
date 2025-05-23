@@ -43,7 +43,6 @@ export default function LoginImproved() {
   });
 
   async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true);
     
     try {
       // Simple hardcoded authentication for demo

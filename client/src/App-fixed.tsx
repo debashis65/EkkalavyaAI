@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -80,7 +80,7 @@ const AdminDashboard: React.FC = () => (
   </div>
 );
 
-// Main Dashboard Page Component following your pattern
+// Main Dashboard Page Component following your exact pattern
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
 
@@ -109,7 +109,7 @@ const DashboardPage: React.FC = () => {
 function App() {
   const { user } = useAuth();
 
-  // If user is logged in, show dashboard; otherwise show login
+  // If user is logged in, show authenticated routes
   if (user) {
     return (
       <QueryClientProvider client={queryClient}>
@@ -132,6 +132,7 @@ function App() {
     );
   }
 
+  // If user is not logged in, show public routes only
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
