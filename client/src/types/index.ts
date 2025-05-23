@@ -14,6 +14,7 @@ export interface User {
   bio?: string;
   experience?: string;
   students?: number;
+  twoFactorEnabled?: boolean;
 }
 
 export interface Session {

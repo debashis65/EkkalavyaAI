@@ -13,6 +13,7 @@ import ArTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-working";
 import Login from "@/pages/login-improved";
 import Register from "@/pages/register-improved";
+import TwoFactorAuth from "@/pages/two-factor-auth";
 import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
