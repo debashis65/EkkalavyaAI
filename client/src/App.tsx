@@ -18,6 +18,7 @@ import Training from "@/pages/training";
 import VideoConsulting from "@/pages/video-consulting";
 import ARTools from "@/pages/ar-tools-new";
 import Profile from "@/pages/profile-correct";
+import CoachProfile from "@/pages/coach-profile";
 
 // Simple user type
 interface User {
@@ -68,7 +69,7 @@ function App() {
       case "ar-tools":
         return <ARTools />;
       case "profile":
-        return <Profile />;
+        return user?.role === 'coach' ? <CoachProfile /> : <Profile />;
       case "students":
         return <CoachStudents />;
       case "training-plans":
