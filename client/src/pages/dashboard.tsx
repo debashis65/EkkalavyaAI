@@ -1,13 +1,8 @@
 import { Helmet } from "react-helmet";
-import { UpcomingSessions } from "@/components/dashboard/upcoming-sessions";
-import { TopAthletes } from "@/components/dashboard/top-athletes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getInitials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
-import { Session, AthletePerformance } from "@/types";
 import { Search, Upload, Video, Trophy, Users, Clock, Target, TrendingUp } from "lucide-react";
 
 // Mock data for dashboard
@@ -115,10 +110,7 @@ export default function Dashboard() {
 
       {isCoach ? <CoachDashboard /> : <AthleteDashboard />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 pb-4">
-        <UpcomingSessions sessions={upcomingSessions} />
-        <TopAthletes athletes={topAthletes} />
-      </div>
+
     </>
   );
 }
