@@ -28,7 +28,18 @@ const DEMO_ACCOUNTS = {
   }
 };
 
-export default function LoginSimple() {
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+}
+
+interface LoginProps {
+  setUser: (user: User | null) => void;
+}
+
+export default function LoginSimple({ setUser }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,8 +59,8 @@ export default function LoginSimple() {
       // Store user in localStorage
       localStorage.setItem("ekalavya_user", JSON.stringify(account.user));
       
-      // Reload the page to trigger the app's user check
-      window.location.reload();
+      // Set user in parent component
+      setUser(account.user);
     } else {
       setError("Invalid email or password");
     }

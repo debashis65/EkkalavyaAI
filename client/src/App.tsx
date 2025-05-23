@@ -10,9 +10,12 @@ import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
 import Sidebar from "@/components/layout/Sidebar";
 import Analytics from "@/pages/analytics";
+import CoachAnalytics from "@/pages/coach-analytics";
 import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
+import CoachStudents from "@/pages/coach-students";
 import Training from "@/pages/training";
+import VideoConsulting from "@/pages/video-consulting";
 import ARTools from "@/pages/ar-tools-new";
 import Profile from "@/pages/profile-correct";
 
@@ -55,7 +58,7 @@ function App() {
           return <PlayerDashboard user={user} setUser={setUser} />;
         }
       case "analytics":
-        return <Analytics />;
+        return user?.role === 'coach' ? <CoachAnalytics /> : <Analytics />;
       case "schedule":
         return <Schedule />;
       case "coaches":
@@ -67,9 +70,11 @@ function App() {
       case "profile":
         return <Profile />;
       case "students":
-        return <Coaches />; // Reuse coaches component for students view
+        return <CoachStudents />;
       case "training-plans":
-        return <Training />; // Reuse training component for training plans
+        return <Training />;
+      case "video-consulting":
+        return <VideoConsulting />;
       case "messages":
         return (
           <div className="p-8 bg-gray-50 min-h-screen">
