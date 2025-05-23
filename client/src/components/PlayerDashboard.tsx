@@ -57,7 +57,8 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
             </div>
             <Button 
               onClick={() => setActiveTab('ar-tools')}
-              className="bg-success text-white hover:bg-success/90 font-semibold px-8 py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="text-white hover:opacity-90 font-semibold px-8 py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              style={{ backgroundColor: '#0CCA4A' }}
             >
               <Zap className="w-6 h-6 mr-3" />
               Start AI Analysis
@@ -166,6 +167,16 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Ready to Level Up Section - Moved from Coaches page */}
+        <div className="mt-8 text-center bg-primary text-primary-foreground p-8 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Ready to Level Up?</h2>
+          <p className="text-primary-foreground/80 mb-4">Personalized training sessions to elevate your skills</p>
+          <div className="flex gap-4 justify-center">
+            <Button className="bg-white text-primary hover:bg-gray-100">Book Now</Button>
+            <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary">Learn More</Button>
           </div>
         </div>
       </div>

@@ -87,7 +87,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
           onClick={onLogout}
           variant="ghost" 
           size="sm"
-          className="w-full bg-white text-secondary hover:bg-gray-100"
+          className="w-full bg-white text-secondary hover:bg-gray-100 hover:text-secondary"
         >
           Logout
         </Button>
