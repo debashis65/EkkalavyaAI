@@ -10,7 +10,7 @@ export default function ARTools() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <div className="bg-secondary p-4 flex items-center justify-between">
+      <div className="bg-white p-4 flex items-center justify-between text-black">
         <div className="flex items-center gap-3">
           <img 
             src="/logo.jpeg" 
@@ -21,7 +21,7 @@ export default function ARTools() {
           <h1 className="text-xl font-semibold">AI-Powered Motion Analysis</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button className="bg-accent hover:bg-accent/90">
+          <Button className="text-white hover:opacity-90" style={{ backgroundColor: '#06036D' }}>
             Start Analysis
           </Button>
         </div>
