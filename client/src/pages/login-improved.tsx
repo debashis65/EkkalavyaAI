@@ -103,8 +103,6 @@ export default function LoginImproved() {
         description: "An unexpected error occurred. Please try again.",
       });
       console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
     }
   }
 
