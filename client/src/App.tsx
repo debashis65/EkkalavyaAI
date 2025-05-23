@@ -17,7 +17,7 @@ import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/shell";
-import { useAuth } from "@/context/auth-context-improved";
+import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
 
 // Simple authentication wrapper component
