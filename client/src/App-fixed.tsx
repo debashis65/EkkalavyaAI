@@ -107,10 +107,10 @@ const DashboardPage: React.FC = () => {
 };
 
 function App() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // If user is logged in, show authenticated routes
-  if (user) {
+  if (user && isAuthenticated) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
