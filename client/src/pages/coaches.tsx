@@ -13,19 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User as UserIcon, MessageSquare } from "lucide-react";
 import { User, Review } from "@/types";
-
-interface UserType {
-  id: string;
-  email: string;
-  role: 'admin' | 'coach' | 'athlete';
-  name: string;
-}
-
-interface CoachesProps {
-  user?: UserType;
-}
 
 // Mock coaches data
 const coaches: User[] = [
@@ -148,7 +136,7 @@ export default function Coaches() {
     return matchesSearch && matchesSport;
   });
 
-  const displayName = user?.name || "Arjuna";
+
 
   return (
     <>
@@ -157,33 +145,9 @@ export default function Coaches() {
         <meta name="description" content="Discover and connect with top sports coaches and mentors specialized in various disciplines. View ratings, experience, and book training sessions." />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-50">
-        {/* Header - Secondary color #046A38 */}
-        <div className="bg-secondary text-white p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <span className="text-primary font-bold text-lg">E</span>
-              </div>
-              <h1 className="text-2xl font-bold">Ekalavya</h1>
-            </div>
-            <div className="flex items-center gap-6">
-              <MessageSquare className="w-7 h-7" />
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <UserIcon className="w-6 h-6" />
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <h2 className="text-2xl mb-2">Find Your Perfect Coach, {displayName}</h2>
-            <p className="text-white/80 text-lg">Connect with expert mentors to accelerate your training</p>
-          </div>
-        </div>
-
-        <div className="p-4">
+      <div className="p-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Browse Coaches</h1>
+          <h1 className="text-2xl font-bold">Find a Coach</h1>
           <Button>
             <i className="fas fa-sliders-h mr-2"></i> Advanced Filters
           </Button>
@@ -265,6 +229,14 @@ export default function Coaches() {
             <Button variant="outline">Learn More</Button>
           </div>
         </div>
+
+        <div className="mt-8 text-center bg-primary text-primary-foreground p-8 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Ready to Level Up?</h2>
+          <p className="text-muted-foreground mb-4">Personalized training sessions to elevate your skills</p>
+          <div className="flex gap-4 justify-center">
+            <Button>Book Now</Button>
+            <Button variant="outline">Learn More</Button>
+          </div>
         </div>
       </div>
     </>
