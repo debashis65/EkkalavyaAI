@@ -128,7 +128,10 @@ export default function Coaches() {
 
   // Filter coaches based on search term and sport filter
   const filteredCoaches = coaches.filter((coach) => {
-    const matchesSearch = coach.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      coach.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      coach.sports.some(sport => sport.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (coach.experience && coach.experience.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesSport = sportFilter === "all" || coach.sports.includes(sportFilter as any);
     return matchesSearch && matchesSport;
   });

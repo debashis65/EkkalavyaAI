@@ -9,7 +9,7 @@ import Login from "@/pages/login-simple";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
 import Sidebar from "@/components/layout/Sidebar";
-import Analytics from "@/pages/analytics";
+import AnalyticsImproved from "@/pages/analytics-improved";
 import CoachAnalytics from "@/pages/coach-analytics";
 import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
@@ -59,7 +59,7 @@ function App() {
           return <PlayerDashboard user={user} setUser={setUser} />;
         }
       case "analytics":
-        return user?.role === 'coach' ? <CoachAnalytics /> : <Analytics />;
+        return user?.role === 'coach' ? <CoachAnalytics /> : <AnalyticsImproved />;
       case "schedule":
         return <Schedule />;
       case "coaches":
