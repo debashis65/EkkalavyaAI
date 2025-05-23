@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/auth-context";
+import { useEkalavyaAuth } from "@/context/ekalavya-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -30,7 +30,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginImproved() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const { login } = useEkalavyaAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
