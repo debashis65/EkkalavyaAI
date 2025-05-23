@@ -33,6 +33,13 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   role: userRoleEnum("role").notNull().default('athlete'),
+  primarySport: sportEnum("primary_sport").notNull(), // User's chosen sport
+  classification: text("classification"), // Para sport classification (W1, B1, CP2, etc.)
+  membershipTier: text("membership_tier").default("free"), // free, basic, premium, pro
+  subscriptionStatus: text("subscription_status").default("inactive"), // active, inactive, expired
+  subscriptionStartDate: timestamp("subscription_start_date"),
+  subscriptionEndDate: timestamp("subscription_end_date"),
+  monthlySpent: integer("monthly_spent").default(0), // Track spending for analytics
   avatar: text("avatar"),
   bio: text("bio"),
   rating: integer("rating"),
