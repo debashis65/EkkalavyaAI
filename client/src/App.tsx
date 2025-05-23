@@ -48,6 +48,7 @@ function App() {
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/2fa" element={<TwoFactorAuth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Protected routes */}
