@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Session, AthletePerformance } from "@/types";
+import { Search, Upload, Video, Trophy, Users, Clock, Target, TrendingUp } from "lucide-react";
 
 // Mock data for dashboard
 const upcomingSessions: Session[] = [
