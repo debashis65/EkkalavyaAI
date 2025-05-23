@@ -14,7 +14,7 @@ import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
 import ARTools from "@/pages/ar-tools-new";
-import Profile from "@/pages/profile-simple";
+import Profile from "@/pages/profile-correct";
 
 // Simple user type
 interface User {

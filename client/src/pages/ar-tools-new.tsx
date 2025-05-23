@@ -4,8 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Play, Camera, BarChart3, Download, Upload } from "lucide-react";
 
 export default function ARTools() {
-  const [selectedSport, setSelectedSport] = useState("basketball");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeTab, setActiveTab] = useState("shooting");
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -13,47 +13,26 @@ export default function ARTools() {
       <div className="bg-orange-600 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Camera className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">
-            {selectedSport === "basketball" ? "Advanced Motion Tracking" : "Swimming AR Analysis"}
-          </h1>
+          <h1 className="text-xl font-semibold">AI-Powered Motion Analysis</h1>
         </div>
         <div className="flex items-center gap-4">
           <Button className="bg-orange-700 hover:bg-orange-800">
-            AI Analysis
+            Start Analysis
           </Button>
         </div>
       </div>
 
-      {/* Sport Selection */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex gap-4">
-          <Button
-            variant={selectedSport === "basketball" ? "default" : "outline"}
-            onClick={() => setSelectedSport("basketball")}
-            className={selectedSport === "basketball" ? "bg-orange-600" : ""}
-          >
-            Basketball
-          </Button>
-          <Button
-            variant={selectedSport === "swimming" ? "default" : "outline"}
-            onClick={() => setSelectedSport("swimming")}
-            className={selectedSport === "swimming" ? "bg-orange-600" : ""}
-          >
-            Swimming
-          </Button>
-        </div>
-      </div>
-
-      {selectedSport === "basketball" ? (
-        <BasketballAnalysis isAnalyzing={isAnalyzing} setIsAnalyzing={setIsAnalyzing} />
-      ) : (
-        <SwimmingAnalysis isAnalyzing={isAnalyzing} setIsAnalyzing={setIsAnalyzing} />
-      )}
+      <BasketballAnalysis isAnalyzing={isAnalyzing} setIsAnalyzing={setIsAnalyzing} activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
 
-function BasketballAnalysis({ isAnalyzing, setIsAnalyzing }: { isAnalyzing: boolean; setIsAnalyzing: (val: boolean) => void }) {
+function BasketballAnalysis({ isAnalyzing, setIsAnalyzing, activeTab, setActiveTab }: { 
+  isAnalyzing: boolean; 
+  setIsAnalyzing: (val: boolean) => void; 
+  activeTab: string; 
+  setActiveTab: (tab: string) => void; 
+}) {
   return (
     <div className="flex">
       {/* Main Video Area */}
@@ -96,18 +75,17 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing }: { isAnalyzing: bool
         {/* Video Controls */}
         <div className="flex items-center justify-center gap-4 mb-6">
           <Button
-            variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
             onClick={() => setIsAnalyzing(!isAnalyzing)}
           >
             <Play className="w-4 h-4" />
             {isAnalyzing ? "00:04 / 00:13" : "Start Analysis"}
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2">
             <Upload className="w-4 h-4" />
             Upload Video
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2">
             <Download className="w-4 h-4" />
             Export Data
           </Button>
@@ -116,10 +94,30 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing }: { isAnalyzing: bool
         {/* Analysis Tabs */}
         <div className="border-b border-gray-700 mb-4">
           <div className="flex gap-6">
-            <button className="pb-2 border-b-2 border-orange-600 text-orange-600">Shooting</button>
-            <button className="pb-2 text-gray-400 hover:text-white">Dribbling</button>
-            <button className="pb-2 text-gray-400 hover:text-white">Movement</button>
-            <button className="pb-2 text-gray-400 hover:text-white">Defense</button>
+            <button 
+              className={`pb-2 border-b-2 ${activeTab === 'shooting' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              onClick={() => setActiveTab('shooting')}
+            >
+              Shooting
+            </button>
+            <button 
+              className={`pb-2 border-b-2 ${activeTab === 'dribbling' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              onClick={() => setActiveTab('dribbling')}
+            >
+              Dribbling
+            </button>
+            <button 
+              className={`pb-2 border-b-2 ${activeTab === 'movement' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              onClick={() => setActiveTab('movement')}
+            >
+              Movement
+            </button>
+            <button 
+              className={`pb-2 border-b-2 ${activeTab === 'defense' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              onClick={() => setActiveTab('defense')}
+            >
+              Defense
+            </button>
           </div>
         </div>
 
@@ -164,23 +162,55 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing }: { isAnalyzing: bool
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Recommended Drills</h3>
-            <Button variant="ghost" size="sm" className="text-orange-400">View All ›</Button>
+            <Button variant="ghost" size="sm" className="text-orange-400 hover:text-orange-300">View All ›</Button>
           </div>
           
-          <Card className="bg-gray-800 border-gray-700 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
-                ⚡
+          <div className="space-y-3">
+            <Card className="bg-gradient-to-r from-orange-900 to-orange-800 border-orange-600 p-4 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-lg">
+                  🏀
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-white">Form Shooting Drill</h4>
+                  <p className="text-sm text-orange-200">Focus on elbow alignment and balance - Your top priority</p>
+                </div>
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-400 text-white font-medium px-4">
+                  Add to Plan
+                </Button>
               </div>
-              <div className="flex-1">
-                <h4 className="font-medium">Form Shooting Drill</h4>
-                <p className="text-sm text-gray-400">Focus on elbow alignment and balance</p>
+            </Card>
+
+            <Card className="bg-gray-800 border-gray-600 p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  ⚡
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium">Balance Training</h4>
+                  <p className="text-sm text-gray-400">Improve shooting stance stability</p>
+                </div>
+                <Button size="sm" variant="outline" className="border-gray-500 text-gray-300 hover:bg-gray-700">
+                  Add to Plan
+                </Button>
               </div>
-              <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
-                Add to Plan
-              </Button>
-            </div>
-          </Card>
+            </Card>
+
+            <Card className="bg-gray-800 border-gray-600 p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                  🎯
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium">Release Technique</h4>
+                  <p className="text-sm text-gray-400">Perfect your follow-through motion</p>
+                </div>
+                <Button size="sm" variant="outline" className="border-gray-500 text-gray-300 hover:bg-gray-700">
+                  Add to Plan
+                </Button>
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
