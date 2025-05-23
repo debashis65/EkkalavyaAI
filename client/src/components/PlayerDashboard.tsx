@@ -19,7 +19,7 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with new color palette */}
+      {/* Header - Secondary color #046A38 */}
       <div className="bg-secondary text-white p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -42,9 +42,9 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
         </div>
       </div>
 
-      {/* AR Tool Banner - Prominent CTA with new colors */}
-      <div className="bg-gradient-to-r from-primary via-accent to-secondary text-white p-8 shadow-lg">
-        <div className="max-w-5xl mx-auto">
+      {/* AR Tool Banner - Boxed with Accent Blue #06036D and Success Green #0CCA4A button */}
+      <div className="p-8">
+        <div className="bg-accent text-white p-8 rounded-2xl shadow-lg max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="bg-white/20 p-4 rounded-full">
@@ -57,7 +57,7 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
             </div>
             <Button 
               onClick={() => setActiveTab('ar-tools')}
-              className="bg-white text-primary hover:bg-gray-50 font-semibold px-8 py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="bg-success text-white hover:bg-success/90 font-semibold px-8 py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               <Zap className="w-6 h-6 mr-3" />
               Start AI Analysis

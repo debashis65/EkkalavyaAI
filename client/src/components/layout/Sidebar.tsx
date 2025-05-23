@@ -38,7 +38,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
   const navItems = user.role === 'athlete' ? playerNavItems : coachNavItems;
 
   return (
-    <div className="w-64 bg-green-600 text-white min-h-screen flex flex-col">
+    <div className="w-64 bg-primary text-white min-h-screen flex flex-col">
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center gap-3">
@@ -61,8 +61,8 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-green-700 text-white' 
-                  : 'text-green-100 hover:bg-green-500'
+                  ? 'bg-primary/80 text-white shadow-lg' 
+                  : 'text-orange-100 hover:bg-primary/70'
               }`}
             >
               <Icon className="w-5 h-5" />
@@ -73,10 +73,10 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
       </nav>
 
       {/* User Profile & Logout */}
-      <div className="p-4 border-t border-green-500">
+      <div className="p-4 border-t border-primary/40">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-            <User className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <User className="w-6 h-6 text-primary" />
           </div>
           <div>
             <div className="font-medium">{user.name}</div>
