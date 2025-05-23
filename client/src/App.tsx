@@ -4,14 +4,14 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import Dashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/dashboard-fixed";
 import Analytics from "@/pages/analytics";
 import Schedule from "@/pages/schedule";
 import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
 import ArTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-working";
-import Login from "@/pages/login-simple";
+import Login from "@/pages/login-improved";
 import Register from "@/pages/register-improved";
 import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";

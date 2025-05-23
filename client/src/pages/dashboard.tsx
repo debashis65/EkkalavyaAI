@@ -1,15 +1,22 @@
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/context/auth-context";
 import { Search, Upload, Video, Trophy, Users, Clock, Target, TrendingUp, Star } from "lucide-react";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const userData = localStorage.getItem("ekalavya_user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
   
   if (!user) {
-    return <div>Please log in to access the dashboard.</div>;
+    return <div>Loading dashboard...</div>;
   }
 
   const isCoach = user.role === 'coach';
@@ -27,7 +34,16 @@ export default function Dashboard() {
 }
 
 function PlayerDashboard() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const userData = localStorage.getItem("ekalavya_user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  if (!user) return <div>Loading...</div>;
 
   return (
     <>
@@ -220,7 +236,16 @@ function PlayerDashboard() {
 }
 
 function CoachDashboard() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const userData = localStorage.getItem("ekalavya_user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  if (!user) return <div>Loading...</div>;
 
   return (
     <>
