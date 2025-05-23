@@ -60,6 +60,11 @@ export default function LoginSimple() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <img 
+            src="/attached_assets/llogo.jpeg" 
+            alt="Ekalavya AI Logo" 
+            className="w-20 h-20 mx-auto mb-4 object-contain rounded-lg"
+          />
           <CardTitle className="text-2xl font-bold">Welcome to Ekalavya</CardTitle>
           <CardDescription>
             Sign in to your sports training platform

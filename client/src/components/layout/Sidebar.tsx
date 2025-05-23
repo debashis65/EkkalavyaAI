@@ -42,9 +42,11 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-            <span className="text-green-600 font-bold text-sm">E</span>
-          </div>
+          <img 
+            src="/attached_assets/llogo.jpeg" 
+            alt="Ekalavya AI Logo" 
+            className="w-10 h-10 object-contain rounded-lg bg-white p-1"
+          />
           <h1 className="text-xl font-bold">Ekalavya</h1>
         </div>
       </div>
