@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useState, useEffect } from "react";
 
-import Login from "@/pages/login-simple";
+import Login from "@/pages/login-fixed";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
 import Sidebar from "@/components/layout/Sidebar";
