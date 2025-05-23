@@ -2,35 +2,14 @@ import { Outlet, Navigate } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { MobileNav } from "./mobile-nav";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/context/auth-context";
 
 export function Shell() {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Simple authentication check
-  useEffect(() => {
-    const checkAuth = () => {
-      const userData = localStorage.getItem("ekalavya_user");
-      setIsAuthenticated(!!userData);
-      setIsLoading(false);
-    };
-    
-    checkAuth();
-    
-    // Listen for storage changes in case we need to update auth state
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
-
-  // Show loading state
-  if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
+  const { user, isAuthenticated } = useAuth();
   
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 

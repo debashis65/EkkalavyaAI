@@ -11,7 +11,8 @@ export function Sidebar({ className }: SidebarProps) {
   
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
+  // Role-based navigation items
+  const playerNavItems = [
     { href: "/", label: "Dashboard", icon: "fa-tachometer-alt" },
     { href: "/analytics", label: "Analytics", icon: "fa-chart-line" },
     { href: "/schedule", label: "Schedule", icon: "fa-calendar" },
@@ -20,6 +21,17 @@ export function Sidebar({ className }: SidebarProps) {
     { href: "/ar-tools", label: "AR Tools", icon: "fa-camera" },
     { href: "/profile", label: "Profile", icon: "fa-user" },
   ];
+
+  const coachNavItems = [
+    { href: "/", label: "Dashboard", icon: "fa-tachometer-alt" },
+    { href: "/analytics", label: "Analytics", icon: "fa-chart-line" },
+    { href: "/schedule", label: "Schedule", icon: "fa-calendar" },
+    { href: "/students", label: "Students", icon: "fa-users" },
+    { href: "/training", label: "Training Plans", icon: "fa-clipboard-list" },
+    { href: "/profile", label: "Profile", icon: "fa-user" },
+  ];
+
+  const navItems = user?.role === 'coach' ? coachNavItems : playerNavItems;
 
   return (
     <div className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground", className)}>
