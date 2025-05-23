@@ -87,9 +87,9 @@ export default function LoginImproved() {
           description: `Welcome back, ${user.name}!`,
         });
         
-        // Use window.location to force navigation
+        // Force a complete page reload to ensure auth state is loaded
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.replace("/");
         }, 1000);
       } else {
         toast({

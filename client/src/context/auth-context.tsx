@@ -51,12 +51,23 @@ const mockAthleteUser: User = {
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  // Initialize state based on localStorage directly
-  const storedUser = localStorage.getItem("ekalavya_user");
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!initialUser);
+  // Initialize auth state from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("ekalavya_user");
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        localStorage.removeItem("ekalavya_user");
+      }
+    }
+  }, []);
   
   const navigate = useNavigate();
 
