@@ -301,6 +301,16 @@ export default function CoachProfile({ user }: CoachProfileProps) {
             </Card>
           </div>
         </div>
+
+        {/* Available for 1-on-1 Coaching Section - Moved from Coaches page */}
+        <div className="mt-8 p-6 bg-secondary/10 rounded-lg border border-secondary/20 text-center">
+          <h2 className="text-xl font-semibold mb-2">Available for 1-on-1 Coaching</h2>
+          <p className="text-muted-foreground mb-4">Personalized training sessions to elevate your skills</p>
+          <div className="flex gap-4 justify-center">
+            <Button>Book Now</Button>
+            <Button variant="outline">Learn More</Button>
+          </div>
+        </div>
       </div>
     </div>
   );
