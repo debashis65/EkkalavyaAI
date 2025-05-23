@@ -3,14 +3,14 @@ import App from "./App-fixed";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "./context/theme-provider";
-import { AuthProvider } from "./context/auth-context";
+import { SimpleAuthProvider } from "./context/simple-auth";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <ThemeProvider defaultTheme="light">
-      <AuthProvider>
+      <SimpleAuthProvider>
         <App />
-      </AuthProvider>
+      </SimpleAuthProvider>
     </ThemeProvider>
   </BrowserRouter>
 );

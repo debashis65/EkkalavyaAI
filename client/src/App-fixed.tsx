@@ -17,7 +17,7 @@ import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/shell";
-import { useAuth } from "@/context/auth-context";
+import { useSimpleAuth } from "@/context/simple-auth";
 
 // Role-specific dashboard components
 const CoachDashboard: React.FC = () => (
@@ -82,7 +82,7 @@ const AdminDashboard: React.FC = () => (
 
 // Main Dashboard Page Component following your exact pattern
 const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user } = useSimpleAuth();
 
   if (!user) return null;
 
@@ -106,11 +106,11 @@ const DashboardPage: React.FC = () => {
   );
 };
 
-function App() {
-  const { user, isAuthenticated } = useAuth();
+function AppContent() {
+  const { user } = useSimpleAuth();
 
   // If user is logged in, show authenticated routes
-  if (user && isAuthenticated) {
+  if (user) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
@@ -146,6 +146,10 @@ function App() {
       </TooltipProvider>
     </QueryClientProvider>
   );
+}
+
+function App() {
+  return <AppContent />;
 }
 
 export default App;
