@@ -12,6 +12,11 @@ export default function ARTools() {
       {/* Header */}
       <div className="bg-orange-600 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <img 
+            src="/attached_assets/llogo.jpeg" 
+            alt="Ekalavya AI Logo" 
+            className="w-8 h-8 object-contain rounded bg-white p-1"
+          />
           <Camera className="w-6 h-6" />
           <h1 className="text-xl font-semibold">AI-Powered Motion Analysis</h1>
         </div>
