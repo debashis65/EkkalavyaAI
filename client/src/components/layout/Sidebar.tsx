@@ -29,9 +29,9 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
   const coachNavItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "students", label: "Students", icon: Users },
     { id: "training-plans", label: "Training Plans", icon: Dumbbell },
+    { id: "video-consulting", label: "Video Consulting", icon: MessageSquare },
     { id: "profile", label: "Profile", icon: User },
   ];
 
