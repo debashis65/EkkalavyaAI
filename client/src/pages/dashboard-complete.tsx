@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/auth-context";
-import { Search, Upload, Video, Trophy, Users, Clock, Target, TrendingUp, Star } from "lucide-react";
+import { Search, Upload, Video, Trophy, Users, Clock, Target, TrendingUp, Star, Calendar, MessageSquare, Settings } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -101,6 +101,31 @@ function PlayerDashboard() {
                   <p className="text-sm text-muted-foreground">Guru Vashistha • 6:00 PM</p>
                 </div>
                 <Badge variant="outline">Tomorrow</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+                  <Video className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm">
+                    <span className="font-medium">Guru Drona</span> reviewed your practice video
+                  </p>
+                  <p className="text-xs text-muted-foreground">2 hours ago</p>
+                  <p className="text-sm text-green-600 mt-1 italic">
+                    "Good progress on your stance. Let's focus on your bow grip in our next session."
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -209,6 +234,17 @@ function PlayerDashboard() {
                 <div className="text-right">
                   <Badge className="bg-green-500 text-white">1st</Badge>
                   <p className="text-sm font-medium mt-1">9.0</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg">
+                <div>
+                  <p className="font-medium">Club Championship</p>
+                  <p className="text-sm text-muted-foreground">November 20, 2023</p>
+                </div>
+                <div className="text-right">
+                  <Badge className="bg-green-500 text-white">1st</Badge>
+                  <p className="text-sm font-medium mt-1">9.2</p>
                 </div>
               </div>
             </div>
@@ -348,6 +384,28 @@ function CoachDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Bottom Navigation Bar */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t p-4">
+          <div className="flex justify-around items-center max-w-md mx-auto">
+            <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1">
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs">Dashboard</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1">
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs">Schedule</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1">
+              <MessageSquare className="h-5 w-5" />
+              <span className="text-xs">Messages</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1">
+              <Settings className="h-5 w-5" />
+              <span className="text-xs">Settings</span>
+            </Button>
+          </div>
+        </div>
       </div>
     </>
   );
