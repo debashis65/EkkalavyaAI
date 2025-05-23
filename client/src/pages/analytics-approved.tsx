@@ -1,8 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Clock, Trophy, Zap } from "lucide-react";
+import { User, Clock, Trophy, Zap, MessageSquare } from "lucide-react";
 
-export default function AnalyticsApproved() {
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+}
+
+interface AnalyticsProps {
+  user?: User;
+}
+
+export default function AnalyticsApproved({ user }: AnalyticsProps) {
   const tournaments = [
     { name: "National Championship", position: "1st", score: 8.9, color: "text-green-600" },
     { name: "Regional Finals", position: "3rd", score: 8.5, color: "text-orange-600" },
@@ -11,8 +22,34 @@ export default function AnalyticsApproved() {
     { name: "Club Championship", position: "1st", score: 9.2, color: "text-green-600" }
   ];
 
+  const displayName = user?.name || "Arjuna";
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header - Secondary color #046A38 */}
+      <div className="bg-secondary text-white p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+              <span className="text-primary font-bold text-lg">E</span>
+            </div>
+            <h1 className="text-2xl font-bold">Ekalavya</h1>
+          </div>
+          <div className="flex items-center gap-6">
+            <MessageSquare className="w-7 h-7" />
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <User className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-2xl mb-2">Welcome back, {displayName}</h2>
+          <p className="text-white/80 text-lg">Track your performance and achievements</p>
+        </div>
+      </div>
+
+      <div className="p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Recent Tournament Results */}
@@ -108,7 +145,7 @@ export default function AnalyticsApproved() {
           </Card>
 
         </div>
-
+      </div>
       </div>
     </div>
   );

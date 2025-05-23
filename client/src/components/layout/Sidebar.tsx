@@ -61,8 +61,8 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-primary/80 text-white shadow-lg' 
-                  : 'text-orange-100 hover:bg-primary/70'
+                  ? 'bg-secondary text-white shadow-lg' 
+                  : 'text-orange-100 hover:bg-secondary'
               }`}
             >
               <Icon className="w-5 h-5" />
@@ -80,14 +80,14 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
           </div>
           <div>
             <div className="font-medium">{user.name}</div>
-            <div className="text-sm text-green-200 capitalize">{user.role}</div>
+            <div className="text-sm text-orange-200 capitalize">{user.role}</div>
           </div>
         </div>
         <Button 
           onClick={onLogout}
           variant="ghost" 
           size="sm"
-          className="w-full text-white hover:bg-green-700"
+          className="w-full bg-white text-secondary hover:bg-gray-100"
         >
           Logout
         </Button>

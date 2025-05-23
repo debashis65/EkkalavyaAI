@@ -59,7 +59,7 @@ function App() {
           return <PlayerDashboard user={user} setUser={setUser} setActiveTab={setActiveTab} />;
         }
       case "analytics":
-        return user?.role === 'coach' ? <CoachAnalytics /> : <AnalyticsApproved />;
+        return user?.role === 'coach' ? <CoachAnalytics /> : <AnalyticsApproved user={user} />;
       case "schedule":
         return <Schedule />;
       case "coaches":

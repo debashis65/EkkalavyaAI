@@ -28,7 +28,7 @@ export default function Profile({ user }: ProfileProps) {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header with Profile Info */}
-        <div className="bg-orange-500 rounded-t-lg p-6 text-white relative">
+        <div className="bg-accent rounded-t-lg p-6 text-white relative">
           <div className="absolute top-4 right-4">
             <Button 
               variant="ghost" 
