@@ -15,11 +15,7 @@ interface CoachDashboardProps {
   setUser: (user: User | null) => void;
 }
 
-export default function CoachDashboard({ user, setUser }: CoachDashboardProps) {
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("ekalavya_user");
-  };
+export default function CoachDashboard({ user }: CoachDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,14 +27,6 @@ export default function CoachDashboard({ user, setUser }: CoachDashboardProps) {
         </div>
         <div className="flex items-center gap-4">
           <Search className="w-6 h-6" />
-          <Button 
-            onClick={handleLogout}
-            variant="ghost" 
-            size="sm"
-            className="text-white hover:bg-orange-600"
-          >
-            Logout
-          </Button>
         </div>
       </div>
 

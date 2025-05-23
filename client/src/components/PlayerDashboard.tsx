@@ -14,11 +14,7 @@ interface PlayerDashboardProps {
   setUser: (user: User | null) => void;
 }
 
-export default function PlayerDashboard({ user, setUser }: PlayerDashboardProps) {
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("ekalavya_user");
-  };
+export default function PlayerDashboard({ user }: PlayerDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import Login from "@/pages/login-simple";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
+import Sidebar from "@/components/layout/Sidebar";
 
 // Simple user type
 interface User {
@@ -19,6 +20,7 @@ interface User {
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Check for stored user on app load
   useEffect(() => {
@@ -32,13 +34,47 @@ function App() {
     }
   }, []);
 
-  // If user is logged in, show role-based dashboard
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("ekalavya_user");
+    setActiveTab("dashboard");
+  };
+
+  const renderContent = () => {
+    if (activeTab === "dashboard") {
+      if (user?.role === 'coach') {
+        return <CoachDashboard user={user} setUser={setUser} />;
+      } else {
+        return <PlayerDashboard user={user} setUser={setUser} />;
+      }
+    }
+    
+    // Placeholder for other tabs
+    return (
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 capitalize">{activeTab.replace('-', ' ')}</h2>
+        <p className="text-gray-600">This section is coming soon...</p>
+      </div>
+    );
+  };
+
+  // If user is logged in, show sidebar with content
   if (user) {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          {user.role === 'coach' ? <CoachDashboard user={user} setUser={setUser} /> : <PlayerDashboard user={user} setUser={setUser} />}
+          <div className="flex min-h-screen">
+            <Sidebar 
+              user={user}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              onLogout={handleLogout}
+            />
+            <div className="flex-1">
+              {renderContent()}
+            </div>
+          </div>
         </TooltipProvider>
       </QueryClientProvider>
     );
@@ -49,10 +85,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+        <Login setUser={setUser} />
       </TooltipProvider>
     </QueryClientProvider>
   );
