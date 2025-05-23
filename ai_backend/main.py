@@ -70,8 +70,42 @@ class BasketballAnalysis:
             min_tracking_confidence=0.5
         )
     
+    def analyze_shooting_motion(self, frame_sequence) -> Dict:
+        """Analyze basketball shooting motion across multiple frames"""
+        try:
+            if len(frame_sequence) < 3:
+                return self.analyze_shooting_form(frame_sequence[-1])
+            
+            # Analyze motion across frames
+            motion_analysis = self._analyze_shooting_trajectory(frame_sequence)
+            
+            # Get latest frame analysis
+            latest_analysis = self.analyze_shooting_form(frame_sequence[-1])
+            
+            # Combine motion and form analysis
+            combined_metrics = {
+                **latest_analysis["metrics"],
+                "shot_arc": motion_analysis["arc_consistency"],
+                "release_timing": motion_analysis["release_timing"],
+                "jump_balance": motion_analysis["jump_balance"],
+                "motion_smoothness": motion_analysis["motion_smoothness"]
+            }
+            
+            # Calculate enhanced score
+            score = sum(combined_metrics.values()) / len(combined_metrics) * 100
+            
+            return {
+                "score": round(score, 2),
+                "metrics": combined_metrics,
+                "feedback": self._generate_motion_feedback(combined_metrics, motion_analysis)
+            }
+            
+        except Exception as e:
+            logger.error(f"Basketball motion analysis error: {e}")
+            return {"score": 0, "metrics": {}, "feedback": ["Motion analysis failed"]}
+
     def analyze_shooting_form(self, landmarks) -> Dict:
-        """Analyze basketball shooting form"""
+        """Analyze basketball shooting form from single frame"""
         try:
             # Key shooting form points
             left_shoulder = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER]
@@ -105,6 +139,169 @@ class BasketballAnalysis:
         except Exception as e:
             logger.error(f"Basketball analysis error: {e}")
             return {"score": 0, "metrics": {}, "feedback": ["Analysis failed"]}
+    
+    def _analyze_shooting_trajectory(self, frame_sequence) -> Dict:
+        """Analyze shooting motion across multiple frames"""
+        try:
+            wrist_positions = []
+            elbow_positions = []
+            
+            for landmarks in frame_sequence:
+                wrist = landmarks[mp_pose.PoseLandmark.RIGHT_WRIST]
+                elbow = landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW]
+                wrist_positions.append((wrist.x, wrist.y))
+                elbow_positions.append((elbow.x, elbow.y))
+            
+            # Calculate trajectory metrics
+            arc_consistency = self._calculate_arc_consistency(wrist_positions)
+            release_timing = self._calculate_release_timing(wrist_positions, elbow_positions)
+            jump_balance = self._calculate_jump_balance(frame_sequence)
+            motion_smoothness = self._calculate_motion_smoothness(wrist_positions)
+            
+            return {
+                "arc_consistency": arc_consistency,
+                "release_timing": release_timing,
+                "jump_balance": jump_balance,
+                "motion_smoothness": motion_smoothness
+            }
+            
+        except Exception as e:
+            logger.error(f"Trajectory analysis error: {e}")
+            return {
+                "arc_consistency": 0.5,
+                "release_timing": 0.5,
+                "jump_balance": 0.5,
+                "motion_smoothness": 0.5
+            }
+    
+    def _calculate_arc_consistency(self, positions) -> float:
+        """Calculate shooting arc consistency"""
+        if len(positions) < 3:
+            return 0.5
+        
+        # Simple arc analysis - check if trajectory follows parabolic path
+        y_values = [pos[1] for pos in positions]
+        if len(y_values) < 3:
+            return 0.5
+        
+        # Check for upward then downward motion (shooting arc)
+        has_peak = False
+        ascending = True
+        
+        for i in range(1, len(y_values)):
+            if ascending and y_values[i] > y_values[i-1]:
+                continue
+            elif ascending and y_values[i] <= y_values[i-1]:
+                ascending = False
+                has_peak = True
+            elif not ascending and y_values[i] < y_values[i-1]:
+                continue
+            else:
+                # Motion is inconsistent
+                return max(0, 0.8 - (i * 0.1))
+        
+        return 0.9 if has_peak else 0.6
+    
+    def _calculate_release_timing(self, wrist_positions, elbow_positions) -> float:
+        """Calculate release timing consistency"""
+        if len(wrist_positions) < 3:
+            return 0.5
+        
+        # Analyze wrist snap motion
+        wrist_velocities = []
+        for i in range(1, len(wrist_positions)):
+            dx = wrist_positions[i][0] - wrist_positions[i-1][0]
+            dy = wrist_positions[i][1] - wrist_positions[i-1][1]
+            velocity = (dx**2 + dy**2)**0.5
+            wrist_velocities.append(velocity)
+        
+        # Good release should show acceleration then deceleration
+        if len(wrist_velocities) >= 2:
+            peak_velocity = max(wrist_velocities)
+            peak_index = wrist_velocities.index(peak_velocity)
+            
+            # Check if peak is in middle portion of motion
+            if 0.3 <= peak_index / len(wrist_velocities) <= 0.7:
+                return 0.85
+            else:
+                return 0.65
+        
+        return 0.5
+    
+    def _calculate_jump_balance(self, frame_sequence) -> float:
+        """Calculate jump balance during shooting motion"""
+        if len(frame_sequence) < 3:
+            return 0.5
+        
+        try:
+            hip_stability = []
+            for landmarks in frame_sequence:
+                left_hip = landmarks[mp_pose.PoseLandmark.LEFT_HIP]
+                right_hip = landmarks[mp_pose.PoseLandmark.RIGHT_HIP]
+                hip_level = abs(left_hip.y - right_hip.y)
+                hip_stability.append(hip_level)
+            
+            # Good balance shows consistent hip level
+            stability_variance = sum(hip_stability) / len(hip_stability)
+            balance_score = max(0, 1 - stability_variance * 10)
+            
+            return balance_score
+        except:
+            return 0.5
+    
+    def _calculate_motion_smoothness(self, positions) -> float:
+        """Calculate overall motion smoothness"""
+        if len(positions) < 4:
+            return 0.5
+        
+        # Calculate acceleration changes (jerk)
+        velocities = []
+        for i in range(1, len(positions)):
+            dx = positions[i][0] - positions[i-1][0]
+            dy = positions[i][1] - positions[i-1][1]
+            velocity = (dx**2 + dy**2)**0.5
+            velocities.append(velocity)
+        
+        accelerations = []
+        for i in range(1, len(velocities)):
+            accel = abs(velocities[i] - velocities[i-1])
+            accelerations.append(accel)
+        
+        if accelerations:
+            avg_jerk = sum(accelerations) / len(accelerations)
+            smoothness = max(0, 1 - avg_jerk * 20)
+            return smoothness
+        
+        return 0.5
+    
+    def _generate_motion_feedback(self, metrics: Dict, motion_analysis: Dict) -> List[str]:
+        """Generate enhanced basketball feedback including motion analysis"""
+        feedback = []
+        
+        # Form feedback
+        if metrics["shooting_hand_alignment"] < 0.7:
+            feedback.append("Keep your shooting hand aligned vertically - elbow under wrist under shoulder")
+        
+        if metrics["elbow_position"] < 0.7:
+            feedback.append("Position your elbow directly under the ball for better accuracy")
+        
+        # Motion feedback
+        if metrics["shot_arc"] < 0.7:
+            feedback.append("Work on consistent shooting arc - follow through high and smooth")
+        
+        if metrics["release_timing"] < 0.7:
+            feedback.append("Focus on release timing - snap wrist at the peak of your shot")
+        
+        if metrics["jump_balance"] < 0.7:
+            feedback.append("Maintain better balance during your jump shot")
+        
+        if metrics["motion_smoothness"] < 0.7:
+            feedback.append("Practice smoother shooting motion - avoid jerky movements")
+        
+        if not feedback:
+            feedback.append("Excellent shooting motion! Great form and consistency")
+        
+        return feedback
     
     def _check_shooting_alignment(self, shoulder, elbow, wrist) -> float:
         """Check if shooting hand is properly aligned"""

@@ -21,50 +21,9 @@ export default function ARTools() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [selectedSport, setSelectedSport] = useState<"basketball" | "archery">("basketball");
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
-
-  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsAnalyzing(true);
-    
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('sport', selectedSport);
-      formData.append('analysis_type', 'form');
-
-      const response = await fetch('http://localhost:8000/api/analyze/image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Analysis failed');
-      }
-
-      const result = await response.json();
-      setAnalysisResult(result);
-      
-      toast({
-        title: "Analysis Complete!",
-        description: `Your ${selectedSport} form has been analyzed with a score of ${result.score}%.`,
-      });
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast({
-        title: "Analysis Failed",
-        description: "Please try again or check your connection.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, [selectedSport, toast]);
 
   const startLiveAnalysis = useCallback(async () => {
     setIsLiveMode(true);
@@ -103,7 +62,7 @@ export default function ARTools() {
     }
   }, []);
 
-  const captureFrame = useCallback(async () => {
+  const startContinuousAnalysis = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -112,47 +71,53 @@ export default function ARTools() {
     
     if (!context) return;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0);
-
     setIsAnalyzing(true);
 
-    try {
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
+    // Start real-time continuous analysis
+    const analyzeFrame = async () => {
+      if (!video.srcObject || isAnalyzing === false) return;
 
-        const formData = new FormData();
-        formData.append('file', blob, 'capture.jpg');
-        formData.append('sport', selectedSport);
-        formData.append('analysis_type', 'form');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0);
 
-        const response = await fetch('http://localhost:8000/api/analyze/image', {
-          method: 'POST',
-          body: formData,
-        });
+      try {
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
 
-        if (response.ok) {
-          const result = await response.json();
-          setAnalysisResult(result);
-          
-          toast({
-            title: "Live Analysis Complete!",
-            description: `Score: ${result.score}% - Check your feedback below.`,
+          const formData = new FormData();
+          formData.append('file', blob, 'frame.jpg');
+          formData.append('sport', selectedSport);
+          formData.append('analysis_type', 'motion');
+
+          const response = await fetch('http://localhost:8000/api/analyze/image', {
+            method: 'POST',
+            body: formData,
           });
-        }
-      }, 'image/jpeg', 0.8);
-    } catch (error) {
-      console.error('Live analysis error:', error);
-      toast({
-        title: "Analysis Error",
-        description: "Failed to analyze the frame. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, [selectedSport, toast]);
+
+          if (response.ok) {
+            const result = await response.json();
+            setAnalysisResult(result);
+          }
+        }, 'image/jpeg', 0.7);
+      } catch (error) {
+        console.error('Continuous analysis error:', error);
+      }
+
+      // Continue analysis every 500ms for real-time feedback
+      if (video.srcObject) {
+        setTimeout(analyzeFrame, 500);
+      }
+    };
+
+    // Start the continuous analysis loop
+    analyzeFrame();
+    
+    toast({
+      title: "Real-time Analysis Started!",
+      description: `Analyzing your ${selectedSport} technique continuously...`,
+    });
+  }, [selectedSport, toast, isAnalyzing]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -262,11 +227,11 @@ export default function ARTools() {
                 </div>
                 <div className="flex justify-center">
                   <Button 
-                    onClick={captureFrame}
+                    onClick={startContinuousAnalysis}
                     disabled={isAnalyzing}
-                    className="bg-red-500 hover:bg-red-600"
+                    className="bg-blue-500 hover:bg-blue-600"
                   >
-                    {isAnalyzing ? "Analyzing..." : "Capture & Analyze"}
+                    {isAnalyzing ? "Analyzing Motion..." : "Start Real-time Analysis"}
                   </Button>
                 </div>
               </CardContent>
@@ -312,22 +277,23 @@ export default function ARTools() {
                   <div className="flex gap-3">
                     <Button 
                       className="flex-1 bg-orange-500 hover:bg-orange-600"
-                      onClick={startLiveAnalysis}
-                      disabled={isLiveMode || selectedSport !== "basketball"}
+                      onClick={() => {
+                        setSelectedSport("basketball");
+                        startLiveAnalysis();
+                      }}
+                      disabled={isLiveMode}
                     >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Live Analysis
+                      <Video className="w-4 h-4 mr-2" />
+                      Start Video Analysis
                     </Button>
                     <Button 
                       variant="outline" 
                       className="flex-1"
-                      onClick={() => {
-                        setSelectedSport("basketball");
-                        fileInputRef.current?.click();
-                      }}
+                      disabled={!isLiveMode || selectedSport !== "basketball"}
+                      onClick={startContinuousAnalysis}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Image
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Real-time Analysis
                     </Button>
                   </div>
                 </div>
@@ -371,22 +337,23 @@ export default function ARTools() {
                   <div className="flex gap-3">
                     <Button 
                       className="flex-1 bg-green-500 hover:bg-green-600"
-                      onClick={startLiveAnalysis}
-                      disabled={isLiveMode || selectedSport !== "archery"}
+                      onClick={() => {
+                        setSelectedSport("archery");
+                        startLiveAnalysis();
+                      }}
+                      disabled={isLiveMode}
                     >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Live Analysis
+                      <Video className="w-4 h-4 mr-2" />
+                      Start Video Analysis
                     </Button>
                     <Button 
                       variant="outline" 
                       className="flex-1"
-                      onClick={() => {
-                        setSelectedSport("archery");
-                        fileInputRef.current?.click();
-                      }}
+                      disabled={!isLiveMode || selectedSport !== "archery"}
+                      onClick={startContinuousAnalysis}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Image
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Real-time Analysis
                     </Button>
                   </div>
                 </div>
@@ -464,14 +431,7 @@ export default function ARTools() {
             </Card>
           )}
 
-          {/* Hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
+
 
           {/* Loading State */}
           {isAnalyzing && (
