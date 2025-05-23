@@ -56,7 +56,7 @@ function App() {
         if (user?.role === 'coach') {
           return <CoachDashboard user={user} setUser={setUser} />;
         } else {
-          return <PlayerDashboard user={user} setUser={setUser} />;
+          return <PlayerDashboard user={user} setUser={setUser} setActiveTab={setActiveTab} />;
         }
       case "analytics":
         return user?.role === 'coach' ? <CoachAnalytics /> : <AnalyticsApproved />;

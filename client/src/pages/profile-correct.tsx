@@ -42,10 +42,10 @@ export default function Profile({ user }: ProfileProps) {
           
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16 bg-white text-orange-500 text-xl font-bold">
-              <AvatarFallback>RK</AvatarFallback>
+              <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold">Rahul Kumar</h1>
+              <h1 className="text-2xl font-bold">{displayName}</h1>
               <p className="text-orange-100">17 yrs • Forward • Swimming</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex items-center">

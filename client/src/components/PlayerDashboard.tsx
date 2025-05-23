@@ -12,9 +12,10 @@ interface User {
 interface PlayerDashboardProps {
   user: User;
   setUser: (user: User | null) => void;
+  setActiveTab: (tab: string) => void;
 }
 
-export default function PlayerDashboard({ user }: PlayerDashboardProps) {
+export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +45,7 @@ export default function PlayerDashboard({ user }: PlayerDashboardProps) {
       <div className="p-6">
         {/* Action Cards */}
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveTab('coaches')}>
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Search className="w-6 h-6 text-green-600" />
@@ -53,7 +54,7 @@ export default function PlayerDashboard({ user }: PlayerDashboardProps) {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveTab('ar-tools')}>
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Upload className="w-6 h-6 text-yellow-600" />
@@ -62,7 +63,7 @@ export default function PlayerDashboard({ user }: PlayerDashboardProps) {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveTab('training')}>
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Video className="w-6 h-6 text-blue-600" />
@@ -71,7 +72,7 @@ export default function PlayerDashboard({ user }: PlayerDashboardProps) {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveTab('analytics')}>
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Trophy className="w-6 h-6 text-purple-600" />
