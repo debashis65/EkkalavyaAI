@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Play, Camera, BarChart3, Download, Upload } from "lucide-react";
@@ -6,6 +6,66 @@ import { Play, Camera, BarChart3, Download, Upload } from "lucide-react";
 export default function ARTools() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeTab, setActiveTab] = useState("shooting");
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const wsRef = useRef(null);
+  const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Connect to AI backend WebSocket for real-time analysis
+  const startRealTimeAnalysis = async () => {
+    try {
+      setIsAnalyzing(true);
+      const ws = new WebSocket('ws://localhost:8000/ws/analyze');
+      wsRef.current = ws;
+      
+      ws.onopen = () => {
+        setIsConnected(true);
+        console.log('Connected to AI backend');
+      };
+      
+      ws.onmessage = (event) => {
+        const result = JSON.parse(event.data);
+        setAnalysisResults(result);
+      };
+      
+      ws.onclose = () => {
+        setIsConnected(false);
+        setIsAnalyzing(false);
+      };
+
+      // Start camera for real-time analysis
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error('Error starting analysis:', error);
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Upload video file for analysis
+  const handleFileUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('sport', 'basketball');
+    formData.append('analysis_type', 'form');
+
+    try {
+      const response = await fetch('http://localhost:8000/analyze-image', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setAnalysisResults(result);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -21,13 +81,40 @@ export default function ARTools() {
           <h1 className="text-xl font-semibold">AI-Powered Motion Analysis</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button className="text-white hover:opacity-90" style={{ backgroundColor: '#06036D' }}>
-            Start Analysis
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/*,image/*"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+          />
+          <Button 
+            onClick={() => fileInputRef.current?.click()}
+            variant="outline"
+            className="border-gray-300 text-black hover:bg-gray-100"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload Video
+          </Button>
+          <Button 
+            onClick={startRealTimeAnalysis}
+            disabled={isAnalyzing}
+            className="text-white hover:opacity-90" 
+            style={{ backgroundColor: '#06036D' }}
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
           </Button>
         </div>
       </div>
 
-      <BasketballAnalysis isAnalyzing={isAnalyzing} setIsAnalyzing={setIsAnalyzing} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BasketballAnalysis 
+        isAnalyzing={isAnalyzing} 
+        setIsAnalyzing={setIsAnalyzing} 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        analysisResults={analysisResults}
+        isConnected={isConnected}
+      />
     </div>
   );
 }
