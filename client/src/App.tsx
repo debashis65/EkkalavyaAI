@@ -11,7 +11,7 @@ import Coaches from "@/pages/coaches";
 import Training from "@/pages/training";
 import ArTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-working";
-import Login from "@/pages/login-improved";
+import Login from "@/pages/login-simple";
 import Register from "@/pages/register-improved";
 import AthleteProfile from "@/pages/athlete-profile";
 import CoachProfile from "@/pages/coach-profile-fixed";
@@ -47,6 +47,7 @@ function App() {
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Protected routes */}
           <Route 
