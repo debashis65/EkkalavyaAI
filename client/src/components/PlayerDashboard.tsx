@@ -19,6 +19,29 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Green Header */}
+      <div className="bg-green-600 text-white p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              <span className="text-green-600 font-bold text-sm">E</span>
+            </div>
+            <h1 className="text-xl font-bold">Ekalavya</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <MessageSquare className="w-6 h-6" />
+            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-lg mb-1">Welcome back, {user.name}</h2>
+          <p className="text-green-100 text-sm">Continue your learning journey today</p>
+        </div>
+      </div>
+
       {/* AR Tool Banner - Prominent CTA */}
       <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white p-6 shadow-lg">
         <div className="max-w-4xl mx-auto">
@@ -41,29 +64,6 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
-        </div>
-      </div>
-
-      {/* Green Header */}
-      <div className="bg-green-600 text-white p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <span className="text-green-600 font-bold text-sm">E</span>
-            </div>
-            <h1 className="text-xl font-bold">Ekalavya</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <MessageSquare className="w-6 h-6" />
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5" />
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <h2 className="text-lg mb-1">Welcome back, {user.name}</h2>
-          <p className="text-green-100 text-sm">Continue your learning journey today</p>
         </div>
       </div>
 
