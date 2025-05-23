@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,19 +15,20 @@
   --card-foreground: 20 14.3% 4.1%;
   --border: 20 5.9% 90%;
   --input: 20 5.9% 90%;
-  --primary: 145 63% 42%; /* #27ae60 */
+  --primary: 19 100% 55%; /* #FF671F */
   --primary-foreground: 0 0% 100%;
-  --secondary: 39 89% 51%; /* #f39c12 */
+  --secondary: 154 89% 17%; /* #046A38 */
   --secondary-foreground: 0 0% 100%;
-  --accent: 195 89% 42%; /* #3498db */
+  --accent: 242 95% 23%; /* #06036D */
   --accent-foreground: 0 0% 100%;
+  --success: 139 88% 42%; /* #0CCA4A */
+  --success-foreground: 0 0% 100%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --success: 150 63% 49%; /* #2ecc71 */
-  --warning: 48 93% 53%; /* #f1c40f */
-  --danger: 6 78% 57%; /* #e74c3c */
-  --ring: 145 63% 42%;
-  --radius: 0.5rem;
+  --warning: 48 93% 53%;
+  --danger: 6 78% 57%;
+  --ring: 19 100% 55%;
+  --radius: 0.75rem;
 
   /* Chart colors */
   --chart-1: 145 63% 42%;
@@ -104,7 +107,55 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    font-weight: 700;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+    font-weight: 600;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+    font-weight: 600;
+  }
+  
+  h4 {
+    @apply text-lg md:text-xl lg:text-2xl;
+    font-weight: 500;
+  }
+  
+  p {
+    @apply text-base md:text-lg;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  
+  .text-sm {
+    @apply md:text-base;
+    font-size: 0.95rem;
+  }
+  
+  .text-xs {
+    @apply md:text-sm;
+    font-size: 0.85rem;
   }
 }
 

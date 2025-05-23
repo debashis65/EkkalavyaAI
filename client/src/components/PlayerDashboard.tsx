@@ -19,49 +19,49 @@ export default function PlayerDashboard({ user, setActiveTab }: PlayerDashboardP
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Green Header */}
-      <div className="bg-green-600 text-white p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <span className="text-green-600 font-bold text-sm">E</span>
-            </div>
-            <h1 className="text-xl font-bold">Ekalavya</h1>
-          </div>
+      {/* Header with new color palette */}
+      <div className="bg-secondary text-white p-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <MessageSquare className="w-6 h-6" />
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5" />
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+              <span className="text-primary font-bold text-lg">E</span>
+            </div>
+            <h1 className="text-2xl font-bold">Ekalavya</h1>
+          </div>
+          <div className="flex items-center gap-6">
+            <MessageSquare className="w-7 h-7" />
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+              <User className="w-6 h-6" />
             </div>
           </div>
         </div>
         
         <div>
-          <h2 className="text-lg mb-1">Welcome back, {user.name}</h2>
-          <p className="text-green-100 text-sm">Continue your learning journey today</p>
+          <h2 className="text-2xl mb-2">Welcome back, {user.name}</h2>
+          <p className="text-white/80 text-lg">Continue your learning journey today</p>
         </div>
       </div>
 
-      {/* AR Tool Banner - Prominent CTA */}
-      <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white p-6 shadow-lg">
-        <div className="max-w-4xl mx-auto">
+      {/* AR Tool Banner - Prominent CTA with new colors */}
+      <div className="bg-gradient-to-r from-primary via-accent to-secondary text-white p-8 shadow-lg">
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-white/20 p-3 rounded-full">
-                <Camera className="w-6 h-6" />
+            <div className="flex items-center gap-6">
+              <div className="bg-white/20 p-4 rounded-full">
+                <Camera className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-xl font-bold mb-1">AI Performance Analysis</h2>
-                <p className="text-blue-100">Upload your training videos and get instant AI-powered technique feedback</p>
+                <h2 className="text-2xl font-bold mb-2">AI Performance Analysis</h2>
+                <p className="text-white/90 text-lg">Upload your training videos and get instant AI-powered technique feedback</p>
               </div>
             </div>
             <Button 
               onClick={() => setActiveTab('ar-tools')}
-              className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="bg-white text-primary hover:bg-gray-50 font-semibold px-8 py-4 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              <Zap className="w-5 h-5 mr-2" />
+              <Zap className="w-6 h-6 mr-3" />
               Start AI Analysis
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-6 h-6 ml-3" />
             </Button>
           </div>
         </div>
