@@ -6,8 +6,23 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, MapPin, Clock, Users, Trophy, Calendar, MessageSquare } from "lucide-react";
 import logoPath from "@assets/llogo.jpeg";
 
-export default function CoachProfile() {
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+}
+
+interface CoachProfileProps {
+  user?: User;
+}
+
+export default function CoachProfile({ user }: CoachProfileProps) {
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Use logged-in user's details or fallback
+  const displayName = user?.name || "Guru Drona";
+  const userInitials = displayName.split(' ').map(n => n[0]).join('');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -17,11 +32,11 @@ export default function CoachProfile() {
           <div className="flex items-center gap-6">
             <Avatar className="w-24 h-24 border-4 border-white">
               <AvatarFallback className="bg-white text-orange-600 text-2xl font-bold">
-                RK
+                {userInitials}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold">Rajesh Kumar</h1>
+              <h1 className="text-3xl font-bold">{displayName}</h1>
               <p className="text-orange-100 text-lg">Basketball & Tennis Coach</p>
               <div className="flex items-center gap-4 mt-2">
                 <div className="flex items-center gap-1">

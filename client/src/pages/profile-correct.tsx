@@ -6,8 +6,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Settings, Star, TrendingUp, Target, Clock, Award } from "lucide-react";
 
-export default function Profile() {
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+}
+
+interface ProfileProps {
+  user?: User;
+}
+
+export default function Profile({ user }: ProfileProps) {
   const [showEditModal, setShowEditModal] = useState(false);
+  
+  // Use logged-in user's details or fallback
+  const displayName = user?.name || "Arjuna";
+  const userInitials = displayName.split(' ').map(n => n[0]).join('');
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
