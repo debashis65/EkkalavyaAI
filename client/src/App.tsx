@@ -32,8 +32,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
   
   // If not authenticated and trying to access a protected route, redirect to login
   if (!isAuthenticated) {
-    // return <Navigate to="/login" replace />;
-    return children;
+    return <Navigate to="/login" replace />;
   }
   
   return children;
