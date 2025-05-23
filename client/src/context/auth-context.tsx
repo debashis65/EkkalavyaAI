@@ -62,13 +62,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
+      // Validate credentials first
+      if (password !== "password123") {
+        throw new Error("Invalid credentials");
+      }
+      
       // Simulated login with mock users
       let userData: User;
       
       if (email === "coach@example.com") {
         userData = mockCoachUser;
-      } else {
+      } else if (email === "athlete@example.com") {
         userData = mockAthleteUser;
+      } else {
+        throw new Error("Invalid credentials");
       }
       
       // Save user data to state and localStorage
