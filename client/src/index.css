@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+  --primary: 19 100% 55%; /* #FF671F */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 154 89% 17%; /* #046A38 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 242 95% 23%; /* #06036D */
+  --accent-foreground: 0 0% 100%;
+  --success: 139 88% 42%; /* #0CCA4A */
+  --success-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --warning: 48 93% 53%;
+  --danger: 6 78% 57%;
+  --ring: 19 100% 55%;
+  --radius: 0.75rem;
+
+  /* Chart colors */
+  --chart-1: 145 63% 42%;
+  --chart-2: 39 89% 51%;
+  --chart-3: 195 89% 42%;
+  --chart-4: 6 78% 57%;
+  --chart-5: 48 93% 53%;
+  
+  /* Sidebar specific colors */
+  --sidebar-background: 145 63% 42%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 145 63% 42%;
+  --sidebar-accent: 145 63% 32%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 145 63% 52%;
+  --sidebar-ring: 0 0% 100%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 145 63% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 39 89% 51%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 195 89% 42%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --success: 150 63% 49%;
+  --warning: 48 93% 53%;
+  --danger: 6 78% 57%;
+  --ring: 240 4.9% 83.9%;
+  --radius: 0.5rem;
+  
+  /* Sidebar specific colors */
+  --sidebar-background: 145 63% 32%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 145 63% 32%;
+  --sidebar-accent: 145 63% 22%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 145 63% 42%;
+  --sidebar-ring: 0 0% 100%;
+}
+
+/* For CoachConnect variation */
+.blue-theme {
+  --primary: 225 64% 56%; /* #4169e1 */
+  --primary-foreground: 0 0% 100%;
+  --ring: 225 64% 56%;
+  
+  /* Sidebar specific colors */
+  --sidebar-background: 225 64% 56%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 0 0% 100%;
+  --sidebar-primary-foreground: 225 64% 56%;
+  --sidebar-accent: 225 64% 46%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 225 64% 66%;
+  --sidebar-ring: 0 0% 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    font-weight: 700;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+    font-weight: 600;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+    font-weight: 600;
+  }
+  
+  h4 {
+    @apply text-lg md:text-xl lg:text-2xl;
+    font-weight: 500;
+  }
+  
+  p {
+    @apply text-base md:text-lg;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  
+  .text-sm {
+    @apply md:text-base;
+    font-size: 0.95rem;
+  }
+  
+  .text-xs {
+    @apply md:text-sm;
+    font-size: 0.85rem;
+  }
+}
+
+/* Custom styles */
+.avatar {
+  @apply flex items-center justify-center rounded-full text-center font-semibold;
+}
+
+/* Style for the tabs component */
+.tab-active {
+  @apply border-b-2 border-primary text-primary font-medium;
+}
+
+.tab-inactive {
+  @apply border-b-2 border-transparent text-muted-foreground;
+}
