@@ -4,7 +4,7 @@ services:
     name: ekkalavya-sports-connect
     env: node
     plan: free
-    buildCommand: npm ci && NODE_ENV=production npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+    buildCommand: npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
