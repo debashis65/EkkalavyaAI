@@ -1,97 +1,86 @@
-import { BarChart3, Calendar, Users, Dumbbell, Camera, User, Settings, MessageSquare } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/auth-context";
 
-interface User {
-  id: string;
-  email: string;
-  role: 'admin' | 'coach' | 'athlete';
-  name: string;
-}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-interface SidebarProps {
-  user: User;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  onLogout: () => void;
-}
+export function Sidebar({ className }: SidebarProps) {
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  
+  const isActive = (path: string) => location.pathname === path;
 
-export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: SidebarProps) {
+  // Role-based navigation items
   const playerNavItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "schedule", label: "Schedule", icon: Calendar },
-    { id: "coaches", label: "Coaches", icon: Users },
-    { id: "training", label: "Training", icon: Dumbbell },
-    { id: "ar-tools", label: "AR Tools", icon: Camera },
-    { id: "profile", label: "Profile", icon: User },
+    { href: "/", label: "Dashboard", icon: "fa-tachometer-alt" },
+    { href: "/analytics", label: "Analytics", icon: "fa-chart-line" },
+    { href: "/schedule", label: "Schedule", icon: "fa-calendar" },
+    { href: "/coaches", label: "Coaches", icon: "fa-user-tie" },
+    { href: "/training", label: "Training", icon: "fa-dumbbell" },
+    { href: "/ar-tools", label: "AR Tools", icon: "fa-camera" },
+    { href: "/profile", label: "Profile", icon: "fa-user" },
   ];
 
   const coachNavItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "students", label: "Students", icon: Users },
-    { id: "training-plans", label: "Training Plans", icon: Dumbbell },
-    { id: "video-consulting", label: "Video Consulting", icon: MessageSquare },
-    { id: "profile", label: "Profile", icon: User },
+    { href: "/", label: "Dashboard", icon: "fa-tachometer-alt" },
+    { href: "/analytics", label: "Analytics", icon: "fa-chart-line" },
+    { href: "/schedule", label: "Schedule", icon: "fa-calendar" },
+    { href: "/students", label: "Students", icon: "fa-users" },
+    { href: "/training", label: "Training Plans", icon: "fa-clipboard-list" },
+    { href: "/profile", label: "Profile", icon: "fa-user" },
   ];
 
-  const navItems = user.role === 'athlete' ? playerNavItems : coachNavItems;
+  const navItems = user?.role === 'coach' ? coachNavItems : playerNavItems;
 
   return (
-    <div className="w-64 bg-primary text-white min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6">
-        <div className="flex items-center gap-3">
-          <img 
-            src="/logo.jpeg" 
-            alt="Ekalavya AI Logo" 
-            className="w-10 h-10 object-contain rounded-lg bg-white p-1"
-          />
-          <h1 className="text-xl font-bold">Ekalavya</h1>
+    <div className={cn("flex flex-col h-full bg-sidebar text-sidebar-foreground", className)}>
+      <div className="px-4 py-4 flex items-center">
+        <div className="bg-sidebar-primary text-sidebar-primary-foreground font-bold rounded-full w-8 h-8 flex items-center justify-center mr-2">
+          E
         </div>
+        <span className="text-sidebar-foreground font-semibold text-lg">Ekalavya</span>
       </div>
-
-      {/* Navigation Items */}
-      <nav className="flex-1 px-4">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors ${
-                activeTab === item.id 
-                  ? 'bg-secondary text-white shadow-lg' 
-                  : 'text-orange-100 hover:bg-secondary'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+      
+      <nav className="flex-1 px-2 mt-5 space-y-1">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={cn(
+              "flex items-center px-2 py-2 text-sm font-medium rounded-md",
+              isActive(item.href)
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground"
+            )}
+          >
+            <i className={`fas ${item.icon} mr-3 text-sm`}></i>
+            {item.label}
+          </Link>
+        ))}
       </nav>
-
-      {/* User Profile & Logout */}
-      <div className="p-4 border-t border-primary/40">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-            <User className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <div className="font-medium">{user.name}</div>
-            <div className="text-sm text-orange-200 capitalize">{user.role}</div>
+      
+      {user && (
+        <div className="flex-shrink-0 flex border-t border-sidebar-border p-4">
+          <div className="flex-shrink-0 w-full group block">
+            <div className="flex items-center">
+              <div className="avatar w-10 h-10 mr-3 bg-sidebar-accent text-sidebar-accent-foreground">
+                {user.name.split(" ").map(n => n[0]).join("")}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-sidebar-foreground">{user.name}</p>
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-xs text-sidebar-accent-foreground/80 hover:text-sidebar-accent-foreground"
+                  onClick={logout}
+                >
+                  Logout
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-        <Button 
-          onClick={onLogout}
-          variant="ghost" 
-          size="sm"
-          className="w-full bg-white text-secondary hover:bg-gray-100 hover:text-secondary"
-        >
-          Logout
-        </Button>
-      </div>
+      )}
     </div>
   );
 }

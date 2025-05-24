@@ -1,0 +1,23 @@
+services:
+  # Combined Frontend + Backend Service
+  - type: web
+    name: ekkalavya-sports-connect
+    env: node
+    plan: free
+    buildCommand: npm install && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ekkalavya-2d
+          property: connectionString
+
+databases:
+  - name: ekkalavya-2d
+    databaseName: ekkalavya2d
+    user: ekkalavya_2d
+    plan: free
