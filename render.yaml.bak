@@ -1,0 +1,39 @@
+services:
+  # Main Web Service (Frontend + Backend)
+  - type: web
+    name: ekalavya-platform
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ekalavya-db
+          property: connectionString
+      - key: AI_BACKEND_URL
+        value: https://ekalavya-ai-backend.onrender.com
+
+  # AI Backend Service
+  - type: web
+    name: ekalavya-ai-backend
+    env: python
+    plan: starter
+    buildCommand: cd ai_backend && pip install -r requirements.txt
+    startCommand: cd ai_backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHONPATH
+        value: /opt/render/project/src/ai_backend
+
+  # Database
+databases:
+  - name: ekalavya-db
+    databaseName: ekalavya
+    user: ekalavya_user
+    plan: starter
