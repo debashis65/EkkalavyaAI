@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import Login from "@/pages/login-fixed";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
-import Sidebar from "@/components/layout/Sidebar";
+import Sidebar from "@/components/layout/SidebarNav";
 import AnalyticsApproved from "@/pages/analytics-approved";
 import CoachAnalytics from "@/pages/coach-analytics";
 import Schedule from "@/pages/schedule";
