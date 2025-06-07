@@ -389,10 +389,12 @@ export default function ARTools() {
                 </Alert>
               </div>
 
-              {/* Player Header */}
+              {/* Player Header - Dynamic based on logged-in user */}
               <div className="mb-6">
-                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">Player: Marcus Johnson</h2>
-                <p className="text-gray-400">Jump Shot Analysis</p>
+                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                  Player: {user?.name || 'Unknown Player'}
+                </h2>
+                <p className="text-gray-400">{sportConfig.analysisTypes[0]} Analysis</p>
               </div>
 
               {/* Metrics Grid */}
@@ -443,16 +445,18 @@ export default function ARTools() {
               <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-6">
                 <Button className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none" onClick={startCamera}>
                   <Play className="h-4 w-4 mr-2" />
-                  Start Analysis
+                  <span className="text-white font-medium">Start Analysis</span>
                 </Button>
-                <Button variant="outline" className="flex-1 sm:flex-none">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Video
-                </Button>
-                <Button variant="outline" className="flex-1 sm:flex-none">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Export Data
-                </Button>
+                <div className="flex gap-3 flex-1 sm:flex-none">
+                  <Button variant="outline" className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1">
+                    <Upload className="h-4 w-4 mr-2" />
+                    <span className="font-medium">Upload Video</span>
+                  </Button>
+                  <Button variant="outline" className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    <span className="font-medium">Export Data</span>
+                  </Button>
+                </div>
               </div>
 
               {/* Analysis Tabs */}
