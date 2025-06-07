@@ -18,7 +18,7 @@ import Coaches from "@/pages/coaches";
 import CoachStudents from "@/pages/coach-students";
 import Training from "@/pages/training";
 import VideoConsulting from "@/pages/video-consulting";
-import ARTools from "@/pages/ar-tools";
+import ARToolsMobile from "@/pages/ar-tools-mobile";
 import Profile from "@/pages/profile-correct";
 import CoachProfile from "@/pages/coach-profile";
 
@@ -70,7 +70,7 @@ function App() {
       case "training":
         return <Training />;
       case "ar-tools":
-        return <ARTools user={user} />;
+        return <ARToolsMobile user={user} />;
       case "profile":
         return user?.role === 'coach' ? <CoachProfile user={user} /> : <Profile user={user} />;
       case "students":

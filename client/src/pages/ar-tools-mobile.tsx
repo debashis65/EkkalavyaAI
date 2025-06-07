@@ -38,7 +38,7 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
   const [userPrimarySport, setUserPrimarySport] = useState(user?.primarySport || 'basketball');
   const [selectedAnalysisType, setSelectedAnalysisType] = useState('general');
   const { toast } = useToast();
-  const { analysisResult, isConnected, sendAnalysisRequest } = useWebSocketAnalysis();
+  const { currentResult: analysisResult, isConnected, sendMessage: sendAnalysisRequest } = useWebSocketAnalysis();
 
   // Screenshot sharing functionality
   const sharePerformanceScreenshot = useCallback(async () => {
