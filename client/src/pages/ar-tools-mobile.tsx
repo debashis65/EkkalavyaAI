@@ -189,61 +189,35 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-to-br from-orange-500 via-white to-green-500">
-        {/* Mobile Header */}
+        {/* Mobile Header with Player Info */}
         <div className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Menu className="h-6 w-6 text-white" />
-              <h1 className="text-lg font-bold text-white">AR Tools</h1>
+              <div>
+                <h1 className="text-lg font-bold text-white">AR Tools</h1>
+                <p className="text-xs text-gray-300">{user?.name || 'Player'} • {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}</p>
+              </div>
             </div>
-            <Badge variant="secondary" className="bg-orange-600 text-white">
-              {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}
-            </Badge>
+            <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-sm">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'P'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Player Details Section */}
-        <div className="p-4">
-          <Card className="bg-gray-900/80 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'P'}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">{user?.name || 'Player Name'}</h3>
-                  <p className="text-gray-300 text-sm">{user?.email || 'player@example.com'}</p>
-                  <Badge variant="secondary" className="bg-blue-600 text-white text-xs mt-1">
-                    {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Athlete
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Main Content - Mobile First */}
-        <div className="px-4 space-y-4">
-          {/* AI Connection Status */}
-          <Alert className="border-green-500 bg-green-900/80 border">
-            <div className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-green-400" />
-              <span className="text-sm text-green-400">
-                AI Server: Connected
-              </span>
-            </div>
-          </Alert>
-
-          {/* Title Section */}
-          <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <div className="px-4 pt-2 space-y-3">
+          {/* Title Section - Prominent */}
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
               Realtime Sports Connect AI Analysis
             </h2>
-            <p className="text-gray-700 text-sm">
-              Smart analysis and video upload for instant AI-powered performance insights
-            </p>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Check className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-green-600 font-medium">AI Server Connected</span>
+            </div>
           </div>
 
           {/* Video Upload Section */}
