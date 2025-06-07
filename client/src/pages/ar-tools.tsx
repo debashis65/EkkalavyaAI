@@ -239,11 +239,11 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         { label: "Balance", value: `${Math.round(metrics.balance || (analysisResult.score * 0.95))}% ${getImprovementIndicator(metrics.balance)}`, color: getScoreColor(metrics.balance || (analysisResult.score * 0.95)) },
         { label: "Accuracy", value: `${Math.round(metrics.accuracy || (analysisResult.score * 1.05))}% ${getImprovementIndicator(metrics.accuracy)}`, color: getScoreColor(metrics.accuracy || (analysisResult.score * 1.05)) },
         { label: "Speed", value: `${Math.round(metrics.speed || (analysisResult.score * 0.85))}% ${getImprovementIndicator(metrics.speed)}`, color: getScoreColor(metrics.speed || (analysisResult.score * 0.85)) },
-        { label: "Overall Performance", value: `${Math.round(analysisResult.score)}% ${getImprovementIndicator(analysisResult.score)}`, color: getScoreColor(analysisResult.score), span: true }
+        { label: "Overall Performance", value: `${Math.round(analysisResult.score)}% ${getImprovementIndicator(analysisResult.score)}`, color: getScoreColor(analysisResult.score) }
       ];
     }
     
-    // Show loading state when no real analysis available
+    // Show loading state when no real analysis available - Always 8 metrics
     const loadingMetrics = {
       basketball: [
         { label: "Shot Release", value: "Analyzing...", color: "text-gray-400" },
@@ -253,21 +253,27 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         { label: "Ball Rotation", value: "Analyzing...", color: "text-gray-400" },
         { label: "Release Timing", value: "Analyzing...", color: "text-gray-400" },
         { label: "Target Accuracy", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Overall Score", value: "Start analysis", color: "text-gray-400", span: true }
+        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
       ],
       archery: [
-        { label: "Anchor Point", value: "96% (Consistent)", color: "text-green-400" },
-        { label: "Draw Length", value: "28.5\" (Optimal)", color: "text-green-400" },
-        { label: "Release Timing", value: "82% (-3%)", color: "text-yellow-400" },
-        { label: "Bow Arm Stability", value: "89% (+2%)", color: "text-blue-400" },
-        { label: "Arrow Grouping", value: "7.2\" radius", color: "text-blue-400", span: true }
+        { label: "Anchor Point", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Draw Length", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Release Timing", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Bow Stability", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Arrow Grouping", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Sight Alignment", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Follow Through", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
       ],
       football: [
-        { label: "Pass Accuracy", value: "78% (+3%)", color: "text-green-400" },
-        { label: "Sprint Speed", value: "8.2 m/s (+0.3)", color: "text-blue-400" },
-        { label: "Ball Control", value: "85% (Good)", color: "text-green-400" },
-        { label: "Shooting Power", value: "92 km/h (+5)", color: "text-blue-400" },
-        { label: "Tactical Position", value: "88% accuracy", color: "text-green-400", span: true }
+        { label: "Pass Accuracy", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Sprint Speed", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Ball Control", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Shooting Power", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Tactical Position", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Dribbling", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Defensive Actions", value: "Analyzing...", color: "text-gray-400" },
+        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
       ],
       cricket: [
         { label: "Bat Speed", value: "105 km/h (+8)", color: "text-blue-400" },
@@ -774,30 +780,15 @@ export default function ARTools({ user }: ARToolsProps = {}) {
               </div>
 
               {/* Player Header - Dynamic based on logged-in user */}
-              <div className="mb-6">
-                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                  Player: {user?.name || 'Unknown Player'}
+              <div className="mb-4">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2">
+                  Realtime Sports Connect AI Analysis
                 </h2>
-                <p className="text-gray-400">{sportConfig.analysisTypes[0]} Analysis</p>
+                <p className="text-gray-400">Player: {user?.name || 'Unknown Player'} | {sportConfig.analysisTypes[0]} Analysis</p>
               </div>
 
-              {/* Real-time AI Metrics Grid - 8 Essential Metrics for Coaching */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {currentMetrics.map((metric: any, index: number) => (
-                  <div key={index} className={`bg-gray-800 p-4 rounded-lg ${metric.span ? "col-span-2 lg:col-span-4" : ""}`}>
-                    <div className="text-sm text-gray-400 mb-1">{metric.label}</div>
-                    <div className={`text-lg font-bold ${metric.color}`}>{metric.value}</div>
-                    {analysisResult && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Updated {new Date(analysisResult.timestamp).toLocaleTimeString()}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Video Analysis Area */}
-              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-60 lg:h-80 border-2 border-dashed border-gray-600">
+              {/* Video Analysis Area - Mobile First (Top Priority) */}
+              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-64 md:h-72 lg:h-80 border-2 border-dashed border-gray-600">
                 {isAnalyzing ? (
                   <video
                     ref={videoRef}
@@ -831,6 +822,24 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                     <BarChart3 className="h-4 w-4 mr-2" />
                     <span className="font-medium">Export Data</span>
                   </Button>
+                </div>
+              </div>
+
+              {/* Real-time AI Metrics Grid - 8 Essential Metrics for Coaching (Mobile First - Below Video) */}
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-white mb-4">Performance Metrics</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  {currentMetrics.slice(0, 8).map((metric: any, index: number) => (
+                    <div key={index} className={`bg-gray-800 p-3 md:p-4 rounded-lg ${index === 7 ? 'col-span-2 md:col-span-4' : ''}`}>
+                      <div className="text-xs md:text-sm text-gray-400 mb-1">{metric.label}</div>
+                      <div className={`text-sm md:text-lg font-bold ${metric.color}`}>{metric.value}</div>
+                      {analysisResult && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          Updated {new Date(analysisResult.timestamp).toLocaleTimeString()}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
