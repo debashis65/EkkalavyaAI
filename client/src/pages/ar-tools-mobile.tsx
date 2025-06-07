@@ -193,7 +193,7 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
       <div 
         className="min-h-screen relative bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(/flag-bg.jpg)'
+          backgroundImage: 'url(/indian-flag.png)'
         }}
       >
         {/* Overlay for better readability */}
