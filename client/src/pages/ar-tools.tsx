@@ -194,8 +194,11 @@ export default function ARTools({ user }: ARToolsProps = {}) {
   const [selectedAnalysisType, setSelectedAnalysisType] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   // WebSocket integration
@@ -225,6 +228,144 @@ export default function ARTools({ user }: ARToolsProps = {}) {
 
   // Get sport configuration
   const sportConfig = getSportAnalysisConfig(userPrimarySport);
+
+  // Update analysis result when WebSocket receives data
+  useEffect(() => {
+    if (currentResult) {
+      setAnalysisResult(currentResult);
+      setIsAnalyzing(false);
+      setIsProcessing(false);
+    }
+  }, [currentResult]);
+
+  // Handle video file upload and processing
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate video file
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a video file (MP4, MOV, AVI, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file size (max 100MB for processing)
+    if (file.size > 100 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload a video smaller than 100MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    try {
+      // Create video URL for display
+      const videoUrl = URL.createObjectURL(file);
+      setUploadedVideo(videoUrl);
+
+      // Process video with AI backend
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('sport', userPrimarySport);
+      formData.append('analysis_type', selectedAnalysisType || 'general');
+
+      // Send to AI backend for processing
+      const response = await fetch('http://localhost:8000/analyze_video', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Video analysis failed');
+      }
+
+      const result = await response.json();
+      setAnalysisResult(result);
+
+      toast({
+        title: "Video analysis complete",
+        description: `${userPrimarySport} performance analyzed successfully`,
+      });
+
+    } catch (error) {
+      console.error('Video upload error:', error);
+      toast({
+        title: "Analysis failed",
+        description: "Unable to process video. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Handle live camera analysis
+  const startCameraAnalysis = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Connection error",
+        description: "Not connected to analysis server. Please wait...",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      // Get camera stream
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 1280, height: 720 }, 
+        audio: false 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+
+      // Send analysis request to AI backend
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sport: userPrimarySport,
+          analysis_type: selectedAnalysisType || 'general',
+          live_stream: true
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Live analysis failed');
+      }
+
+      const result = await response.json();
+      setAnalysisResult(result);
+
+      toast({
+        title: "Live analysis started",
+        description: `Real-time ${userPrimarySport} analysis active`,
+      });
+
+    } catch (error) {
+      console.error('Camera analysis error:', error);
+      setIsAnalyzing(false);
+      toast({
+        title: "Camera access failed",
+        description: "Unable to access camera or start analysis",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Get real-time AI analysis metrics - 8 ESSENTIAL METRICS FOR COACHING
   const getMetricsForSport = (sport: string) => {
@@ -788,37 +929,84 @@ export default function ARTools({ user }: ARToolsProps = {}) {
               </div>
 
               {/* Video Analysis Area - Mobile First (Top Priority) */}
-              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-64 md:h-72 lg:h-80 border-2 border-dashed border-gray-600">
-                {isAnalyzing ? (
-                  <video
-                    ref={videoRef}
-                    className="w-full h-full object-cover rounded-lg"
-                    autoPlay
-                    muted
-                    playsInline
-                  />
+              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-64 md:h-72 lg:h-80 border-2 border-dashed border-gray-600 relative">
+                {isAnalyzing || uploadedVideo || isProcessing ? (
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={uploadedVideo || undefined}
+                      className="w-full h-full object-cover rounded-lg"
+                      autoPlay
+                      muted
+                      playsInline
+                      controls={uploadedVideo ? true : false}
+                    />
+                    {isProcessing && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                        <div className="text-center text-white">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-2"></div>
+                          <p className="text-sm">Processing video...</p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="text-center">
                     <Camera className="h-12 lg:h-16 w-12 lg:w-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg lg:text-xl font-semibold text-white mb-2">Basketball Motion Analysis</h3>
+                    <h3 className="text-lg lg:text-xl font-semibold text-white mb-2">{userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Motion Analysis</h3>
                     <p className="text-gray-400 text-sm lg:text-base">Upload video or start live analysis</p>
                   </div>
                 )}
                 <canvas ref={canvasRef} className="hidden" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="hidden"
+                />
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-6">
-                <Button className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none" onClick={startCamera}>
+                <Button 
+                  className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none" 
+                  onClick={startCameraAnalysis}
+                  disabled={isAnalyzing || isProcessing}
+                >
                   <Play className="h-4 w-4 mr-2" />
-                  <span className="text-white font-medium">Start Analysis</span>
+                  <span className="text-white font-medium">
+                    {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                  </span>
                 </Button>
                 <div className="flex gap-3 flex-1 sm:flex-none">
-                  <Button variant="outline" className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1">
+                  <Button 
+                    variant="outline" 
+                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isAnalyzing || isProcessing}
+                  >
                     <Upload className="h-4 w-4 mr-2" />
-                    <span className="font-medium">Upload Video</span>
+                    <span className="font-medium">
+                      {isProcessing ? 'Processing...' : 'Upload Video'}
+                    </span>
                   </Button>
-                  <Button variant="outline" className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1">
+                  <Button 
+                    variant="outline" 
+                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1"
+                    onClick={() => {
+                      if (analysisResult) {
+                        const dataStr = JSON.stringify(analysisResult, null, 2);
+                        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                        const exportFileDefaultName = `${userPrimarySport}_analysis_${new Date().toISOString().split('T')[0]}.json`;
+                        const linkElement = document.createElement('a');
+                        linkElement.setAttribute('href', dataUri);
+                        linkElement.setAttribute('download', exportFileDefaultName);
+                        linkElement.click();
+                      }
+                    }}
+                    disabled={!analysisResult}
+                  >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     <span className="font-medium">Export Data</span>
                   </Button>
