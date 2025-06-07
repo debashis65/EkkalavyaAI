@@ -190,22 +190,30 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
         <title>Realtime Sports Connect AI Analysis - Ekkalavya Sports AI</title>
       </Helmet>
       
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-        {/* Mobile Header */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Menu className="h-6 w-6 text-white" />
-              <h1 className="text-lg font-bold text-white">AR Tools</h1>
+      <div className="min-h-screen relative" style={{
+        backgroundImage: 'url(/indian-flag-bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}>
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-gray-900/70"></div>
+        <div className="relative z-10">
+          {/* Mobile Header */}
+          <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Menu className="h-6 w-6 text-white" />
+                <h1 className="text-lg font-bold text-white">AR Tools</h1>
+              </div>
+              <Badge variant="secondary" className="bg-orange-600 text-white">
+                {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}
+              </Badge>
             </div>
-            <Badge variant="secondary" className="bg-orange-600 text-white">
-              {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}
-            </Badge>
           </div>
-        </div>
 
-        {/* Main Content - Mobile First */}
-        <div className="p-4 space-y-4">
+          {/* Main Content - Mobile First */}
+          <div className="p-4 space-y-4">
           {/* AI Connection Status */}
           <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border`}>
             <div className="flex items-center gap-2">
@@ -366,6 +374,7 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </>
