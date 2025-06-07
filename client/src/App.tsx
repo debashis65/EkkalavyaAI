@@ -70,7 +70,7 @@ function App() {
       case "training":
         return <Training />;
       case "ar-tools":
-        return <ARTools />;
+        return <ARTools user={user} />;
       case "profile":
         return user?.role === 'coach' ? <CoachProfile user={user} /> : <Profile user={user} />;
       case "students":
