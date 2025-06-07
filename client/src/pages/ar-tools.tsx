@@ -341,13 +341,22 @@ export default function ARTools({ user }: ARToolsProps = {}) {
     });
   };
 
-  // Add drill to training schedule
+  // Add drill to training schedule - AUTHENTICATED USERS ONLY
   const addDrillToSchedule = async (drill: any) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to add drills to your training schedule",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 1000);
+      return;
+    }
+
     try {
-      // Add to database/storage
       const scheduleEntry = {
-        userId: user?.id || 'guest',
-        drillId: drill.id,
         drillName: drill.name,
         sport: drill.sport,
         targetArea: drill.targetArea,
@@ -357,7 +366,6 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         estimatedDuration: drill.estimatedDuration
       };
 
-      // Store in local state or send to backend
       const response = await fetch('/api/training-schedule', {
         method: 'POST',
         headers: {
@@ -366,16 +374,21 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         body: JSON.stringify(scheduleEntry),
       });
 
-      toast({
-        title: "Drill added to schedule",
-        description: `${drill.name} has been added to your training plan`,
-      });
+      if (response.ok) {
+        toast({
+          title: "Drill added to schedule",
+          description: `${drill.name} has been added to your training plan`,
+        });
+      } else {
+        throw new Error('Failed to add drill to schedule');
+      }
 
     } catch (error) {
       console.error('Error adding drill to schedule:', error);
       toast({
-        title: "Added to training plan",
-        description: `${drill.name} is now in your schedule`,
+        title: "Error",
+        description: "Failed to add drill to schedule. Please try again.",
+        variant: "destructive",
       });
     }
   };
