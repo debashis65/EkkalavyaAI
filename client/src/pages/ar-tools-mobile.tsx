@@ -190,12 +190,15 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
         <title>Realtime Sports Connect AI Analysis - Ekkalavya Sports AI</title>
       </Helmet>
       
-      <div className="min-h-screen relative" style={{
-        backgroundImage: 'url(/indian-flag-bg.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
+      <div 
+        className="min-h-screen relative"
+        style={{
+          background: `linear-gradient(to bottom, 
+            #FF9933 0%, #FF9933 33%, 
+            #FFFFFF 33%, #FFFFFF 66%, 
+            #138808 66%, #138808 100%)`
+        }}
+      >
         {/* Overlay for better readability */}
         <div className="absolute inset-0 bg-gray-900/70"></div>
         <div className="relative z-10">
