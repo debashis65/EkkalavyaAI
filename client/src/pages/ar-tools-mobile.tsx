@@ -191,12 +191,9 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
       </Helmet>
       
       <div 
-        className="min-h-screen relative"
+        className="min-h-screen relative bg-cover bg-center bg-no-repeat"
         style={{
-          background: `linear-gradient(to bottom, 
-            #FF9933 0%, #FF9933 33%, 
-            #FFFFFF 33%, #FFFFFF 66%, 
-            #138808 66%, #138808 100%)`
+          backgroundImage: 'url(/flag-bg.jpg)'
         }}
       >
         {/* Overlay for better readability */}
