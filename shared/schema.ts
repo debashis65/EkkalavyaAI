@@ -14,7 +14,51 @@ export const sportEnum = pgEnum('sport', [
   'tennis', 
   'badminton', 
   'yoga', 
-  'athletics'
+  'athletics',
+  'volleyball',
+  'squash',
+  'table_tennis',
+  'cycling',
+  'long_jump',
+  'high_jump',
+  'pole_vault',
+  'hurdle',
+  'boxing',
+  'shotput_throw',
+  'discus_throw',
+  'javelin_throw',
+  'hockey',
+  'wrestling',
+  'judo',
+  'weightlifting',
+  'karate',
+  'skating',
+  'ice_skating',
+  'golf',
+  'kabaddi',
+  'kho_kho',
+  'para_archery',
+  'para_swimming',
+  'para_basketball',
+  'para_football',
+  'para_cricket',
+  'para_athletics',
+  'para_tennis',
+  'para_badminton',
+  'para_volleyball',
+  'para_table_tennis',
+  'para_boxing',
+  'para_wrestling',
+  'para_judo',
+  'para_weightlifting',
+  'para_cycling',
+  'para_skating',
+  'wheelchair_basketball',
+  'wheelchair_tennis',
+  'wheelchair_racing',
+  'blind_football',
+  'goalball',
+  'sitting_volleyball'
 ]);
 export const sessionStatusEnum = pgEnum('session_status', ['upcoming', 'completed', 'cancelled']);
 export const sessionTypeEnum = pgEnum('session_type', [
@@ -121,6 +165,74 @@ export const achievements = pgTable("achievements", {
   date: timestamp("date"),
   position: text("position"),
   category: text("category"),
+});
+
+// Real-time AR Analysis Results
+export const arAnalysisResults = pgTable("ar_analysis_results", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  playerId: integer("player_id").notNull().references(() => users.id),
+  sport: sportEnum("sport").notNull(),
+  analysisType: text("analysis_type").notNull(),
+  realTimeData: text("real_time_data").notNull(), // JSON string of pose data
+  finalScore: integer("final_score"),
+  improvements: text("improvements").notNull(), // JSON array of suggestions
+  recordingUrl: text("recording_url"),
+  thumbnailUrl: text("thumbnail_url"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// AI Drill Recommendations
+export const drillRecommendations = pgTable("drill_recommendations", {
+  id: serial("id").primaryKey(),
+  playerId: integer("player_id").notNull().references(() => users.id),
+  sport: sportEnum("sport").notNull(),
+  drillName: text("drill_name").notNull(),
+  description: text("description").notNull(),
+  difficulty: text("difficulty").notNull(), // beginner, intermediate, advanced
+  focusAreas: text("focus_areas").notNull(), // JSON array
+  instructions: text("instructions").notNull(), // JSON array
+  videoUrl: text("video_url"),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  aiGenerated: boolean("ai_generated").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Progress Tracking
+export const progressTracking = pgTable("progress_tracking", {
+  id: serial("id").primaryKey(),
+  playerId: integer("player_id").notNull().references(() => users.id),
+  sport: sportEnum("sport").notNull(),
+  metricName: text("metric_name").notNull(),
+  currentValue: integer("current_value").notNull(),
+  previousValue: integer("previous_value"),
+  targetValue: integer("target_value"),
+  unit: text("unit"), // seconds, meters, percentage, etc.
+  category: text("category").notNull(), // speed, accuracy, strength, endurance, technique
+  recordedAt: timestamp("recorded_at").defaultNow(),
+});
+
+// Coach Player Relationships
+export const coachPlayerRelations = pgTable("coach_player_relations", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").notNull().references(() => users.id),
+  playerId: integer("player_id").notNull().references(() => users.id),
+  sport: sportEnum("sport").notNull(),
+  enrolledAt: timestamp("enrolled_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
+// WebSocket Sessions for real-time analysis
+export const websocketSessions = pgTable("websocket_sessions", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull().unique(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  sport: sportEnum("sport").notNull(),
+  analysisType: text("analysis_type").notNull(),
+  isActive: boolean("is_active").default(true),
+  startedAt: timestamp("started_at").defaultNow(),
+  endedAt: timestamp("ended_at"),
 });
 
 // Subscription Plans table

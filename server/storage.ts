@@ -93,6 +93,7 @@ export class MemStorage implements IStorage {
       email: "coach@example.com",
       password: "password123",
       role: "coach",
+      primarySport: "archery",
       bio: "Elite archery coach with over 15 years of experience training national and international champions. Specializes in technical precision and mental preparation.",
       rating: 49, // 4.9 out of 5
       experience: "15+ Years Experience",
@@ -104,6 +105,7 @@ export class MemStorage implements IStorage {
       email: "athlete@example.com",
       password: "password123",
       role: "athlete",
+      primarySport: "basketball",
       bio: "Passionate about improving my skills and reaching new heights in my sporting journey."
     });
   }
