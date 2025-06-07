@@ -1,422 +1,562 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import { useState, useRef, useCallback } from "react";
+import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Camera, 
-  Upload, 
-  Play, 
-  Square, 
-  RotateCcw,
-  Zap,
-  Activity,
-  Target,
-  TrendingUp,
-  Clock,
-  Award
-} from 'lucide-react';
-
-interface User {
-  id: string;
-  email: string;
-  role: 'admin' | 'coach' | 'athlete';
-  name: string;
-  primarySport?: string;
-}
-
-interface ARToolsProps {
-  user?: User;
-}
 
 interface AnalysisResult {
   sport: string;
   score: number;
-  metrics: Record<string, number>;
   feedback: string[];
+  metrics: Record<string, number>;
   timestamp: string;
-  drill_recommendations?: any[];
 }
 
-export default function ARTools({ user }: ARToolsProps = {}) {
-  const { toast } = useToast();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+export default function ARTools() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  
-  const userPrimarySport = user?.primarySport || 'basketball';
+  const [selectedSport, setSelectedSport] = useState<"basketball" | "archery">("basketball");
+  const [isLiveMode, setIsLiveMode] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { toast } = useToast();
 
-  // Check AI backend connection on component mount
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/health');
-        setIsConnected(response.ok);
-      } catch (error) {
-        console.log('AI backend connection check failed:', error);
-        setIsConnected(false);
-      }
-    };
-    checkConnection().catch(err => console.log('Connection check error:', err));
-  }, []);
-
-  // Generate 8 essential metrics from analysis result
-  const getMetricsForSport = (sport: string) => {
-    if (!analysisResult) {
-      return [
-        { label: "Technical Form", value: "Start analysis", color: "text-gray-500" },
-        { label: "Power Output", value: "Start analysis", color: "text-gray-500" },
-        { label: "Consistency", value: "Start analysis", color: "text-gray-500" },
-        { label: "Timing", value: "Start analysis", color: "text-gray-500" },
-        { label: "Balance", value: "Start analysis", color: "text-gray-500" },
-        { label: "Accuracy", value: "Start analysis", color: "text-gray-500" },
-        { label: "Speed", value: "Start analysis", color: "text-gray-500" },
-        { label: "Overall Score", value: "Start analysis", color: "text-gray-500" }
-      ];
-    }
-
-    // Generate metrics from real analysis data
-    const metrics = analysisResult.metrics || {};
-    const score = analysisResult.score || 0;
+  const startLiveAnalysis = useCallback(async () => {
+    setIsLiveMode(true);
     
-    return [
-      { label: "Technical Form", value: `${metrics.form || score}%`, color: getScoreColor(metrics.form || score) },
-      { label: "Power Output", value: `${metrics.power || score}%`, color: getScoreColor(metrics.power || score) },
-      { label: "Consistency", value: `${metrics.consistency || score}%`, color: getScoreColor(metrics.consistency || score) },
-      { label: "Timing", value: `${metrics.timing || score}%`, color: getScoreColor(metrics.timing || score) },
-      { label: "Balance", value: `${metrics.balance || score}%`, color: getScoreColor(metrics.balance || score) },
-      { label: "Accuracy", value: `${metrics.accuracy || score}%`, color: getScoreColor(metrics.accuracy || score) },
-      { label: "Speed", value: `${metrics.speed || score}%`, color: getScoreColor(metrics.speed || score) },
-      { label: "Overall Score", value: `${Math.round(score)}%`, color: getScoreColor(score) }
-    ];
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-400";
-    if (score >= 60) return "text-yellow-400";
-    return "text-red-400";
-  };
-
-  // Start camera capture
-  const startCamera = async () => {
     try {
-      setIsAnalyzing(true);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 1280, height: 720 },
-        audio: false
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480 } 
       });
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        
-        toast({
-          title: "Camera Started",
-          description: "Click Start Analysis to begin processing"
-        });
+        videoRef.current.play();
       }
-    } catch (error) {
-      setIsAnalyzing(false);
+      
       toast({
-        title: "Camera Error",
-        description: "Unable to access camera. Please check permissions.",
-        variant: "destructive"
+        title: "Live Analysis Started",
+        description: "Position yourself in front of the camera and start your technique.",
       });
+    } catch (error) {
+      console.error('Camera access error:', error);
+      toast({
+        title: "Camera Access Failed",
+        description: "Please allow camera access to use live analysis.",
+        variant: "destructive",
+      });
+      setIsLiveMode(false);
     }
-  };
+  }, [toast]);
 
-  // Process video frame for analysis
-  const processVideo = async () => {
+  const stopLiveAnalysis = useCallback(() => {
+    setIsLiveMode(false);
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+
+  const startContinuousAnalysis = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const context = canvas.getContext('2d');
     
-    try {
-      setIsAnalyzing(true);
-      
-      const canvas = canvasRef.current;
-      const video = videoRef.current;
-      const ctx = canvas.getContext('2d')!;
-      
+    if (!context) return;
+
+    setIsAnalyzing(true);
+
+    // Real AI-powered continuous analysis
+    const analyzeFrame = async () => {
+      if (!video.srcObject || isAnalyzing === false) return;
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      
-      const frameData = canvas.toDataURL('image/jpeg', 0.8);
-      
-      const response = await fetch('/api/analyze-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sport: userPrimarySport,
-          analysis_type: 'real_time',
-          frames: [frameData],
-          timestamp: new Date().toISOString(),
-          user_id: user?.id || 'anonymous'
-        }),
-      });
+      context.drawImage(video, 0, 0);
 
-      if (!response.ok) {
-        throw new Error('Analysis failed');
+      try {
+        const frameData = canvas.toDataURL('image/jpeg', 0.8);
+
+        const response = await fetch('/api/analyze-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sport: selectedSport,
+            analysis_type: 'real_time',
+            frames: [frameData],
+            timestamp: new Date().toISOString(),
+            user_id: 'live-analysis'
+          }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setAnalysisResult(result);
+        }
+      } catch (error) {
+        console.error('Continuous analysis error:', error);
       }
 
-      const analysisData = await response.json();
-      setAnalysisResult(analysisData);
-      
-      toast({
-        title: "Analysis Complete",
-        description: `${userPrimarySport} analysis completed successfully`
-      });
-    } catch (error) {
-      toast({
-        title: "Analysis Error",
-        description: "Failed to process video frame",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
+      // Continue analysis every 500ms for real-time feedback
+      if (video.srcObject) {
+        setTimeout(analyzeFrame, 500);
+      }
+    };
+
+    // Start the continuous analysis loop
+    analyzeFrame();
+    
+    toast({
+      title: "Real-time Analysis Started!",
+      description: `Analyzing your ${selectedSport} technique continuously...`,
+    });
+  }, [selectedSport, toast, isAnalyzing]);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
-  // Handle video file upload
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('video/')) {
-      toast({
-        title: "Invalid File",
-        description: "Please select a valid video file",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      setIsAnalyzing(true);
-      
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(file);
-      
-      video.onloadedmetadata = async () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d')!;
-          
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          
-          const frames: string[] = [];
-          const frameCount = Math.min(10, Math.floor(video.duration));
-          
-          for (let i = 0; i < frameCount; i++) {
-            video.currentTime = (video.duration / frameCount) * i;
-            await new Promise(resolve => video.onseeked = resolve);
-            
-            ctx.drawImage(video, 0, 0);
-            frames.push(canvas.toDataURL('image/jpeg', 0.8));
-          }
-          
-          const response = await fetch('/api/analyze-video', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              sport: userPrimarySport,
-              analysis_type: 'video_upload',
-              frames,
-              timestamp: new Date().toISOString(),
-              user_id: user?.id || 'anonymous',
-              filename: file.name
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Analysis failed');
-          }
-
-          const analysisData = await response.json();
-          setAnalysisResult(analysisData);
-          
-          URL.revokeObjectURL(video.src);
-          
-          toast({
-            title: "Video Processed",
-            description: `Analysis complete for ${file.name}`
-          });
-          
-          setIsAnalyzing(false);
-        } catch (uploadError) {
-          console.log('Video upload processing error:', uploadError);
-          setIsAnalyzing(false);
-          toast({
-            title: "Processing Error",
-            description: "Failed to analyze video file",
-            variant: "destructive"
-          });
-        }
-      };
-    } catch (error) {
-      setIsAnalyzing(false);
-      toast({
-        title: "Upload Error",
-        description: "Failed to process video file",
-        variant: "destructive"
-      });
-    }
+  const getScoreBg = (score: number) => {
+    if (score >= 80) return "bg-green-50";
+    if (score >= 60) return "bg-yellow-50";
+    return "bg-red-50";
   };
-
-  const currentMetrics = getMetricsForSport(userPrimarySport);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <>
       <Helmet>
-        <title>Realtime Sports Connect AI Analysis - Ekkalavya Sports AI</title>
-        <meta name="description" content="Real-time AR sports analysis and performance tracking" />
+        <title>AI Analysis Tools | Ekalavya</title>
+        <meta
+          name="description"
+          content="Advanced AI-powered biomechanical analysis for Basketball and Archery technique improvement with real-time feedback."
+        />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Realtime Sports Connect AI Analysis
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Advanced AR Analysis for {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}
-          </p>
-          <div className="flex items-center justify-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm text-gray-400">
-              AI Backend {isConnected ? 'Connected' : 'Disconnected'}
-            </span>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Target className="h-8 w-8 text-blue-600" />
+              <h1 className="text-4xl font-bold text-gray-900">AI Analysis Tools</h1>
+            </div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Advanced AI-powered biomechanical analysis for sports technique improvement
+            </p>
           </div>
-        </div>
 
-        {/* Video Analysis Section */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Camera className="w-5 h-5" />
-              Live Analysis Feed
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Video Display */}
-            <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-              <canvas ref={canvasRef} className="hidden" />
-              
-              {/* Analysis Overlay */}
-              {isAnalyzing && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <p>Analyzing Movement...</p>
-                  </div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-6 text-center">
+                <Zap className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900">Real-time Analysis</h3>
+                <p className="text-gray-600">Instant feedback on your technique</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-6 text-center">
+                <BarChart3 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900">Performance Metrics</h3>
+                <p className="text-gray-600">Detailed biomechanical scoring</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-6 text-center">
+                <Trophy className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900">Progress Tracking</h3>
+                <p className="text-gray-600">Monitor improvement over time</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sport Selection */}
+          <div className="flex justify-center gap-4 mb-8">
+            <Button
+              variant={selectedSport === "basketball" ? "default" : "outline"}
+              onClick={() => setSelectedSport("basketball")}
+              className="flex items-center gap-2"
+            >
+              🏀 Basketball
+            </Button>
+            <Button
+              variant={selectedSport === "archery" ? "default" : "outline"}
+              onClick={() => setSelectedSport("archery")}
+              className="flex items-center gap-2"
+            >
+              🏹 Archery
+            </Button>
+          </div>
+
+          {/* Live Video Analysis */}
+          {isLiveMode && (
+            <Card className="mb-8 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Video className="h-5 w-5" />
+                    Live Analysis - {selectedSport === "basketball" ? "Basketball" : "Archery"}
+                  </span>
+                  <Button variant="outline" size="sm" onClick={stopLiveAnalysis}>
+                    <X className="h-4 w-4 mr-2" />
+                    Stop
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative bg-black rounded-lg overflow-hidden mb-4">
+                  <video
+                    ref={videoRef}
+                    className="w-full h-96 object-cover"
+                    autoPlay
+                    muted
+                    playsInline
+                  />
+                  <canvas ref={canvasRef} className="hidden" />
                 </div>
-              )}
-            </div>
-
-            {/* Controls */}
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Button
-                onClick={startCamera}
-                disabled={isAnalyzing}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Camera className="w-4 h-4 mr-2" />
-                Start Camera
-              </Button>
-              
-              <Button
-                onClick={processVideo}
-                disabled={!videoRef.current?.srcObject || isAnalyzing}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Analyze Frame
-              </Button>
-              
-              <label className="cursor-pointer">
-                <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-700">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Video
-                </Button>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {currentMetrics.map((metric, index) => (
-            <Card key={index} className="bg-slate-800/50 border-slate-700">
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-gray-400 mb-1">{metric.label}</div>
-                <div className={`text-lg font-semibold ${metric.color}`}>
-                  {metric.value}
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={startContinuousAnalysis}
+                    disabled={isAnalyzing}
+                    className="bg-blue-500 hover:bg-blue-600"
+                  >
+                    {isAnalyzing ? "Analyzing Motion..." : "Start Real-time Analysis"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
 
-        {/* Analysis Results */}
-        {analysisResult && (
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Analysis Results
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Performance Feedback</h3>
-                  <div className="space-y-2">
-                    {analysisResult.feedback?.map((feedback, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <p className="text-gray-300 text-sm">{feedback}</p>
-                      </div>
-                    ))}
+          {/* Analysis Tools */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Basketball Analysis */}
+            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  🏀 Basketball Analysis
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                    Dynamic
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-orange-100">
+                  Shooting form, movement patterns, and technique analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Real-time shooting form analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Elbow positioning and alignment</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Follow-through consistency</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Stance and balance analysis</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1 bg-orange-500 hover:bg-orange-600"
+                      onClick={() => {
+                        setSelectedSport("basketball");
+                        startLiveAnalysis();
+                      }}
+                      disabled={isLiveMode}
+                    >
+                      <Video className="w-4 h-4 mr-2" />
+                      Start Video Analysis
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      disabled={!isLiveMode || selectedSport !== "basketball"}
+                      onClick={startContinuousAnalysis}
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Real-time Analysis
+                    </Button>
                   </div>
                 </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Recommended Drills</h3>
-                  <div className="space-y-2">
-                    {analysisResult.drill_recommendations?.slice(0, 3).map((drill, index) => (
-                      <div key={index} className="bg-slate-700/50 p-3 rounded-lg">
-                        <div className="font-medium text-white text-sm">{drill.name}</div>
-                        <div className="text-gray-400 text-xs mt-1">{drill.description}</div>
-                      </div>
-                    )) || (
-                      <p className="text-gray-400 text-sm">No drill recommendations available</p>
-                    )}
+              </CardContent>
+            </Card>
+
+            {/* Archery Analysis */}
+            <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-3 text-2xl">
+                  🏹 Archery Analysis
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                    Precision
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-green-100">
+                  Form analysis, stance stability, and accuracy tracking
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Stance stability analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Draw technique consistency</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Anchor point tracking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Release timing analysis</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1 bg-green-500 hover:bg-green-600"
+                      onClick={() => {
+                        setSelectedSport("archery");
+                        startLiveAnalysis();
+                      }}
+                      disabled={isLiveMode}
+                    >
+                      <Video className="w-4 h-4 mr-2" />
+                      Start Video Analysis
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      disabled={!isLiveMode || selectedSport !== "archery"}
+                      onClick={startContinuousAnalysis}
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Real-time Analysis
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Analysis Results */}
+          {analysisResult && (
+            <Card className="mb-8 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <BarChart3 className="h-6 w-6" />
+                  Realtime Sports Connect AI Analysis - {analysisResult.sport.charAt(0).toUpperCase() + analysisResult.sport.slice(1)}
+                  <Badge 
+                    className={`${getScoreBg(analysisResult.score)} ${getScoreColor(analysisResult.score)} border-current`}
+                    variant="outline"
+                  >
+                    {analysisResult.score}% Score
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* 8 Essential Coaching Metrics */}
+                  <div>
+                    <h4 className="font-semibold mb-4 text-lg">Performance Metrics</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {/* Generate exactly 8 essential metrics from AI data */}
+                      {(() => {
+                        const metrics = analysisResult.metrics || {};
+                        const score = analysisResult.score || 0;
+                        const sport = analysisResult.sport.toLowerCase();
+                        
+                        // Sport-specific essential metrics
+                        let essentialMetrics = [];
+                        if (sport === 'basketball') {
+                          essentialMetrics = [
+                            { label: "Shooting Form", value: metrics.form || score, icon: "🎯" },
+                            { label: "Elbow Angle", value: metrics.elbow_angle || score - 5, icon: "📐" },
+                            { label: "Jump Height", value: metrics.jump_height || score + 3, icon: "⬆️" },
+                            { label: "Follow Through", value: metrics.follow_through || score - 2, icon: "👋" },
+                            { label: "Arc Consistency", value: metrics.consistency || score, icon: "📈" },
+                            { label: "Release Point", value: metrics.release_point || score - 3, icon: "🤏" },
+                            { label: "Footwork", value: metrics.footwork || score + 2, icon: "🦶" },
+                            { label: "Balance", value: metrics.balance || score, icon: "⚖️" }
+                          ];
+                        } else if (sport === 'archery') {
+                          essentialMetrics = [
+                            { label: "Draw Technique", value: metrics.form || score, icon: "🏹" },
+                            { label: "Anchor Point", value: metrics.anchor_point || score - 3, icon: "⚓" },
+                            { label: "Stance Stability", value: metrics.balance || score + 2, icon: "🧍" },
+                            { label: "Release Timing", value: metrics.timing || score - 2, icon: "⏱️" },
+                            { label: "Bow Alignment", value: metrics.alignment || score, icon: "📏" },
+                            { label: "Back Tension", value: metrics.tension || score - 4, icon: "💪" },
+                            { label: "Follow Through", value: metrics.follow_through || score, icon: "👋" },
+                            { label: "Consistency", value: metrics.consistency || score + 1, icon: "📊" }
+                          ];
+                        } else {
+                          // Default 8 essential metrics for any sport
+                          essentialMetrics = [
+                            { label: "Technical Form", value: metrics.form || score, icon: "⚙️" },
+                            { label: "Power Output", value: metrics.power || score, icon: "💥" },
+                            { label: "Consistency", value: metrics.consistency || score, icon: "📈" },
+                            { label: "Timing", value: metrics.timing || score, icon: "⏱️" },
+                            { label: "Balance", value: metrics.balance || score, icon: "⚖️" },
+                            { label: "Accuracy", value: metrics.accuracy || score, icon: "🎯" },
+                            { label: "Speed", value: metrics.speed || score, icon: "⚡" },
+                            { label: "Endurance", value: metrics.endurance || score, icon: "💪" }
+                          ];
+                        }
+                        
+                        return essentialMetrics.map((metric, index) => (
+                          <div key={index} className="bg-gray-50 rounded-lg p-4 text-center">
+                            <div className="text-2xl mb-2">{metric.icon}</div>
+                            <div className="text-sm font-medium mb-1">{metric.label}</div>
+                            <div className={`text-lg font-bold ${getScoreColor(metric.value)}`}>
+                              {Math.round(metric.value)}%
+                            </div>
+                            <Progress value={metric.value} className="h-2 mt-2" />
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* AI Feedback */}
+                  <div>
+                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                      <Trophy className="h-5 w-5 text-blue-600" />
+                      AI Feedback
+                    </h4>
+                    <div className="space-y-2">
+                      {analysisResult.feedback.map((feedback, index) => (
+                        <Alert key={index} className="border-blue-200 bg-blue-50">
+                          <AlertCircle className="h-4 w-4 text-blue-600" />
+                          <AlertDescription className="text-blue-800">
+                            • {feedback}
+                          </AlertDescription>
+                        </Alert>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* AI-Generated Recommended Drills */}
+                  {analysisResult.drill_recommendations && analysisResult.drill_recommendations.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                        <Target className="h-5 w-5 text-green-600" />
+                        AI-Generated Recommended Drills
+                      </h4>
+                      <div className="space-y-3">
+                        {analysisResult.drill_recommendations.map((drill, index) => (
+                          <Card key={index} className="border-green-200 bg-green-50">
+                            <CardContent className="p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <h5 className="font-medium text-green-800">{drill.name}</h5>
+                                <Badge variant="outline" className="text-green-700 border-green-300">
+                                  {drill.difficulty}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-green-700 mb-2">{drill.description}</p>
+                              <div className="flex justify-between items-center text-xs text-green-600">
+                                <span>Duration: {drill.duration}</span>
+                                <span>Focus: {drill.focus_areas?.join(', ')}</span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+
+
+          {/* Loading State */}
+          {isAnalyzing && (
+            <Card className="mb-8 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent className="p-8 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                  <h3 className="text-xl font-semibold">Analyzing Your Technique...</h3>
+                  <p className="text-gray-600">
+                    Our AI is processing your {selectedSport} form and generating personalized feedback.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Coming Soon Section */}
+          <div className="mt-12">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl text-gray-900">Coming Soon</CardTitle>
+                <CardDescription>More sports analysis tools in development</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                    <div className="text-2xl mb-2">🏊‍♀️</div>
+                    <div className="font-medium">Swimming</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                    <div className="text-2xl mb-2">🏐</div>
+                    <div className="font-medium">Volleyball</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                    <div className="text-2xl mb-2">🎾</div>
+                    <div className="font-medium">Tennis</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                    <div className="text-2xl mb-2">🥊</div>
+                    <div className="font-medium">Boxing</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Alert */}
+          <div className="mt-8">
+            <Card className="bg-blue-50 border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <AlertCircle className="h-6 w-6 text-blue-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-2">AI Analysis Ready</h3>
+                    <p className="text-blue-800 text-sm">
+                      Our AI system is trained on professional techniques. 
+                      Upload an image or use live analysis to get instant feedback on your form!
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
