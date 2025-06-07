@@ -1,5 +1,8 @@
 import { 
-  users, type User, type InsertUser,
+  users, 
+  trainingSchedule,
+  type User, 
+  type UpsertUser,
   userSports, type UserSport, type InsertUserSport,
   sessions, type Session, type InsertSession,
   reviews, type Review, type InsertReview,
@@ -9,15 +12,15 @@ import {
   achievements, type Achievement, type InsertAchievement,
   sessionStatusEnum
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // Define the storage interface
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
+  // User methods for Replit Auth - NO FALLBACK DATA
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
-  createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined>;
   
   // User-Sport methods
   addUserSport(userSport: InsertUserSport): Promise<UserSport>;
@@ -58,271 +61,156 @@ export interface IStorage {
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
 }
 
-export class MemStorage implements IStorage {
-  private usersStore: Map<number, User>;
-  private userSportsStore: Map<number, UserSport>;
-  private sessionsStore: Map<number, Session>;
-  private reviewsStore: Map<number, Review>;
-  private performanceMetricsStore: Map<number, PerformanceMetric>;
-  private trainingSessionsStore: Map<number, TrainingSession>;
-  private arMetricsStore: Map<number, ARMetric>;
-  private achievementsStore: Map<number, Achievement>;
+// Database storage implementation - NO MOCK DATA
+export class DatabaseStorage implements IStorage {
   
-  private userId: number = 1;
-  private userSportId: number = 1;
-  private sessionId: number = 1;
-  private reviewId: number = 1;
-  private performanceMetricId: number = 1;
-  private trainingSessionId: number = 1;
-  private arMetricId: number = 1;
-  private achievementId: number = 1;
-  
-  constructor() {
-    this.usersStore = new Map();
-    this.userSportsStore = new Map();
-    this.sessionsStore = new Map();
-    this.reviewsStore = new Map();
-    this.performanceMetricsStore = new Map();
-    this.trainingSessionsStore = new Map();
-    this.arMetricsStore = new Map();
-    this.achievementsStore = new Map();
-    
-    // Initialize with sample users for development
-    this.createUser({
-      name: "Guru Drona",
-      email: "coach@example.com",
-      password: "password123",
-      role: "coach",
-      primarySport: "archery",
-      bio: "Elite archery coach with over 15 years of experience training national and international champions. Specializes in technical precision and mental preparation.",
-      rating: 49, // 4.9 out of 5
-      experience: "15+ Years Experience",
-      students: 48
-    });
-    
-    this.createUser({
-      name: "Arjun Sharma",
-      email: "athlete@example.com",
-      password: "password123",
-      role: "athlete",
-      primarySport: "basketball",
-      bio: "Passionate about improving my skills and reaching new heights in my sporting journey."
-    });
+  // User methods for Replit Auth
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
   
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.usersStore.get(id);
-  }
-  
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.usersStore.values()).find(user => user.email === email);
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
   
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.usersStore.values());
-  }
-  
-  async createUser(user: InsertUser): Promise<User> {
-    const id = this.userId++;
-    const now = new Date();
-    const newUser: User = {
-      ...user,
-      id,
-      createdAt: now,
-      updatedAt: now
-    };
-    this.usersStore.set(id, newUser);
-    return newUser;
-  }
-  
-  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
-    const user = await this.getUser(id);
-    if (!user) return undefined;
-    
-    const updatedUser: User = {
-      ...user,
-      ...userData,
-      updatedAt: new Date()
-    };
-    
-    this.usersStore.set(id, updatedUser);
-    return updatedUser;
+    return await db.select().from(users);
   }
   
   // User-Sport methods
   async addUserSport(userSport: InsertUserSport): Promise<UserSport> {
-    const id = this.userSportId++;
-    const newUserSport: UserSport = {
-      ...userSport,
-      id
-    };
-    this.userSportsStore.set(id, newUserSport);
+    const [newUserSport] = await db.insert(userSports).values(userSport).returning();
     return newUserSport;
   }
   
   async getUserSports(userId: number): Promise<UserSport[]> {
-    return Array.from(this.userSportsStore.values()).filter(userSport => userSport.userId === userId);
+    return await db.select().from(userSports).where(eq(userSports.userId, userId));
   }
   
   // Session methods
   async getAllSessions(): Promise<Session[]> {
-    return Array.from(this.sessionsStore.values());
+    return await db.select().from(sessions);
   }
   
   async getSession(id: number): Promise<Session | undefined> {
-    return this.sessionsStore.get(id);
+    const [session] = await db.select().from(sessions).where(eq(sessions.id, id));
+    return session;
   }
   
   async getSessionsByUser(userId: number): Promise<Session[]> {
-    return Array.from(this.sessionsStore.values())
-      .filter(session => session.athleteId === userId || session.coachId === userId);
+    return await db.select().from(sessions)
+      .where(eq(sessions.athleteId, userId));
   }
   
   async getSessionsByCoach(coachId: number): Promise<Session[]> {
-    return Array.from(this.sessionsStore.values())
-      .filter(session => session.coachId === coachId);
+    return await db.select().from(sessions)
+      .where(eq(sessions.coachId, coachId));
   }
   
   async getSessionsByAthlete(athleteId: number): Promise<Session[]> {
-    return Array.from(this.sessionsStore.values())
-      .filter(session => session.athleteId === athleteId);
+    return await db.select().from(sessions)
+      .where(eq(sessions.athleteId, athleteId));
   }
   
   async createSession(session: InsertSession): Promise<Session> {
-    const id = this.sessionId++;
-    const now = new Date();
-    const newSession: Session = {
-      ...session,
-      id,
-      createdAt: now,
-      updatedAt: now
-    };
-    this.sessionsStore.set(id, newSession);
+    const [newSession] = await db.insert(sessions).values(session).returning();
     return newSession;
   }
   
   async updateSessionStatus(id: number, status: 'upcoming' | 'completed' | 'cancelled'): Promise<Session | undefined> {
-    const session = await this.getSession(id);
-    if (!session) return undefined;
-    
-    const updatedSession: Session = {
-      ...session,
-      status,
-      updatedAt: new Date()
-    };
-    
-    this.sessionsStore.set(id, updatedSession);
+    const [updatedSession] = await db.update(sessions)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(sessions.id, id))
+      .returning();
     return updatedSession;
   }
   
   // Review methods
   async getReview(id: number): Promise<Review | undefined> {
-    return this.reviewsStore.get(id);
+    const [review] = await db.select().from(reviews).where(eq(reviews.id, id));
+    return review;
   }
   
   async getReviewsByCoach(coachId: number): Promise<Review[]> {
-    return Array.from(this.reviewsStore.values())
-      .filter(review => review.coachId === coachId);
+    return await db.select().from(reviews).where(eq(reviews.coachId, coachId));
   }
   
   async createReview(review: InsertReview): Promise<Review> {
-    const id = this.reviewId++;
-    const now = new Date();
-    const newReview: Review = {
-      ...review,
-      id,
-      date: now
-    };
-    this.reviewsStore.set(id, newReview);
+    const [newReview] = await db.insert(reviews).values(review).returning();
     return newReview;
   }
   
   // Performance Metric methods
   async getPerformanceMetric(id: number): Promise<PerformanceMetric | undefined> {
-    return this.performanceMetricsStore.get(id);
+    const [metric] = await db.select().from(performanceMetrics).where(eq(performanceMetrics.id, id));
+    return metric;
   }
   
   async getPerformanceMetricsByAthlete(athleteId: number): Promise<PerformanceMetric[]> {
-    return Array.from(this.performanceMetricsStore.values())
-      .filter(metric => metric.athleteId === athleteId);
+    return await db.select().from(performanceMetrics).where(eq(performanceMetrics.athleteId, athleteId));
   }
   
   async createPerformanceMetric(metric: InsertPerformanceMetric): Promise<PerformanceMetric> {
-    const id = this.performanceMetricId++;
-    const now = new Date();
-    const newMetric: PerformanceMetric = {
-      ...metric,
-      id,
-      date: now
-    };
-    this.performanceMetricsStore.set(id, newMetric);
+    const [newMetric] = await db.insert(performanceMetrics).values(metric).returning();
     return newMetric;
   }
   
   // Training Session methods
   async getTrainingSession(id: number): Promise<TrainingSession | undefined> {
-    return this.trainingSessionsStore.get(id);
+    const [session] = await db.select().from(trainingSessions).where(eq(trainingSessions.id, id));
+    return session;
   }
   
   async getTrainingSessionsByAthlete(athleteId: number): Promise<TrainingSession[]> {
-    return Array.from(this.trainingSessionsStore.values())
-      .filter(session => session.athleteId === athleteId);
+    return await db.select().from(trainingSessions).where(eq(trainingSessions.athleteId, athleteId));
   }
   
   async createTrainingSession(trainingSession: InsertTrainingSession): Promise<TrainingSession> {
-    const id = this.trainingSessionId++;
-    const now = new Date();
-    const newTrainingSession: TrainingSession = {
-      ...trainingSession,
-      id,
-      date: now
-    };
-    this.trainingSessionsStore.set(id, newTrainingSession);
+    const [newTrainingSession] = await db.insert(trainingSessions).values(trainingSession).returning();
     return newTrainingSession;
   }
   
   // AR Metric methods
   async getARMetric(id: number): Promise<ARMetric | undefined> {
-    return this.arMetricsStore.get(id);
+    const [metric] = await db.select().from(arMetrics).where(eq(arMetrics.id, id));
+    return metric;
   }
   
   async getARMetricsByUser(userId: number): Promise<ARMetric[]> {
-    return Array.from(this.arMetricsStore.values())
-      .filter(metric => metric.userId === userId);
+    return await db.select().from(arMetrics).where(eq(arMetrics.userId, userId));
   }
   
   async createARMetric(arMetric: InsertARMetric): Promise<ARMetric> {
-    const id = this.arMetricId++;
-    const now = new Date();
-    const newARMetric: ARMetric = {
-      ...arMetric,
-      id,
-      timestamp: now
-    };
-    this.arMetricsStore.set(id, newARMetric);
+    const [newARMetric] = await db.insert(arMetrics).values(arMetric).returning();
     return newARMetric;
   }
   
   // Achievement methods
   async getAchievement(id: number): Promise<Achievement | undefined> {
-    return this.achievementsStore.get(id);
+    const [achievement] = await db.select().from(achievements).where(eq(achievements.id, id));
+    return achievement;
   }
   
   async getAchievementsByUser(userId: number): Promise<Achievement[]> {
-    return Array.from(this.achievementsStore.values())
-      .filter(achievement => achievement.userId === userId);
+    return await db.select().from(achievements).where(eq(achievements.userId, userId));
   }
   
   async createAchievement(achievement: InsertAchievement): Promise<Achievement> {
-    const id = this.achievementId++;
-    const newAchievement: Achievement = {
-      ...achievement,
-      id
-    };
-    this.achievementsStore.set(id, newAchievement);
+    const [newAchievement] = await db.insert(achievements).values(achievement).returning();
     return newAchievement;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

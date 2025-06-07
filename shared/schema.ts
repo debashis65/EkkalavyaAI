@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, pgEnum, varchar, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -70,21 +70,32 @@ export const sessionTypeEnum = pgEnum('session_type', [
   'physical'
 ]);
 
-// Users table
+// Session storage table for Replit authentication
+export const authSessions = pgTable(
+  "auth_sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Users table with Replit authentication support
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
+  id: varchar("id").primaryKey().notNull(), // Replit user ID
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   role: userRoleEnum("role").notNull().default('athlete'),
-  primarySport: sportEnum("primary_sport").notNull(), // User's chosen sport
+  primarySport: sportEnum("primary_sport"), // User's chosen sport
   classification: text("classification"), // Para sport classification (W1, B1, CP2, etc.)
   membershipTier: text("membership_tier").default("free"), // free, basic, premium, pro
   subscriptionStatus: text("subscription_status").default("inactive"), // active, inactive, expired
   subscriptionStartDate: timestamp("subscription_start_date"),
   subscriptionEndDate: timestamp("subscription_end_date"),
   monthlySpent: integer("monthly_spent").default(0), // Track spending for analytics
-  avatar: text("avatar"),
   bio: text("bio"),
   rating: integer("rating"),
   experience: text("experience"),
@@ -368,6 +379,10 @@ export const insertAchievementSchema = createInsertSchema(achievements).omit({
   id: true,
 });
 
+// Authentication types for Replit Auth
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertUserSport = z.infer<typeof insertUserSportSchema>;
@@ -378,7 +393,6 @@ export type InsertTrainingSession = z.infer<typeof insertTrainingSessionSchema>;
 export type InsertARMetric = z.infer<typeof insertARMetricSchema>;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 
-export type User = typeof users.$inferSelect;
 export type UserSport = typeof userSports.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
