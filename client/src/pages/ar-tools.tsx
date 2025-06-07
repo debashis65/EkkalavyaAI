@@ -12,6 +12,7 @@ import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
 
 interface AnalysisResult {
   sport: string;
+  analysis_type: string;
   score: number;
   feedback: string[];
   metrics: Record<string, number>;
@@ -495,11 +496,10 @@ export default function ARTools({ user }: ARToolsProps = {}) {
     if (!analysisResult) return [];
     
     try {
-      const response = await fetch('/api/recommend_drills', {
+      const response = await fetch('http://localhost:8000/recommend_drills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: user?.id,
           sport: userPrimarySport,
           skill_level: analysisResult.score >= 80 ? 'advanced' : analysisResult.score >= 60 ? 'intermediate' : 'beginner',
           weak_areas: Object.entries(analysisResult.metrics || {})
@@ -519,6 +519,61 @@ export default function ARTools({ user }: ARToolsProps = {}) {
     return [];
   };
 
+  // Helper function to get drill recommendations for specific areas
+  const getDrillForArea = (area: string, sport: string) => {
+    const drillDatabase = {
+      basketball: {
+        form: "Practice wall shooting with focus on elbow alignment. Stand 3 feet from wall, shoot with one hand focusing on proper release.",
+        power: "Resistance band shooting drills. Use resistance bands to build shooting strength and muscle memory.",
+        consistency: "Spot shooting drill. Practice from the same spot until you can make 8/10 shots consistently.",
+        timing: "Rhythm shooting with metronome. Practice shooting to a steady beat to improve timing consistency.",
+        balance: "Single leg shooting drills. Practice shooting while standing on one leg to improve balance and core strength.",
+        accuracy: "Target practice with smaller hoops or targets. Use tennis balls through smaller targets to improve precision.",
+        speed: "Quick release drills. Practice catching and shooting in under 0.5 seconds with proper form."
+      },
+      // Add more sports as needed
+    };
+    
+    return drillDatabase[sport as keyof typeof drillDatabase]?.[area as keyof typeof drillDatabase.basketball] 
+      || `Specific ${area} improvement exercises for ${sport}. Practice fundamental techniques with focus on this area.`;
+  };
+
+  // Start AI Analysis function
+  const handleStartAnalysis = async () => {
+    if (!isConnected) {
+      console.log('AI server not connected, attempting to reconnect...');
+      connect();
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      // Send analysis request to AI backend
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sport: userPrimarySport,
+          analysis_type: selectedAnalysisType || sportConfig.analysisTypes[0],
+          user_id: user?.id
+        })
+      });
+
+      if (response.ok) {
+        const analysisData = await response.json();
+        // Analysis result will be received via WebSocket
+        console.log('Analysis started:', analysisData);
+      } else {
+        console.error('Failed to start analysis');
+        setIsAnalyzing(false);
+      }
+    } catch (error) {
+      console.error('Analysis error:', error);
+      setIsAnalyzing(false);
+    }
+  };
+
   const currentMetrics = getMetricsForSport(userPrimarySport);
 
   // Initialize analysis type
@@ -533,13 +588,15 @@ export default function ARTools({ user }: ARToolsProps = {}) {
     if (currentResult) {
       setAnalysisResult({
         sport: currentResult.sport,
+        analysis_type: currentResult.analysis_type || selectedAnalysisType || sportConfig.analysisTypes[0],
         score: currentResult.score,
         feedback: currentResult.feedback || [],
         metrics: currentResult.metrics || {},
         timestamp: currentResult.timestamp || new Date().toISOString()
       });
+      setIsAnalyzing(false);
     }
-  }, [currentResult]);
+  }, [currentResult, selectedAnalysisType, sportConfig.analysisTypes]);
 
   const startCamera = useCallback(async () => {
     setIsAnalyzing(true);
@@ -690,8 +747,13 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Video
                   </Button>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    Start Analysis
+                  <Button 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={handleStartAnalysis}
+                    disabled={isAnalyzing || !isConnected}
+                  >
+                    {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
                   </Button>
                 </div>
               </div>
