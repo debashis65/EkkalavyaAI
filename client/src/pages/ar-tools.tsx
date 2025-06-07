@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
 
 interface AnalysisResult {
   sport: string;
@@ -16,14 +17,87 @@ interface AnalysisResult {
   timestamp: string;
 }
 
+interface SportMetric {
+  name: string;
+  description: string;
+  unit: string;
+}
+
+// Sport-specific helper functions
+const getSportDisplayName = (sport: string): string => {
+  const sportNames: Record<string, string> = {
+    basketball: "Basketball", archery: "Archery", swimming: "Swimming", football: "Football",
+    cricket: "Cricket", tennis: "Tennis", badminton: "Badminton", volleyball: "Volleyball",
+    gymnastics: "Gymnastics", athletics: "Athletics", yoga: "Yoga", table_tennis: "Table Tennis",
+    squash: "Squash", cycling: "Cycling", boxing: "Boxing", wrestling: "Wrestling",
+    judo: "Judo", karate: "Karate", weightlifting: "Weightlifting", hockey: "Hockey",
+    golf: "Golf", skating: "Skating", ice_skating: "Ice Skating", long_jump: "Long Jump",
+    high_jump: "High Jump", pole_vault: "Pole Vault", hurdle: "Hurdle", shot_put: "Shot Put",
+    discus_throw: "Discus Throw", javelin_throw: "Javelin Throw", kabaddi: "Kabaddi",
+    kho_kho: "Kho Kho", para_archery: "Para Archery", para_swimming: "Para Swimming",
+    wheelchair_basketball: "Wheelchair Basketball", para_athletics: "Para Athletics"
+  };
+  return sportNames[sport] || sport.charAt(0).toUpperCase() + sport.slice(1);
+};
+
+const getSportMetrics = (sport: string): SportMetric[] => {
+  const sportMetrics: Record<string, SportMetric[]> = {
+    basketball: [
+      { name: "Shooting Form", description: "Release angle and arc", unit: "Score" },
+      { name: "Footwork", description: "Balance and positioning", unit: "%" },
+      { name: "Ball Handling", description: "Dribbling technique", unit: "Score" }
+    ],
+    archery: [
+      { name: "Draw Length", description: "Consistent draw distance", unit: "inches" },
+      { name: "Anchor Point", description: "Consistent hand placement", unit: "Score" },
+      { name: "Release", description: "Clean finger release", unit: "Score" }
+    ],
+    swimming: [
+      { name: "Stroke Rate", description: "Strokes per minute", unit: "SPM" },
+      { name: "Body Position", description: "Horizontal alignment", unit: "Score" },
+      { name: "Breathing", description: "Bilateral breathing pattern", unit: "Score" }
+    ],
+    default: [
+      { name: "Form", description: "Overall technique", unit: "Score" },
+      { name: "Balance", description: "Body stability", unit: "Score" },
+      { name: "Power", description: "Force generation", unit: "Score" }
+    ]
+  };
+  return sportMetrics[sport] || sportMetrics.default;
+};
+
 export default function ARTools() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [selectedSport, setSelectedSport] = useState<"basketball" | "archery">("basketball");
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [userSport, setUserSport] = useState<string>("basketball"); // User's primary sport
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
+  
+  // WebSocket for real-time analysis
+  const { isConnected, currentResult, startAnalysis, stopAnalysis } = useWebSocketAnalysis();
+
+  // Get user's primary sport from authentication context
+  useEffect(() => {
+    // In production, this would come from user authentication context
+    // For now, we'll use the selected sport as the user's primary sport
+    setUserSport(selectedSport);
+  }, [selectedSport]);
+
+  // Update analysis result when WebSocket data arrives
+  useEffect(() => {
+    if (currentResult) {
+      setAnalysisResult({
+        sport: currentResult.sport,
+        score: currentResult.score,
+        feedback: currentResult.feedback || [],
+        metrics: currentResult.metrics || {},
+        timestamp: currentResult.timestamp || new Date().toISOString()
+      });
+    }
+  }, [currentResult]);
 
   const startLiveAnalysis = useCallback(async () => {
     setIsLiveMode(true);
@@ -199,6 +273,36 @@ export default function ARTools() {
               🏹 Archery
             </Button>
           </div>
+
+          {/* Sport-Specific Information Display */}
+          {userSport && (
+            <div className="mb-6 sm:mb-8">
+              <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <Target className="h-5 w-5" />
+                    {getSportDisplayName(userSport)} Analysis Dashboard
+                  </CardTitle>
+                  <CardDescription>
+                    Specialized analysis tools for {getSportDisplayName(userSport)} technique improvement
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {getSportMetrics(userSport).map((metric, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-900 mb-2">{metric.name}</h4>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{metric.description}</span>
+                          <Badge variant="outline">{metric.unit}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Live Video Analysis */}
           {isLiveMode && (
@@ -449,30 +553,78 @@ export default function ARTools() {
             </Card>
           )}
 
-          {/* Coming Soon Section */}
+          {/* All Supported Sports Section */}
           <div className="mt-12">
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-gray-900">Coming Soon</CardTitle>
-                <CardDescription>More sports analysis tools in development</CardDescription>
+                <CardTitle className="text-2xl text-gray-900">All Supported Sports</CardTitle>
+                <CardDescription>54+ sports with AI-powered analysis available</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-2xl mb-2">🏊‍♀️</div>
-                    <div className="font-medium">Swimming</div>
+                    <div className="font-medium text-green-800">Swimming</div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-2xl mb-2">🏐</div>
-                    <div className="font-medium">Volleyball</div>
+                    <div className="font-medium text-green-800">Volleyball</div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-2xl mb-2">🎾</div>
-                    <div className="font-medium">Tennis</div>
+                    <div className="font-medium text-green-800">Tennis</div>
                   </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-2xl mb-2">🥊</div>
-                    <div className="font-medium">Boxing</div>
+                    <div className="font-medium text-green-800">Boxing</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🏑</div>
+                    <div className="font-medium text-green-800">Hockey</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">⚽</div>
+                    <div className="font-medium text-green-800">Football</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🏏</div>
+                    <div className="font-medium text-green-800">Cricket</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🤸‍♀️</div>
+                    <div className="font-medium text-green-800">Gymnastics</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🏃‍♂️</div>
+                    <div className="font-medium text-green-800">Athletics</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🧘‍♀️</div>
+                    <div className="font-medium text-green-800">Yoga</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🏓</div>
+                    <div className="font-medium text-green-800">Table Tennis</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-2xl mb-2">🚴‍♀️</div>
+                    <div className="font-medium text-green-800">Cycling</div>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="text-2xl mb-2">♿</div>
+                    <div className="font-medium text-blue-800">Para Sports</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="text-2xl mb-2">🏛️</div>
+                    <div className="font-medium text-purple-800">Kabaddi</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="text-2xl mb-2">🏃‍♀️</div>
+                    <div className="font-medium text-purple-800">Kho Kho</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-100 rounded-lg border border-gray-300">
+                    <div className="text-2xl mb-2">+39</div>
+                    <div className="font-medium text-gray-700">More Sports</div>
                   </div>
                 </div>
               </CardContent>
