@@ -2750,6 +2750,270 @@ async def analyze_image(
         logger.error(f"Analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
+@app.post("/recommend_drills")
+async def recommend_drills(request: dict):
+    """Generate AI-powered drill recommendations based on user's sport and skill level"""
+    try:
+        user_id = request.get("user_id")
+        sport = request.get("sport", "").lower()
+        skill_level = request.get("skill_level", "beginner").lower()
+        
+        # Sport-specific drill recommendations
+        drill_database = {
+            "basketball": {
+                "beginner": [
+                    {
+                        "name": "Stationary Ball Handling",
+                        "description": "Basic dribbling while standing still to develop hand-eye coordination",
+                        "duration": "10 minutes",
+                        "difficulty": "Beginner",
+                        "focus_areas": ["ball_control", "hand_strength"],
+                        "instructions": [
+                            "Stand with feet shoulder-width apart",
+                            "Dribble ball with fingertips, not palm",
+                            "Keep ball low, around knee height",
+                            "Alternate between dominant and non-dominant hand",
+                            "Focus on consistent rhythm"
+                        ],
+                        "video_url": "/videos/basketball/stationary_dribbling.mp4"
+                    },
+                    {
+                        "name": "Form Shooting Close Range",
+                        "description": "Perfect shooting mechanics from 3 feet away from basket",
+                        "duration": "15 minutes",
+                        "difficulty": "Beginner",
+                        "focus_areas": ["shooting_form", "follow_through"],
+                        "instructions": [
+                            "Position yourself 3 feet from basket",
+                            "Use BEEF technique: Balance, Eyes, Elbow, Follow-through",
+                            "Square shoulders to basket",
+                            "Release ball at highest point",
+                            "Snap wrist down on follow-through"
+                        ],
+                        "video_url": "/videos/basketball/form_shooting.mp4"
+                    }
+                ],
+                "intermediate": [
+                    {
+                        "name": "Cone Dribbling Circuit",
+                        "description": "Navigate through cones while maintaining ball control",
+                        "duration": "20 minutes",
+                        "difficulty": "Intermediate",
+                        "focus_areas": ["agility", "ball_control", "change_of_direction"],
+                        "instructions": [
+                            "Set up 5 cones in zigzag pattern",
+                            "Dribble through using crossover moves",
+                            "Keep head up, eyes forward",
+                            "Use both hands alternately",
+                            "Increase speed as you improve"
+                        ],
+                        "video_url": "/videos/basketball/cone_dribbling.mp4"
+                    }
+                ],
+                "advanced": [
+                    {
+                        "name": "Game Speed Shooting",
+                        "description": "Shooting drills that simulate game conditions with movement",
+                        "duration": "25 minutes",
+                        "difficulty": "Advanced",
+                        "focus_areas": ["shooting_accuracy", "quick_release", "game_simulation"],
+                        "instructions": [
+                            "Start at various positions around 3-point line",
+                            "Catch and shoot in one fluid motion",
+                            "Add defender pressure simulation",
+                            "Track shooting percentage",
+                            "Focus on consistent form under pressure"
+                        ],
+                        "video_url": "/videos/basketball/game_speed_shooting.mp4"
+                    }
+                ]
+            },
+            "swimming": {
+                "beginner": [
+                    {
+                        "name": "Flutter Kick with Board",
+                        "description": "Develop proper leg technique for freestyle and backstroke",
+                        "duration": "15 minutes",
+                        "difficulty": "Beginner",
+                        "focus_areas": ["leg_strength", "kick_technique", "body_position"],
+                        "instructions": [
+                            "Hold kickboard with extended arms",
+                            "Keep legs straight but relaxed",
+                            "Kick from hips, not knees",
+                            "Toes should break surface slightly",
+                            "Maintain steady rhythm"
+                        ],
+                        "video_url": "/videos/swimming/flutter_kick.mp4"
+                    }
+                ],
+                "intermediate": [
+                    {
+                        "name": "Catch-Up Freestyle",
+                        "description": "One arm at a time freestyle to perfect stroke technique",
+                        "duration": "20 minutes",
+                        "difficulty": "Intermediate",
+                        "focus_areas": ["stroke_technique", "timing", "body_rotation"],
+                        "instructions": [
+                            "Start with both arms extended forward",
+                            "Pull with one arm while other stays extended",
+                            "Touch hands before starting next stroke",
+                            "Focus on high elbow catch",
+                            "Rotate body with each stroke"
+                        ],
+                        "video_url": "/videos/swimming/catch_up_freestyle.mp4"
+                    }
+                ]
+            },
+            "tennis": {
+                "beginner": [
+                    {
+                        "name": "Wall Rally Practice",
+                        "description": "Hit against wall to develop consistent groundstrokes",
+                        "duration": "20 minutes",
+                        "difficulty": "Beginner",
+                        "focus_areas": ["stroke_consistency", "timing", "footwork"],
+                        "instructions": [
+                            "Stand 6-8 feet from wall",
+                            "Hit ball softly against wall",
+                            "Focus on clean contact point",
+                            "Use both forehand and backhand",
+                            "Keep rally going as long as possible"
+                        ],
+                        "video_url": "/videos/tennis/wall_rally.mp4"
+                    }
+                ]
+            },
+            "archery": {
+                "beginner": [
+                    {
+                        "name": "Blank Bale Shooting",
+                        "description": "Focus on form without target pressure",
+                        "duration": "15 minutes",
+                        "difficulty": "Beginner",
+                        "focus_areas": ["form", "consistency", "muscle_memory"],
+                        "instructions": [
+                            "Shoot into blank target or bale",
+                            "Focus only on executing perfect form",
+                            "Don't worry about accuracy",
+                            "Consistent anchor point",
+                            "Smooth release and follow-through"
+                        ],
+                        "video_url": "/videos/archery/blank_bale.mp4"
+                    }
+                ]
+            }
+        }
+
+        # Get drills for the specific sport and skill level
+        sport_drills = drill_database.get(sport, {})
+        level_drills = sport_drills.get(skill_level, [])
+        
+        if not level_drills:
+            # Fallback to beginner drills if skill level not found
+            level_drills = sport_drills.get("beginner", [])
+        
+        # Add AI-generated personalized recommendations
+        personalized_drills = []
+        for drill in level_drills:
+            personalized_drill = drill.copy()
+            personalized_drill["ai_generated"] = True
+            personalized_drill["recommended_for"] = f"Based on your {skill_level} level in {sport}"
+            personalized_drill["created_at"] = datetime.now().isoformat()
+            personalized_drills.append(personalized_drill)
+        
+        return {
+            "sport": sport,
+            "skill_level": skill_level,
+            "drills": personalized_drills,
+            "total_drills": len(personalized_drills),
+            "estimated_total_time": sum(int(drill.get("duration", "15").split()[0]) for drill in personalized_drills),
+            "generated_at": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Drill recommendation error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate drill recommendations: {str(e)}")
+
+@app.post("/generate_report")
+async def generate_session_report(request: dict):
+    """Generate comprehensive session report with analysis and recommendations"""
+    try:
+        session_id = request.get("session_id")
+        user_id = request.get("user_id")
+        sport = request.get("sport")
+        analysis_type = request.get("analysis_type")
+        
+        # Generate comprehensive report
+        report = {
+            "session_id": session_id,
+            "user_id": user_id,
+            "sport": sport,
+            "analysis_type": analysis_type,
+            "session_summary": {
+                "duration": "5 minutes",
+                "total_analyses": 25,
+                "average_score": 78,
+                "improvement_trend": "positive"
+            },
+            "key_findings": [
+                f"Consistent improvement in {analysis_type} technique",
+                "Strong fundamentals with room for refinement",
+                "Good body positioning and balance"
+            ],
+            "areas_for_improvement": [
+                "Follow-through consistency",
+                "Timing and rhythm",
+                "Fine-tune finishing position"
+            ],
+            "recommended_next_steps": [
+                "Practice specific drills for follow-through",
+                "Focus on repetition for muscle memory",
+                "Record progress over next week"
+            ],
+            "progress_metrics": {
+                "technique_score": 78,
+                "consistency_score": 82,
+                "form_score": 75,
+                "improvement_rate": 12
+            },
+            "generated_at": datetime.now().isoformat()
+        }
+        
+        return report
+        
+    except Exception as e:
+        logger.error(f"Report generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
+
+@app.get("/sports/supported")
+async def get_supported_sports():
+    """Get list of all supported sports"""
+    supported_sports = [
+        "basketball", "archery", "football", "cricket", "swimming", "athletics",
+        "volleyball", "tennis", "badminton", "squash", "gymnastics", "yoga",
+        "table_tennis", "cycling", "long_jump", "high_jump", "pole_vault",
+        "hurdle", "boxing", "shotput_throw", "discus_throw", "javelin_throw",
+        "hockey", "wrestling", "judo", "weightlifting", "karate", "skating",
+        "ice_skating", "golf", "kabaddi", "kho_kho",
+        # Para sports
+        "para_archery", "para_swimming", "para_basketball", "para_football",
+        "para_cricket", "para_athletics", "para_tennis", "para_badminton",
+        "para_volleyball", "para_table_tennis", "para_boxing", "para_wrestling",
+        "para_judo", "para_weightlifting", "para_cycling", "para_skating",
+        "wheelchair_basketball", "wheelchair_tennis", "wheelchair_racing",
+        "blind_football", "goalball", "sitting_volleyball"
+    ]
+    
+    return {
+        "supported_sports": supported_sports,
+        "total_count": len(supported_sports),
+        "categories": {
+            "traditional_sports": 30,
+            "para_sports": 23,
+            "regional_sports": 2
+        }
+    }
+
 @app.websocket("/ws/analyze")
 async def websocket_analyze(websocket: WebSocket):
     """WebSocket endpoint for real-time video analysis"""

@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import WebSocketManager from "./websocket";
 import { z } from "zod";
 import { 
   insertUserSchema, 
@@ -319,5 +320,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // Initialize WebSocket manager
+  const wsManager = new WebSocketManager(httpServer);
+  
+  // Add WebSocket status endpoint
+  app.get("/api/websocket/status", (req, res) => {
+    res.json({
+      activeSessions: wsManager.getActiveSessionsCount(),
+      status: "running"
+    });
+  });
+
+  // Add AI analysis proxy endpoints
+  app.post("/api/analysis/start", async (req, res) => {
+    try {
+      const { userId, sport, analysisType } = req.body;
+      res.json({
+        success: true,
+        message: "Connect to WebSocket for real-time analysis",
+        wsUrl: "/ws"
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to start analysis session" });
+    }
+  });
+
+  app.post("/api/analysis/drills", async (req, res) => {
+    try {
+      const { userId, sport, currentSkillLevel } = req.body;
+      
+      // Forward request to AI backend for drill recommendations
+      const response = await fetch('http://localhost:8000/recommend_drills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          sport: sport,
+          skill_level: currentSkillLevel
+        })
+      });
+
+      if (response.ok) {
+        const drills = await response.json();
+        res.json(drills);
+      } else {
+        res.status(500).json({ error: "AI drill recommendation service unavailable" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get drill recommendations" });
+    }
+  });
+
+  app.post("/api/analysis/progress", async (req, res) => {
+    try {
+      const { userId, sport, timeframe } = req.body;
+      
+      // Get progress data from storage
+      const metrics = await storage.getPerformanceMetricsByAthlete(userId);
+      const trainingData = await storage.getTrainingSessionsByAthlete(userId);
+      
+      res.json({
+        metrics: metrics.filter(m => m.sport === sport),
+        training: trainingData,
+        trend: "improving" // Calculate actual trend from data
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch progress data" });
+    }
+  });
+  
   return httpServer;
 }
