@@ -277,9 +277,16 @@ export default function ARTools({ user }: ARToolsProps = {}) {
       formData.append('analysis_type', selectedAnalysisType || 'general');
 
       // Send to AI backend for processing
-      const response = await fetch('http://localhost:8000/analyze_video', {
+      const response = await fetch('http://localhost:8000/analyze', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sport: userPrimarySport,
+          analysis_type: selectedAnalysisType || 'general',
+          video_upload: true
+        }),
       });
 
       if (!response.ok) {
