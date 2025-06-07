@@ -18,7 +18,7 @@ import Coaches from "@/pages/coaches";
 import CoachStudents from "@/pages/coach-students";
 import Training from "@/pages/training";
 import VideoConsulting from "@/pages/video-consulting";
-import ARTools from "@/pages/ar-tools-new";
+import ARTools from "@/pages/ar-tools";
 import Profile from "@/pages/profile-correct";
 import CoachProfile from "@/pages/coach-profile";
 
