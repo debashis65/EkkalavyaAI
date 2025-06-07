@@ -95,6 +95,12 @@ class SportAnalysisEngine:
                     "control": 82
                 }
             }
+        else:
+            return {
+                "score": base_score,
+                "feedback": ["Focus on fundamental basketball skills"],
+                "metrics": {"overall": 75}
+            }
         
     def _analyze_swimming(self, analysis_type: str) -> Dict[str, Any]:
         """Swimming-specific analysis"""
@@ -115,6 +121,12 @@ class SportAnalysisEngine:
                     "breathing_rhythm": 85
                 }
             }
+        else:
+            return {
+                "score": base_score,
+                "feedback": ["Focus on swimming fundamentals"],
+                "metrics": {"overall": 78}
+            }
             
     def _analyze_tennis(self, analysis_type: str) -> Dict[str, Any]:
         """Tennis-specific analysis"""
@@ -133,6 +145,12 @@ class SportAnalysisEngine:
                     "contact_point": 85,
                     "follow_through": 90
                 }
+            }
+        else:
+            return {
+                "score": base_score,
+                "feedback": ["Focus on tennis fundamentals"],
+                "metrics": {"overall": 76}
             }
             
     def _analyze_archery(self, analysis_type: str) -> Dict[str, Any]:
@@ -153,6 +171,12 @@ class SportAnalysisEngine:
                     "back_tension": 87
                 }
             }
+        else:
+            return {
+                "score": base_score,
+                "feedback": ["Focus on archery fundamentals"],
+                "metrics": {"overall": 82}
+            }
             
     def _analyze_football(self, analysis_type: str) -> Dict[str, Any]:
         """Football-specific analysis"""
@@ -171,6 +195,12 @@ class SportAnalysisEngine:
                     "accuracy": 76,
                     "technique": 88
                 }
+            }
+        else:
+            return {
+                "score": base_score,
+                "feedback": ["Focus on football fundamentals"],
+                "metrics": {"overall": 74}
             }
             
     def _analyze_racket_sports(self, sport: str, analysis_type: str) -> Dict[str, Any]:
