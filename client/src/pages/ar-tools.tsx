@@ -8,15 +8,27 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X, Wifi, WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
+import { VideoProcessor } from "@/components/VideoProcessor";
+import { 
+  RealTimeSportsAnalyzer, 
+  getSportConfig, 
+  getEssentialMetrics, 
+  generateDrillRecommendations,
+  type RealTimeAnalysis,
+  type DrillRecommendation,
+  type AnalysisMetric
+} from "@/lib/sportsAnalysis";
 
-interface AnalysisResult {
-  sport: string;
-  analysis_type: string;
-  score: number;
-  feedback: string[];
-  metrics: Record<string, number>;
-  timestamp: string;
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+  primarySport?: string;
+}
+
+interface ARToolsProps {
+  user?: User;
 }
 
 // Comprehensive sport-specific analysis data
@@ -198,16 +210,51 @@ export default function ARTools({ user }: ARToolsProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
-  // WebSocket integration
-  const { isConnected, currentResult, connect, disconnect } = useWebSocketAnalysis();
+  // Real WebSocket connection for authentic analysis
+  const [isConnected, setIsConnected] = useState(false);
+  const [wsConnection, setWsConnection] = useState<WebSocket | null>(null);
 
-  // Connect to AI server on component mount
+  // Connect to real AI backend
   useEffect(() => {
-    connect();
-    return () => {
-      disconnect();
+    const connectToAnalysisServer = async () => {
+      try {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/ws`;
+        const ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+          setIsConnected(true);
+          setWsConnection(ws);
+          console.log('Connected to analysis server');
+        };
+        
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.sport && data.metrics) {
+              setAnalysisResult(data);
+            }
+          } catch (error) {
+            console.error('Failed to parse analysis data:', error);
+          }
+        };
+        
+        ws.onerror = () => setIsConnected(false);
+        ws.onclose = () => setIsConnected(false);
+      } catch (error) {
+        console.error('Failed to connect to analysis server:', error);
+        setIsConnected(false);
+      }
     };
-  }, [connect, disconnect]);
+    
+    connectToAnalysisServer();
+    
+    return () => {
+      if (wsConnection) {
+        wsConnection.close();
+      }
+    };
+  }, []);
 
   // Helper functions for real-time scoring
   const getScoreColor = (score: number) => {
