@@ -1,13 +1,12 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X, Wifi, WifiOff } from "lucide-react";
+import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
 
 interface AnalysisResult {
   sport: string;
@@ -17,104 +16,14 @@ interface AnalysisResult {
   timestamp: string;
 }
 
-// Sport-specific data mapping
-const getSportData = (sport: string) => {
-  const sportConfigs = {
-    basketball: {
-      emoji: "🏀",
-      name: "Basketball",
-      color: "orange",
-      gradient: "from-orange-500 to-red-500",
-      bgColor: "bg-orange-500 hover:bg-orange-600",
-      features: [
-        "Real-time shooting form analysis",
-        "Elbow positioning and alignment", 
-        "Follow-through consistency",
-        "Stance and balance analysis"
-      ]
-    },
-    archery: {
-      emoji: "🏹", 
-      name: "Archery",
-      color: "green",
-      gradient: "from-green-500 to-emerald-500",
-      bgColor: "bg-green-500 hover:bg-green-600",
-      features: [
-        "Stance stability analysis",
-        "Draw technique consistency",
-        "Anchor point tracking", 
-        "Release timing analysis"
-      ]
-    },
-    swimming: {
-      emoji: "🏊‍♀️",
-      name: "Swimming", 
-      color: "blue",
-      gradient: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-500 hover:bg-blue-600",
-      features: [
-        "Stroke technique analysis",
-        "Body position optimization",
-        "Breathing pattern tracking",
-        "Turn and dive mechanics"
-      ]
-    },
-    tennis: {
-      emoji: "🎾",
-      name: "Tennis",
-      color: "yellow", 
-      gradient: "from-yellow-500 to-orange-500",
-      bgColor: "bg-yellow-500 hover:bg-yellow-600",
-      features: [
-        "Racquet swing analysis",
-        "Footwork and positioning",
-        "Serve technique breakdown",
-        "Backhand/forehand form"
-      ]
-    },
-    football: {
-      emoji: "⚽",
-      name: "Football",
-      color: "green",
-      gradient: "from-green-600 to-emerald-600", 
-      bgColor: "bg-green-600 hover:bg-green-700",
-      features: [
-        "Kicking technique analysis",
-        "Ball control assessment",
-        "Running form evaluation",
-        "Defensive positioning"
-      ]
-    }
-  };
-  
-  return sportConfigs[sport as keyof typeof sportConfigs] || sportConfigs.basketball;
-};
-
 export default function ARTools() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [selectedSport, setSelectedSport] = useState<"basketball" | "archery">("basketball");
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const [userPrimarySport, setUserPrimarySport] = useState<string>("basketball"); // User's registered sport
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
-
-  // WebSocket integration
-  const { isConnected, currentResult, startAnalysis, stopAnalysis } = useWebSocketAnalysis();
-
-  // Update analysis result from WebSocket
-  useEffect(() => {
-    if (currentResult) {
-      setAnalysisResult({
-        sport: currentResult.sport,
-        score: currentResult.score,
-        feedback: currentResult.feedback || [],
-        metrics: currentResult.metrics || {},
-        timestamp: currentResult.timestamp || new Date().toISOString()
-      });
-    }
-  }, [currentResult]);
 
   const startLiveAnalysis = useCallback(async () => {
     setIsLiveMode(true);
@@ -178,7 +87,7 @@ export default function ARTools() {
 
           const formData = new FormData();
           formData.append('file', blob, 'frame.jpg');
-          formData.append('sport', userPrimarySport); // Use user's primary sport
+          formData.append('sport', selectedSport);
           formData.append('analysis_type', 'motion');
 
           const response = await fetch('http://localhost:8000/api/analyze/image', {
@@ -206,9 +115,9 @@ export default function ARTools() {
     
     toast({
       title: "Real-time Analysis Started!",
-      description: `Analyzing your ${getSportData(userPrimarySport).name} technique continuously...`,
+      description: `Analyzing your ${selectedSport} technique continuously...`,
     });
-  }, [userPrimarySport, toast, isAnalyzing]);
+  }, [selectedSport, toast, isAnalyzing]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -222,10 +131,6 @@ export default function ARTools() {
     return "bg-red-50";
   };
 
-  // Get sport data for user's primary sport
-  const primarySportData = getSportData(userPrimarySport);
-  const secondarySportData = getSportData(userPrimarySport === "basketball" ? "archery" : "basketball");
-
   return (
     <>
       <Helmet>
@@ -238,18 +143,6 @@ export default function ARTools() {
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
         <div className="max-w-7xl mx-auto">
-          {/* AI Connection Status */}
-          <div className="mb-4">
-            <Alert className={`${isConnected ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'}`}>
-              <div className="flex items-center gap-2">
-                {isConnected ? <Wifi className="h-4 w-4 text-green-600" /> : <WifiOff className="h-4 w-4 text-orange-600" />}
-                <AlertDescription className={isConnected ? 'text-green-800' : 'text-orange-800'}>
-                  AI Analysis Server: {isConnected ? 'Connected & Ready' : 'Connecting...'}
-                </AlertDescription>
-              </div>
-            </Alert>
-          </div>
-
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -313,7 +206,7 @@ export default function ARTools() {
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <Video className="h-5 w-5" />
-                    Live Analysis - {getSportData(userPrimarySport).name}
+                    Live Analysis - {selectedSport === "basketball" ? "Basketball" : "Archery"}
                   </span>
                   <Button variant="outline" size="sm" onClick={stopLiveAnalysis}>
                     <X className="h-4 w-4 mr-2" />
@@ -345,37 +238,47 @@ export default function ARTools() {
             </Card>
           )}
 
-          {/* Analysis Tools - Dynamic based on user's primary sport */}
+          {/* Analysis Tools */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Primary Sport Analysis (User's registered sport) */}
+            {/* Basketball Analysis */}
             <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader className={`bg-gradient-to-r ${primarySportData.gradient} text-white rounded-t-lg`}>
+              <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  {primarySportData.emoji} {primarySportData.name} Analysis
+                  🏀 Basketball Analysis
                   <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                    Primary
+                    Dynamic
                   </Badge>
                 </CardTitle>
-                <CardDescription className={`text-${primarySportData.color}-100`}>
-                  Specialized analysis for your registered sport
+                <CardDescription className="text-orange-100">
+                  Shooting form, movement patterns, and technique analysis
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    {primarySportData.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Real-time shooting form analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Elbow positioning and alignment</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Follow-through consistency</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Stance and balance analysis</span>
+                    </div>
                   </div>
                   
                   <div className="flex gap-3">
                     <Button 
-                      className={`flex-1 ${primarySportData.bgColor}`}
+                      className="flex-1 bg-orange-500 hover:bg-orange-600"
                       onClick={() => {
-                        setSelectedSport(userPrimarySport as any);
+                        setSelectedSport("basketball");
                         startLiveAnalysis();
                       }}
                       disabled={isLiveMode}
@@ -386,7 +289,7 @@ export default function ARTools() {
                     <Button 
                       variant="outline" 
                       className="flex-1"
-                      disabled={!isLiveMode}
+                      disabled={!isLiveMode || selectedSport !== "basketball"}
                       onClick={startContinuousAnalysis}
                     >
                       <Play className="w-4 h-4 mr-2" />
@@ -397,35 +300,45 @@ export default function ARTools() {
               </CardContent>
             </Card>
 
-            {/* Secondary Sport Analysis */}
+            {/* Archery Analysis */}
             <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader className={`bg-gradient-to-r ${secondarySportData.gradient} text-white rounded-t-lg`}>
+              <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-3 text-2xl">
-                  {secondarySportData.emoji} {secondarySportData.name} Analysis
+                  🏹 Archery Analysis
                   <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                    Available
+                    Precision
                   </Badge>
                 </CardTitle>
-                <CardDescription className={`text-${secondarySportData.color}-100`}>
-                  {secondarySportData.name === "Basketball" ? "Shooting form, movement patterns, and technique analysis" : "Form analysis, stance stability, and accuracy tracking"}
+                <CardDescription className="text-green-100">
+                  Form analysis, stance stability, and accuracy tracking
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    {secondarySportData.features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Stance stability analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Draw technique consistency</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Anchor point tracking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Release timing analysis</span>
+                    </div>
                   </div>
                   
                   <div className="flex gap-3">
                     <Button 
-                      className={`flex-1 ${secondarySportData.bgColor}`}
+                      className="flex-1 bg-green-500 hover:bg-green-600"
                       onClick={() => {
-                        setSelectedSport(secondarySportData.name.toLowerCase() as any);
+                        setSelectedSport("archery");
                         startLiveAnalysis();
                       }}
                       disabled={isLiveMode}
@@ -436,7 +349,7 @@ export default function ARTools() {
                     <Button 
                       variant="outline" 
                       className="flex-1"
-                      disabled={!isLiveMode || selectedSport !== secondarySportData.name.toLowerCase()}
+                      disabled={!isLiveMode || selectedSport !== "archery"}
                       onClick={startContinuousAnalysis}
                     >
                       <Play className="w-4 h-4 mr-2" />
@@ -518,6 +431,8 @@ export default function ARTools() {
             </Card>
           )}
 
+
+
           {/* Loading State */}
           {isAnalyzing && (
             <Card className="mb-8 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
@@ -526,85 +441,37 @@ export default function ARTools() {
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                   <h3 className="text-xl font-semibold">Analyzing Your Technique...</h3>
                   <p className="text-gray-600">
-                    Our AI is processing your {getSportData(userPrimarySport).name} form and generating personalized feedback.
+                    Our AI is processing your {selectedSport} form and generating personalized feedback.
                   </p>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* All Supported Sports Section */}
+          {/* Coming Soon Section */}
           <div className="mt-12">
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-gray-900">All Supported Sports</CardTitle>
-                <CardDescription>54+ sports with AI-powered analysis available</CardDescription>
+                <CardTitle className="text-2xl text-gray-900">Coming Soon</CardTitle>
+                <CardDescription>More sports analysis tools in development</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
                     <div className="text-2xl mb-2">🏊‍♀️</div>
-                    <div className="font-medium text-green-800">Swimming</div>
+                    <div className="font-medium">Swimming</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
                     <div className="text-2xl mb-2">🏐</div>
-                    <div className="font-medium text-green-800">Volleyball</div>
+                    <div className="font-medium">Volleyball</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
                     <div className="text-2xl mb-2">🎾</div>
-                    <div className="font-medium text-green-800">Tennis</div>
+                    <div className="font-medium">Tennis</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg opacity-60">
                     <div className="text-2xl mb-2">🥊</div>
-                    <div className="font-medium text-green-800">Boxing</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🏑</div>
-                    <div className="font-medium text-green-800">Hockey</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">⚽</div>
-                    <div className="font-medium text-green-800">Football</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🏏</div>
-                    <div className="font-medium text-green-800">Cricket</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🤸‍♀️</div>
-                    <div className="font-medium text-green-800">Gymnastics</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🏃‍♂️</div>
-                    <div className="font-medium text-green-800">Athletics</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🧘‍♀️</div>
-                    <div className="font-medium text-green-800">Yoga</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🏓</div>
-                    <div className="font-medium text-green-800">Table Tennis</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-2xl mb-2">🚴‍♀️</div>
-                    <div className="font-medium text-green-800">Cycling</div>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="text-2xl mb-2">♿</div>
-                    <div className="font-medium text-blue-800">Para Sports</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <div className="text-2xl mb-2">🏛️</div>
-                    <div className="font-medium text-purple-800">Kabaddi</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <div className="text-2xl mb-2">🏃‍♀️</div>
-                    <div className="font-medium text-purple-800">Kho Kho</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-100 rounded-lg border border-gray-300">
-                    <div className="text-2xl mb-2">+39</div>
-                    <div className="font-medium text-gray-700">More Sports</div>
+                    <div className="font-medium">Boxing</div>
                   </div>
                 </div>
               </CardContent>
