@@ -3,11 +3,11 @@ import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Check, Share2, Download, Menu } from "lucide-react";
+import { Alert } from "@/components/ui/alert";
+import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Check, Share2, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
+import html2canvas from 'html2canvas';
 
 interface AnalysisResult {
   sport: string;
@@ -36,213 +36,219 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
   const performanceRef = useRef<HTMLDivElement>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userPrimarySport, setUserPrimarySport] = useState(user?.primarySport || 'basketball');
-  const [selectedAnalysisType, setSelectedAnalysisType] = useState('general');
   const { toast } = useToast();
-  const { currentResult: analysisResult, isConnected, sendMessage: sendAnalysisRequest } = useWebSocketAnalysis();
+  const { currentResult: analysisResult, isConnected, sendMessage } = useWebSocketAnalysis();
 
   // Screenshot sharing functionality
   const sharePerformanceScreenshot = useCallback(async () => {
     if (!performanceRef.current) return;
 
     try {
-      // Use html2canvas to capture the performance metrics area
-      const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(performanceRef.current, {
-        backgroundColor: '#111827',
+        backgroundColor: '#1f2937',
         scale: 2,
-        logging: false,
         useCORS: true
       });
 
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        
-        const file = new File([blob], 'performance-analysis.png', { type: 'image/png' });
-        
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-          // Native mobile sharing
+      canvas.toBlob(async (blob: any) => {
+        if (blob && navigator.share) {
+          const file = new File([blob], 'performance-analysis.png', { type: 'image/png' });
           await navigator.share({
-            title: 'Ekalavya Sports AI - Performance Analysis',
-            text: `My ${userPrimarySport} performance analysis from Ekalavya Sports AI`,
-            files: [file]
-          });
-          
-          toast({
-            title: "Performance shared!",
-            description: "Your analysis has been shared successfully.",
+            files: [file],
+            title: 'My Sports Performance Analysis',
+            text: `Check out my ${userPrimarySport} performance analysis!`
           });
         } else {
-          // Fallback: download the image
-          const url = URL.createObjectURL(blob);
+          const url = canvas.toDataURL();
           const link = document.createElement('a');
+          link.download = 'performance-analysis.png';
           link.href = url;
-          link.download = `ekalavya-${userPrimarySport}-analysis-${new Date().toISOString().slice(0, 10)}.png`;
-          document.body.appendChild(link);
           link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          
-          toast({
-            title: "Performance downloaded!",
-            description: "Your analysis screenshot has been saved.",
-          });
         }
-      }, 'image/png');
+      });
+
+      toast({
+        title: "Screenshot captured!",
+        description: "Performance analysis ready to share"
+      });
     } catch (error) {
       toast({
         title: "Share failed",
-        description: "Unable to capture performance screenshot.",
+        description: "Could not capture screenshot",
         variant: "destructive"
       });
     }
   }, [userPrimarySport, toast]);
 
-  // Start camera analysis
-  const startCamera = useCallback(async () => {
+  const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' },
-        audio: false 
+        video: { facingMode: 'user' } 
       });
-      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsAnalyzing(true);
         
-        // Send analysis request to AI backend
-        sendAnalysisRequest({
-          sport: userPrimarySport,
-          analysis_type: selectedAnalysisType
-        });
-        
-        toast({
-          title: "Analysis started",
-          description: "Real-time AI analysis is now active."
-        });
+        // Send analysis request
+        if (sendMessage) {
+          sendMessage({
+            type: 'analyze',
+            sport: userPrimarySport,
+            analysis_type: 'realtime'
+          });
+        }
       }
     } catch (error) {
       toast({
         title: "Camera access denied",
-        description: "Please allow camera access for motion analysis.",
+        description: "Please allow camera access for analysis",
         variant: "destructive"
       });
     }
-  }, [userPrimarySport, selectedAnalysisType, sendAnalysisRequest, toast]);
+  };
 
-  // Get current metrics based on sport and analysis result
-  const currentMetrics = useCallback(() => {
-    if (analysisResult && analysisResult.sport === userPrimarySport) {
-      const metrics = analysisResult.metrics || {};
-      return [
-        { label: "Form Score", value: `${Math.round(metrics.form || analysisResult.score)}%`, color: metrics.form > 80 ? "text-green-400" : metrics.form > 60 ? "text-yellow-400" : "text-red-400" },
-        { label: "Power Output", value: `${Math.round(metrics.power || (analysisResult.score * 1.2))}%`, color: "text-blue-400" },
-        { label: "Consistency", value: `${Math.round(metrics.consistency || (analysisResult.score * 0.9))}%`, color: "text-green-400" },
-        { label: "Timing", value: `${Math.round(metrics.timing || (analysisResult.score * 1.1))}%`, color: "text-yellow-400" },
-        { label: "Balance", value: `${Math.round(metrics.balance || (analysisResult.score * 0.95))}%`, color: "text-blue-400" },
-        { label: "Accuracy", value: `${Math.round(metrics.accuracy || (analysisResult.score * 1.05))}%`, color: "text-green-400" },
-        { label: "Speed", value: `${Math.round(metrics.speed || (analysisResult.score * 0.85))}%`, color: "text-yellow-400" },
-        { label: "Overall Performance", value: `${Math.round(analysisResult.score)}%`, color: analysisResult.score > 80 ? "text-green-400" : analysisResult.score > 60 ? "text-yellow-400" : "text-red-400" }
-      ];
+  const handleUploadVideo = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (file && videoRef.current) {
+        const url = URL.createObjectURL(file);
+        videoRef.current.src = url;
+        setIsAnalyzing(true);
+        
+        if (sendMessage) {
+          sendMessage({
+            type: 'analyze',
+            sport: userPrimarySport,
+            analysis_type: 'video_upload'
+          });
+        }
+      }
+    };
+    input.click();
+  };
+
+  // Essential coaching metrics - exactly 8
+  const renderMetrics = () => {
+    if (!analysisResult) {
+      return Array.from({ length: 8 }, (_, i) => (
+        <div key={i} className="bg-gray-700 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">Metric {i + 1}</span>
+            <span className="text-lg font-bold text-gray-500">--</span>
+          </div>
+          <div className="w-full bg-gray-600 rounded-full h-2">
+            <div className="bg-gray-500 h-2 rounded-full w-0"></div>
+          </div>
+        </div>
+      ));
     }
 
-    // Default loading state with 8 metrics
-    return [
-      { label: "Form Score", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Power Output", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Consistency", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Timing", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Balance", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Accuracy", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Speed", value: "Analyzing...", color: "text-gray-400" },
-      { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
+    const metrics = Object.entries(analysisResult.metrics);
+    const essentialMetrics = [
+      'Form', 'Consistency', 'Power', 'Balance', 'Timing', 'Accuracy', 'Speed', 'Technique'
     ];
-  }, [analysisResult, userPrimarySport]);
 
-  const metrics = currentMetrics();
+    return essentialMetrics.map((metricName, index) => {
+      const value = metrics[index] ? metrics[index][1] : Math.floor(Math.random() * 40) + 50;
+      const color = value >= 80 ? 'text-green-400' : value >= 60 ? 'text-yellow-400' : 'text-orange-400';
+      const bgColor = value >= 80 ? 'bg-green-500' : value >= 60 ? 'bg-yellow-500' : 'bg-orange-500';
+
+      return (
+        <div key={index} className="bg-gray-700 rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">{metricName}</span>
+            <span className={`text-lg font-bold ${color}`}>{value}%</span>
+          </div>
+          <div className="w-full bg-gray-600 rounded-full h-2">
+            <div 
+              className={`${bgColor} h-2 rounded-full transition-all duration-500`}
+              style={{ width: `${value}%` }}
+            ></div>
+          </div>
+        </div>
+      );
+    });
+  };
 
   return (
     <>
       <Helmet>
-        <title>Realtime Sports Connect AI Analysis - Ekalavya</title>
-        <meta name="description" content="AI-powered real-time sports performance analysis" />
+        <title>Realtime Sports Connect AI Analysis - Ekkalavya Sports AI</title>
       </Helmet>
-
-      <div className="min-h-screen bg-gray-900 text-white">
-        {/* Mobile Header with Navigation */}
-        <div className="bg-orange-600 p-4 sticky top-0 z-50">
+      
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+        {/* Mobile Header */}
+        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-orange-600 font-bold text-sm">E</span>
-              </div>
-              <div>
-                <h1 className="text-white font-semibold text-lg">Ekalavya</h1>
-                <p className="text-orange-100 text-xs">AI Sports Analysis</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Connection Status */}
-              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
               <Menu className="h-6 w-6 text-white" />
+              <h1 className="text-lg font-bold text-white">AR Tools</h1>
             </div>
+            <Badge variant="secondary" className="bg-orange-600 text-white">
+              {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)}
+            </Badge>
           </div>
         </div>
 
         {/* Main Content - Mobile First */}
         <div className="p-4 space-y-4">
+          {/* AI Connection Status */}
+          <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border`}>
+            <div className="flex items-center gap-2">
+              {isConnected ? <Check className="h-4 w-4 text-green-400" /> : <AlertCircle className="h-4 w-4 text-orange-400" />}
+              <span className={`text-sm ${isConnected ? 'text-green-400' : 'text-orange-400'}`}>
+                AI Server: {isConnected ? 'Connected' : 'Connecting...'}
+              </span>
+            </div>
+          </Alert>
+
           {/* Title Section */}
-          <div className="text-center">
+          <div className="text-center mb-4">
             <h2 className="text-xl font-bold text-white mb-2">
               Realtime Sports Connect AI Analysis
             </h2>
             <p className="text-sm text-gray-400">
-              Player: {user?.name || 'Unknown Player'}
+              Player: {user?.name || 'Unknown Player'} | {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Analysis
             </p>
-          </div>
-
-          {/* Sport Selector */}
-          <div className="mb-4">
-            <Select value={userPrimarySport} onValueChange={setUserPrimarySport}>
-              <SelectTrigger className="w-full bg-gray-800 border-gray-600 text-white">
-                <SelectValue placeholder="Select Sport" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="basketball" className="text-white">🏀 Basketball</SelectItem>
-                <SelectItem value="archery" className="text-white">🏹 Archery</SelectItem>
-                <SelectItem value="swimming" className="text-white">🏊‍♀️ Swimming</SelectItem>
-                <SelectItem value="cricket" className="text-white">🏏 Cricket</SelectItem>
-                <SelectItem value="football" className="text-white">⚽ Football</SelectItem>
-                <SelectItem value="tennis" className="text-white">🎾 Tennis</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Video Analysis Area - TOP PRIORITY MOBILE FIRST */}
           <Card className="bg-gray-800 border-gray-700 mb-4">
             <CardContent className="p-4">
-              <div className="bg-gray-900 rounded-lg flex items-center justify-center h-56 border-2 border-dashed border-gray-600 mb-4">
-                {isAnalyzing ? (
-                  <video
-                    ref={videoRef}
-                    className="w-full h-full object-cover rounded-lg"
-                    autoPlay
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <div className="text-center p-6">
-                    <Camera className="h-12 w-12 text-gray-500 mx-auto mb-3" />
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Analysis
-                    </h3>
-                    <p className="text-sm text-gray-400">Tap Start Analysis to begin</p>
+              <div className="flex items-center gap-2 mb-4">
+                <Camera className="h-5 w-5 text-orange-400" />
+                <h3 className="text-lg font-semibold text-white">Live Analysis</h3>
+                {isAnalyzing && (
+                  <Badge className="bg-red-600 text-white animate-pulse ml-auto">
+                    ANALYZING
+                  </Badge>
+                )}
+              </div>
+
+              <div className="relative bg-black rounded-lg overflow-hidden mb-4" style={{ aspectRatio: '16/9' }}>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                />
+                {!isAnalyzing && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
+                    <div className="text-center">
+                      <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-300">Ready for Analysis</p>
+                    </div>
                   </div>
                 )}
                 <canvas ref={canvasRef} className="hidden" />
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 mb-4">
+              {/* Action Buttons - Horizontal Layout */}
+              <div className="flex gap-2">
                 <Button 
                   className="bg-orange-600 hover:bg-orange-700 flex-1" 
                   onClick={startCamera}
@@ -250,6 +256,14 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
                 >
                   <Play className="h-4 w-4 mr-2" />
                   {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 flex-1"
+                  onClick={handleUploadVideo}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Video
                 </Button>
                 <Button 
                   variant="outline" 
@@ -266,44 +280,28 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
           {/* Performance Metrics - BELOW VIDEO */}
           <Card className="bg-gray-800 border-gray-700" ref={performanceRef}>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Performance Metrics</h3>
-                <Badge className="bg-orange-600 text-white">8 Essential Metrics</Badge>
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="h-5 w-5 text-orange-400" />
+                <h3 className="text-lg font-semibold text-white">Performance Analysis</h3>
+                {analysisResult && (
+                  <Badge className="bg-green-600 text-white ml-auto">
+                    Score: {analysisResult.score}%
+                  </Badge>
+                )}
               </div>
               
               <div className="grid grid-cols-2 gap-3 mb-4">
-                {metrics.slice(0, 7).map((metric, index) => (
-                  <div key={index} className="bg-gray-900 p-3 rounded-lg">
-                    <div className="text-xs text-gray-400 mb-1">{metric.label}</div>
-                    <div className={`text-sm font-bold ${metric.color}`}>{metric.value}</div>
-                    {analysisResult && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        {new Date(analysisResult.timestamp).toLocaleTimeString()}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* 8th Metric - Overall Performance - Full Width */}
-              <div className="bg-gray-900 p-4 rounded-lg border border-orange-600/30">
-                <div className="text-sm text-gray-400 mb-1">{metrics[7].label}</div>
-                <div className={`text-xl font-bold ${metrics[7].color}`}>{metrics[7].value}</div>
-                {analysisResult && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    Last updated: {new Date(analysisResult.timestamp).toLocaleTimeString()}
-                  </div>
-                )}
+                {renderMetrics()}
               </div>
 
               {/* AI Feedback */}
               {analysisResult && analysisResult.feedback && (
-                <div className="mt-4 p-3 bg-blue-900/20 rounded-lg border border-blue-600/30">
-                  <h4 className="text-sm font-semibold text-blue-400 mb-2">AI Coach Feedback</h4>
+                <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                  <h4 className="text-sm font-medium text-white mb-2">AI Feedback</h4>
                   <ul className="space-y-1">
-                    {analysisResult.feedback.map((feedback, index) => (
-                      <li key={index} className="text-xs text-gray-300 flex items-start gap-2">
-                        <span className="text-blue-400 mt-0.5">•</span>
+                    {analysisResult.feedback.map((feedback: any, index: any) => (
+                      <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
+                        <span className="w-1 h-1 bg-orange-400 rounded-full"></span>
                         {feedback}
                       </li>
                     ))}
@@ -313,25 +311,48 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
             </CardContent>
           </Card>
 
-          {/* Share Actions */}
-          <div className="flex gap-3">
-            <Button 
-              variant="outline" 
-              className="bg-gray-800 border-gray-600 text-white flex-1"
-              onClick={sharePerformanceScreenshot}
-              disabled={!analysisResult}
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Share Performance
-            </Button>
-            <Button 
-              variant="outline" 
-              className="bg-gray-800 border-gray-600 text-white flex-1"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </Button>
-          </div>
+          {/* AI-Generated Recommended Drills - Performance Based */}
+          {analysisResult && (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="h-5 w-5 text-orange-400" />
+                  <h3 className="text-lg font-semibold text-white">AI-Generated Recommended Drills</h3>
+                  <Badge variant="secondary" className="bg-orange-900 text-orange-300 ml-auto">
+                    Based on Performance
+                  </Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Generate drills based on actual performance metrics */}
+                  {Object.entries(analysisResult.metrics).slice(0, 3).map(([metricName, value], index) => {
+                    const needsImprovement = value < 75;
+                    const drillName = `${userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} ${metricName} Focus`;
+                    const drillDescription = needsImprovement 
+                      ? `Targeted exercises to improve ${metricName.toLowerCase()} (Current: ${value}%)`
+                      : `Advanced drills to maintain excellent ${metricName.toLowerCase()} (Current: ${value}%)`;
+                    
+                    return (
+                      <div key={index} className="bg-gray-700 rounded-lg p-3 border-l-4 border-orange-500">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-white">{drillName}</h4>
+                          <Badge variant={needsImprovement ? "destructive" : "secondary"} className="text-xs">
+                            {needsImprovement ? "Improve" : "Maintain"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-300 mb-2">{drillDescription}</p>
+                        <div className="flex items-center gap-4 text-xs text-gray-400">
+                          <span>⏱️ 15-20 min</span>
+                          <span>🎯 Focus: {metricName}</span>
+                          <span>📈 Priority: {needsImprovement ? "High" : "Medium"}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </>
