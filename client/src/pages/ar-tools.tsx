@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Camera, Upload, Play, BarChart3, Target, Zap, Trophy, AlertCircle, Video, Image, Check, X, Wifi, WifiOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketAnalysis } from "@/hooks/useWebSocketAnalysis";
@@ -17,86 +18,167 @@ interface AnalysisResult {
   timestamp: string;
 }
 
-// Sport-specific data for different sports
-const getSportAnalysisData = (sport: string) => {
-  const sportData = {
+// Comprehensive sport-specific analysis data
+const getSportAnalysisConfig = (sport: string) => {
+  const sportConfigs = {
     basketball: {
-      playerName: "Marcus Johnson",
-      analysisType: "Jump Shot Analysis",
-      metrics: [
-        { name: "Release Height", value: "8'2\"", status: "good", color: "text-blue-400" },
-        { name: "Release Angle", value: "42° (Optimal: 45°)", status: "warning", color: "text-yellow-400" },
-        { name: "Elbow Alignment", value: "85%", status: "warning", color: "text-yellow-400" },
-        { name: "Balance", value: "78%", status: "poor", color: "text-red-400" },
-        { name: "Follow Through", value: "82%", status: "good", color: "text-green-400" }
+      title: "Basketball AR Analysis",
+      description: "Real-time basketball technique analysis and improvement recommendations",
+      analysisTypes: [
+        "Shooting Form", "Free Throw", "Dribbling", "Defensive Stance", "Jump Shot", "Layup Technique"
       ],
-      analysisTitle: "Basketball Motion Analysis",
-      tabs: ["Shooting", "Dribbling", "Movement", "Defense"],
-      feedback: [
-        { type: "excellent", title: "Follow through is excellent", description: "Full extension with proper wrist snap creates optimal backspin. Continue to emphasize this technique.", icon: "✓", color: "text-green-400" },
-        { type: "warning", title: "Elbow alignment needs adjustment", description: "Your shooting elbow is slightly out at a +2° angle. Try to keep it at 45° for better accuracy and consistency.", icon: "⚠", color: "text-yellow-400" },
-        { type: "poor", title: "Balance is shifting during release", description: "Your weight distribution is uneven (70%). Focus on maintaining a stable base through the entire shot motion.", icon: "✗", color: "text-red-400" }
-      ],
-      drills: [
-        { name: "Form Shooting Drill", description: "Focus on elbow alignment and balance - Your top priority", color: "bg-orange-600", icon: "🏀" },
-        { name: "Balance Training", description: "Improve shooting stance stability - Critical improvement", color: "bg-blue-600", icon: "⚡" },
-        { name: "Release Technique", description: "Perfect your follow-through motion - Essential skill", color: "bg-green-600", icon: "🎯" }
+      keyMetrics: [
+        { name: "Shot Accuracy", icon: "🎯", description: "Shooting percentage and form consistency" },
+        { name: "Release Point", icon: "📏", description: "Optimal release height and angle" },
+        { name: "Shooting Mechanics", icon: "⚙️", description: "Form breakdown and analysis" },
+        { name: "Balance & Footwork", icon: "👟", description: "Stance stability and positioning" },
+        { name: "Follow Through", icon: "🤲", description: "Wrist snap and finger release" },
+        { name: "Arc Trajectory", icon: "📈", description: "Shot arc optimization" }
       ]
     },
     archery: {
-      playerName: "Sarah Chen",
-      analysisType: "Draw & Release Analysis",
-      metrics: [
-        { name: "Draw Length", value: "28.5\"", status: "good", color: "text-green-400" },
-        { name: "Anchor Point", value: "Consistent 92%", status: "good", color: "text-green-400" },
-        { name: "Back Tension", value: "75%", status: "warning", color: "text-yellow-400" },
-        { name: "Release Timing", value: "68%", status: "poor", color: "text-red-400" },
-        { name: "Follow Through", value: "88%", status: "good", color: "text-green-400" }
+      title: "Archery AR Analysis", 
+      description: "Precision archery form analysis and accuracy improvement",
+      analysisTypes: [
+        "Draw Technique", "Release Form", "Stance Analysis", "Anchor Point", "Aiming Consistency", "Follow Through"
       ],
-      analysisTitle: "Archery Motion Analysis",
-      tabs: ["Form", "Draw", "Release", "Accuracy"],
-      feedback: [
-        { type: "excellent", title: "Anchor point consistency is excellent", description: "Perfect hand placement creates repeatable shots. Your muscle memory is well developed.", icon: "✓", color: "text-green-400" },
-        { type: "warning", title: "Back tension needs improvement", description: "Increase engagement of rhomboids and rear deltoids for more stable draw. Focus on pulling through your back.", icon: "⚠", color: "text-yellow-400" },
-        { type: "poor", title: "Release timing is inconsistent", description: "Variation in release timing affects accuracy. Practice surprise release technique for better consistency.", icon: "✗", color: "text-red-400" }
-      ],
-      drills: [
-        { name: "Back Tension Drill", description: "Strengthen draw stability - Your top priority", color: "bg-orange-600", icon: "🏹" },
-        { name: "Release Training", description: "Improve timing consistency - Critical improvement", color: "bg-blue-600", icon: "⚡" },
-        { name: "Anchor Practice", description: "Maintain excellent consistency - Essential skill", color: "bg-green-600", icon: "🎯" }
+      keyMetrics: [
+        { name: "Draw Consistency", icon: "🏹", description: "Draw length and power consistency" },
+        { name: "Anchor Point", icon: "📍", description: "Hand placement repeatability" },
+        { name: "Release Quality", icon: "✋", description: "Clean finger release technique" },
+        { name: "Stance Stability", icon: "🏛️", description: "Body position and balance" },
+        { name: "Sight Alignment", icon: "👁️", description: "Aiming precision and focus" },
+        { name: "Back Tension", icon: "💪", description: "Proper muscle engagement" }
       ]
     },
     swimming: {
-      playerName: "Alex Rivera",
-      analysisType: "Freestyle Stroke Analysis", 
-      metrics: [
-        { name: "Stroke Rate", value: "72 SPM", status: "good", color: "text-green-400" },
-        { name: "Body Position", value: "85%", status: "good", color: "text-green-400" },
-        { name: "Catch Phase", value: "78%", status: "warning", color: "text-yellow-400" },
-        { name: "Breathing", value: "65%", status: "poor", color: "text-red-400" },
-        { name: "Kick Tempo", value: "82%", status: "good", color: "text-green-400" }
+      title: "Swimming AR Analysis",
+      description: "Comprehensive stroke analysis and technique optimization", 
+      analysisTypes: [
+        "Freestyle Stroke", "Backstroke", "Breaststroke", "Butterfly", "Starts & Turns", "Breathing Technique"
       ],
-      analysisTitle: "Swimming Motion Analysis",
-      tabs: ["Stroke", "Breathing", "Turns", "Starts"],
-      feedback: [
-        { type: "excellent", title: "Body position is excellent", description: "Horizontal alignment minimizes drag. Your streamline position creates optimal hydrodynamics.", icon: "✓", color: "text-green-400" },
-        { type: "warning", title: "Catch phase needs refinement", description: "Early vertical forearm could be improved. Focus on high elbow catch for better propulsion.", icon: "⚠", color: "text-yellow-400" },
-        { type: "poor", title: "Breathing pattern disrupts rhythm", description: "Bilateral breathing timing affects stroke symmetry. Practice smoother head rotation technique.", icon: "✗", color: "text-red-400" }
+      keyMetrics: [
+        { name: "Stroke Rate", icon: "🏊‍♀️", description: "Strokes per minute efficiency" },
+        { name: "Body Position", icon: "📐", description: "Horizontal alignment and streamline" },
+        { name: "Catch Phase", icon: "🤲", description: "Early vertical forearm technique" },
+        { name: "Breathing Pattern", icon: "💨", description: "Bilateral breathing rhythm" },
+        { name: "Kick Technique", icon: "🦵", description: "Leg drive and tempo" },
+        { name: "Turn Efficiency", icon: "🔄", description: "Wall push-off and rotation" }
+      ]
+    },
+    cricket: {
+      title: "Cricket AR Analysis",
+      description: "Advanced batting, bowling, and fielding technique analysis",
+      analysisTypes: [
+        "Batting Stance", "Bowling Action", "Fielding Position", "Shot Selection", "Footwork", "Wicket Keeping"
       ],
-      drills: [
-        { name: "Catch Technique Drill", description: "Improve early vertical forearm - Your top priority", color: "bg-orange-600", icon: "🏊‍♀️" },
-        { name: "Breathing Training", description: "Smooth bilateral technique - Critical improvement", color: "bg-blue-600", icon: "⚡" },
-        { name: "Streamline Practice", description: "Maintain excellent position - Essential skill", color: "bg-green-600", icon: "🎯" }
+      keyMetrics: [
+        { name: "Batting Average", icon: "🏏", description: "Shot accuracy and timing" },
+        { name: "Bowling Speed", icon: "⚡", description: "Pace and consistency" },
+        { name: "Footwork", icon: "👟", description: "Movement and positioning" },
+        { name: "Shot Power", icon: "💥", description: "Ball strike force" },
+        { name: "Field Position", icon: "📍", description: "Optimal positioning" },
+        { name: "Reaction Time", icon: "⏱️", description: "Response speed" }
+      ]
+    },
+    tennis: {
+      title: "Tennis AR Analysis",
+      description: "Professional tennis stroke analysis and court movement",
+      analysisTypes: [
+        "Forehand", "Backhand", "Serve Technique", "Volley", "Footwork", "Court Positioning"
+      ],
+      keyMetrics: [
+        { name: "Serve Speed", icon: "🎾", description: "First and second serve velocity" },
+        { name: "Stroke Power", icon: "💪", description: "Groundstroke force generation" },
+        { name: "Court Coverage", icon: "🏃‍♂️", description: "Movement efficiency" },
+        { name: "Shot Accuracy", icon: "🎯", description: "Target precision" },
+        { name: "Spin Rate", icon: "🌪️", description: "Topspin and slice technique" },
+        { name: "Recovery Time", icon: "⚡", description: "Position reset speed" }
+      ]
+    },
+    football: {
+      title: "Football AR Analysis",
+      description: "Complete football skill analysis and tactical awareness",
+      analysisTypes: [
+        "Shooting", "Passing", "Dribbling", "Defending", "Heading", "Ball Control"
+      ],
+      keyMetrics: [
+        { name: "Shot Accuracy", icon: "⚽", description: "Goal scoring precision" },
+        { name: "Pass Completion", icon: "📨", description: "Passing success rate" },
+        { name: "Ball Control", icon: "🎮", description: "First touch quality" },
+        { name: "Sprint Speed", icon: "💨", description: "Running velocity" },
+        { name: "Agility", icon: "🔄", description: "Change of direction" },
+        { name: "Stamina", icon: "❤️", description: "Endurance levels" }
+      ]
+    },
+    kabaddi: {
+      title: "Kabaddi AR Analysis",
+      description: "Traditional kabaddi technique and tactical analysis",
+      analysisTypes: [
+        "Raiding Technique", "Defense Formation", "Tackle Strength", "Escape Skills", "Team Coordination", "Breathing Control"
+      ],
+      keyMetrics: [
+        { name: "Raid Success", icon: "🏃‍♂️", description: "Successful raid percentage" },
+        { name: "Tackle Power", icon: "💪", description: "Defensive strength" },
+        { name: "Agility Score", icon: "🤸‍♂️", description: "Movement flexibility" },
+        { name: "Breath Control", icon: "💨", description: "Cant duration" },
+        { name: "Escape Rate", icon: "🎯", description: "Successful escapes" },
+        { name: "Team Sync", icon: "👥", description: "Coordination efficiency" }
+      ]
+    },
+    kho_kho: {
+      title: "Kho Kho AR Analysis",
+      description: "Traditional kho kho running and chasing technique analysis",
+      analysisTypes: [
+        "Running Form", "Direction Change", "Pole Technique", "Chasing Strategy", "Sitting Position", "Turn Speed"
+      ],
+      keyMetrics: [
+        { name: "Chase Success", icon: "🏃‍♀️", description: "Successful chase percentage" },
+        { name: "Turn Speed", icon: "🔄", description: "Direction change velocity" },
+        { name: "Sitting Form", icon: "🪑", description: "Proper sitting technique" },
+        { name: "Pole Touch", icon: "📏", description: "Pole contact accuracy" },
+        { name: "Stamina", icon: "❤️", description: "Endurance capacity" },
+        { name: "Strategy", icon: "🧠", description: "Game awareness" }
+      ]
+    },
+    gymnastics: {
+      title: "Gymnastics AR Analysis",
+      description: "Comprehensive gymnastics form and routine analysis",
+      analysisTypes: [
+        "Floor Routine", "Balance Beam", "Uneven Bars", "Vault", "Rings", "Pommel Horse"
+      ],
+      keyMetrics: [
+        { name: "Form Score", icon: "🤸‍♀️", description: "Technical execution quality" },
+        { name: "Balance", icon: "⚖️", description: "Stability and control" },
+        { name: "Flexibility", icon: "🤲", description: "Range of motion" },
+        { name: "Strength", icon: "💪", description: "Power generation" },
+        { name: "Timing", icon: "⏱️", description: "Routine pacing" },
+        { name: "Landing", icon: "👟", description: "Dismount accuracy" }
+      ]
+    },
+    para_archery: {
+      title: "Para Archery AR Analysis",
+      description: "Adaptive archery technique analysis for para athletes",
+      analysisTypes: [
+        "Seated Draw", "Standing Form", "Mouth Draw", "Adaptive Release", "Sight Alignment", "Stability Control"
+      ],
+      keyMetrics: [
+        { name: "Draw Adaptation", icon: "🏹", description: "Adaptive draw technique" },
+        { name: "Stability Score", icon: "🏛️", description: "Position control" },
+        { name: "Release Quality", icon: "✋", description: "Adaptive release method" },
+        { name: "Sight Focus", icon: "👁️", description: "Aiming precision" },
+        { name: "Consistency", icon: "📊", description: "Shot repeatability" },
+        { name: "Equipment Sync", icon: "⚙️", description: "Adaptive gear efficiency" }
       ]
     }
   };
   
-  return sportData[sport as keyof typeof sportData] || sportData.basketball;
+  return sportConfigs[sport as keyof typeof sportConfigs] || sportConfigs.basketball;
 };
 
 export default function ARTools() {
-  const [userPrimarySport, setUserPrimarySport] = useState<string>("basketball");
-  const [currentTab, setCurrentTab] = useState(0);
+  const [userPrimarySport, setUserPrimarySport] = useState<string>("basketball"); // This would come from user auth
+  const [selectedAnalysisType, setSelectedAnalysisType] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -105,6 +187,16 @@ export default function ARTools() {
 
   // WebSocket integration
   const { isConnected, currentResult } = useWebSocketAnalysis();
+
+  // Get sport configuration
+  const sportConfig = getSportAnalysisConfig(userPrimarySport);
+
+  // Initialize analysis type
+  useEffect(() => {
+    if (!selectedAnalysisType && sportConfig.analysisTypes.length > 0) {
+      setSelectedAnalysisType(sportConfig.analysisTypes[0]);
+    }
+  }, [userPrimarySport, sportConfig, selectedAnalysisType]);
 
   // Update analysis result from WebSocket
   useEffect(() => {
@@ -119,12 +211,12 @@ export default function ARTools() {
     }
   }, [currentResult]);
 
-  const startAnalysis = useCallback(async () => {
+  const startCamera = useCallback(async () => {
     setIsAnalyzing(true);
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { width: 640, height: 480 } 
+        video: { width: 1280, height: 720 } 
       });
       
       if (videoRef.current) {
@@ -133,199 +225,324 @@ export default function ARTools() {
       }
       
       toast({
-        title: "Analysis Started",
-        description: "AI is analyzing your technique in real-time.",
+        title: "Camera Started",
+        description: `Analyzing ${sportConfig.title.split(' ')[0]} technique in real-time.`,
       });
     } catch (error) {
       console.error('Camera access error:', error);
       toast({
         title: "Camera Access Failed",
-        description: "Please allow camera access to use analysis.",
+        description: "Please allow camera access to use AR analysis.",
         variant: "destructive",
       });
       setIsAnalyzing(false);
     }
-  }, [toast]);
+  }, [toast, sportConfig]);
 
-  const uploadVideo = useCallback(() => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'video/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        toast({
-          title: "Video Uploaded",
-          description: "Processing your video for analysis...",
-        });
-      }
-    };
-    input.click();
-  }, [toast]);
-
-  const exportData = useCallback(() => {
-    toast({
-      title: "Data Exported",
-      description: "Analysis data has been exported successfully.",
-    });
-  }, [toast]);
-
-  // Get current sport data
-  const sportData = getSportAnalysisData(userPrimarySport);
+  const stopCamera = useCallback(() => {
+    setIsAnalyzing(false);
+    if (videoRef.current?.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  }, []);
 
   return (
     <>
       <Helmet>
-        <title>AR Tools | Ekalavya</title>
-        <meta name="description" content="AI-Powered Motion Analysis for sports performance improvement" />
+        <title>{sportConfig.title} | Ekalavya</title>
+        <meta name="description" content={sportConfig.description} />
       </Helmet>
 
       <div className="min-h-screen bg-gray-900 text-white">
-        {/* Header */}
-        <div className="bg-gray-800 px-6 py-4 border-b border-gray-700">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-orange-600 p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Camera className="h-6 w-6 text-gray-400" />
-              <h1 className="text-xl font-semibold text-white">AI-Powered Motion Analysis</h1>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                <span className="text-orange-600 font-bold text-sm">E</span>
+              </div>
+              <span className="text-white font-semibold">Ekalavya</span>
             </div>
-            <div className="flex items-center gap-3">
-              {/* AI Connection Status */}
-              <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border px-3 py-1`}>
-                <div className="flex items-center gap-2">
-                  {isConnected ? <Wifi className="h-4 w-4 text-green-400" /> : <WifiOff className="h-4 w-4 text-orange-400" />}
-                  <span className={`text-sm ${isConnected ? 'text-green-400' : 'text-orange-400'}`}>
-                    AI Server: {isConnected ? 'Connected' : 'Connecting...'}
-                  </span>
-                </div>
-              </Alert>
-              <Button variant="outline" size="sm" onClick={uploadVideo}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Video
-              </Button>
-              <Button size="sm" onClick={startAnalysis} disabled={isAnalyzing}>
-                {isAnalyzing ? "Analyzing..." : "Start Analysis"}
-              </Button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
+                <span className="text-orange-900 font-bold text-sm">A</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="flex">
-          {/* Video Analysis Area */}
-          <div className="flex-1 p-6">
-            {/* Player Header */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-white mb-2">Player: {sportData.playerName}</h2>
-              <p className="text-gray-400">{sportData.analysisType}</p>
-            </div>
-
-            {/* Metrics */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {sportData.metrics.map((metric, index) => (
-                <div key={index} className="text-right">
-                  <div className="text-sm text-gray-400">{metric.name}:</div>
-                  <div className={`text-lg font-semibold ${metric.color}`}>{metric.value}</div>
+          {/* Desktop Sidebar Navigation */}
+          <div className="hidden lg:flex w-64 bg-orange-600 flex-col min-h-screen">
+            {/* Logo */}
+            <div className="p-4 border-b border-orange-700">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-orange-600 font-bold text-sm">E</span>
                 </div>
-              ))}
-            </div>
-
-            {/* Video/Camera Area */}
-            <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-80 border-2 border-dashed border-gray-600">
-              {isAnalyzing ? (
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-cover rounded-lg"
-                  autoPlay
-                  muted
-                  playsInline
-                />
-              ) : (
-                <div className="text-center">
-                  <Camera className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">{sportData.analysisTitle}</h3>
-                  <p className="text-gray-400">Upload video or start live analysis</p>
-                </div>
-              )}
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 mb-6">
-              <Button className="bg-orange-600 hover:bg-orange-700" onClick={startAnalysis}>
-                <Play className="h-4 w-4 mr-2" />
-                Start Analysis
-              </Button>
-              <Button variant="outline" onClick={uploadVideo}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Video
-              </Button>
-              <Button variant="outline" onClick={exportData}>
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Export Data
-              </Button>
-            </div>
-
-            {/* Analysis Tabs */}
-            <div className="mb-6">
-              <div className="flex gap-4 mb-4 border-b border-gray-700">
-                {sportData.tabs.map((tab, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentTab(index)}
-                    className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
-                      currentTab === index
-                        ? 'border-orange-500 text-orange-400'
-                        : 'border-transparent text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
+                <span className="text-white font-semibold">Ekalavya</span>
               </div>
             </div>
 
-            {/* AI Motion Analysis Results */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-white mb-4">AI Motion Analysis</h3>
-              <div className="space-y-4">
-                {sportData.feedback.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold ${
-                      item.type === 'excellent' ? 'bg-green-600' :
-                      item.type === 'warning' ? 'bg-yellow-600' : 'bg-red-600'
-                    }`}>
-                      {item.icon}
+            {/* Navigation Menu */}
+            <nav className="flex-1 py-4">
+              <div className="space-y-1 px-3">
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <BarChart3 className="h-5 w-5" />
+                  <span>Dashboard</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <Target className="h-5 w-5" />
+                  <span>Analytics</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <Video className="h-5 w-5" />
+                  <span>Schedule</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <Trophy className="h-5 w-5" />
+                  <span>Coaches</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <Zap className="h-5 w-5" />
+                  <span>Training</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 bg-green-700 text-white rounded">
+                  <Camera className="h-5 w-5" />
+                  <span>AR Tools</span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 text-orange-200 hover:bg-orange-700 rounded">
+                  <AlertCircle className="h-5 w-5" />
+                  <span>Profile</span>
+                </div>
+              </div>
+            </nav>
+
+            {/* User Profile */}
+            <div className="p-4 border-t border-orange-700">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
+                  <span className="text-orange-900 font-bold text-sm">A</span>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-white">Arjuna</div>
+                  <div className="text-xs text-orange-200">Athlete</div>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="w-full text-orange-600 border-orange-400 hover:bg-orange-50">
+                Logout
+              </Button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col">
+            {/* Desktop Header */}
+            <div className="hidden lg:block bg-gray-800 px-6 py-4 border-b border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Camera className="h-6 w-6 text-gray-400" />
+                  <h1 className="text-xl font-semibold text-white">AI-Powered Motion Analysis</h1>
+                </div>
+                <div className="flex items-center gap-3">
+                  {/* AI Connection Status */}
+                  <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border px-3 py-1`}>
+                    <div className="flex items-center gap-2">
+                      {isConnected ? <Check className="h-4 w-4 text-green-400" /> : <AlertCircle className="h-4 w-4 text-orange-400" />}
+                      <span className={`text-sm ${isConnected ? 'text-green-400' : 'text-orange-400'}`}>
+                        AI Server: {isConnected ? 'Connected' : 'Connecting...'}
+                      </span>
+                    </div>
+                  </Alert>
+                  <Button variant="outline" size="sm">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Video
+                  </Button>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    Start Analysis
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 p-4 lg:p-6">
+              {/* Mobile AI Connection Status */}
+              <div className="lg:hidden mb-4">
+                <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border px-3 py-2`}>
+                  <div className="flex items-center gap-2">
+                    {isConnected ? <Check className="h-4 w-4 text-green-400" /> : <AlertCircle className="h-4 w-4 text-orange-400" />}
+                    <span className={`text-sm ${isConnected ? 'text-green-400' : 'text-orange-400'}`}>
+                      AI Server: {isConnected ? 'Connected' : 'Connecting...'}
+                    </span>
+                  </div>
+                </Alert>
+              </div>
+
+              {/* Player Header */}
+              <div className="mb-6">
+                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">Player: Marcus Johnson</h2>
+                <p className="text-gray-400">Jump Shot Analysis</p>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-right">
+                <div>
+                  <div className="text-sm text-gray-400">Release Height:</div>
+                  <div className="text-lg font-semibold text-blue-400">8'2" (+2")</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Release Angle:</div>
+                  <div className="text-lg font-semibold text-yellow-400">42° (Optimal: 45°)</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Elbow Alignment:</div>
+                  <div className="text-lg font-semibold text-yellow-400">85% (-3%)</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400">Balance:</div>
+                  <div className="text-lg font-semibold text-red-400">78% (-2%)</div>
+                </div>
+                <div className="sm:col-span-2">
+                  <div className="text-sm text-gray-400">Follow Through:</div>
+                  <div className="text-lg font-semibold text-green-400">82% (-4%)</div>
+                </div>
+              </div>
+
+              {/* Video Analysis Area */}
+              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-60 lg:h-80 border-2 border-dashed border-gray-600">
+                {isAnalyzing ? (
+                  <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover rounded-lg"
+                    autoPlay
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <div className="text-center">
+                    <Camera className="h-12 lg:h-16 w-12 lg:w-16 text-gray-500 mx-auto mb-4" />
+                    <h3 className="text-lg lg:text-xl font-semibold text-white mb-2">Basketball Motion Analysis</h3>
+                    <p className="text-gray-400 text-sm lg:text-base">Upload video or start live analysis</p>
+                  </div>
+                )}
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-6">
+                <Button className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none" onClick={startCamera}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Analysis
+                </Button>
+                <Button variant="outline" className="flex-1 sm:flex-none">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Video
+                </Button>
+                <Button variant="outline" className="flex-1 sm:flex-none">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+              </div>
+
+              {/* Analysis Tabs */}
+              <div className="mb-6">
+                <div className="flex gap-2 lg:gap-4 mb-4 border-b border-gray-700 overflow-x-auto">
+                  <button className="pb-2 px-1 text-sm font-medium border-b-2 border-orange-500 text-orange-400 whitespace-nowrap">
+                    Shooting
+                  </button>
+                  <button className="pb-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white whitespace-nowrap">
+                    Dribbling
+                  </button>
+                  <button className="pb-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white whitespace-nowrap">
+                    Movement
+                  </button>
+                  <button className="pb-2 px-1 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white whitespace-nowrap">
+                    Defense
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Motion Analysis Results */}
+              <div className="mb-8">
+                <h3 className="text-lg lg:text-xl font-bold text-white mb-4">AI Motion Analysis</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      ✓
                     </div>
                     <div className="flex-1">
-                      <h4 className={`font-semibold mb-1 ${item.color}`}>{item.title}</h4>
-                      <p className="text-gray-300 text-sm">{item.description}</p>
+                      <h4 className="font-semibold mb-1 text-green-400">Follow through is excellent</h4>
+                      <p className="text-gray-300 text-sm">Full extension with proper wrist snap creates optimal backspin. Continue to emphasize this technique.</p>
                     </div>
                   </div>
-                ))}
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      ⚠
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold mb-1 text-yellow-400">Elbow alignment needs adjustment</h4>
+                      <p className="text-gray-300 text-sm">Your shooting elbow is slightly out at a +2° angle. Try to keep it at 45° for better accuracy and consistency.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                      ✗
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold mb-1 text-red-400">Balance is shifting during release</h4>
+                      <p className="text-gray-300 text-sm">Your weight distribution is uneven (70%). Focus on maintaining a stable base through the entire shot motion.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Recommended Drills */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">Recommended Drills</h3>
-                <button className="text-blue-400 hover:text-blue-300 text-sm">View All ›</button>
-              </div>
-              <div className="space-y-3">
-                {sportData.drills.map((drill, index) => (
-                  <div key={index} className={`${drill.color} rounded-lg p-4 flex items-center justify-between`}>
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">{drill.icon}</div>
-                      <div>
-                        <h4 className="font-semibold text-white">{drill.name}</h4>
-                        <p className="text-sm text-gray-200">{drill.description}</p>
+              {/* Recommended Drills */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg lg:text-xl font-bold text-white">Recommended Drills</h3>
+                  <button className="text-blue-400 hover:text-blue-300 text-sm">View All ›</button>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-orange-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="text-2xl">🏀</div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white">Form Shooting Drill</h4>
+                        <p className="text-sm text-gray-200">Focus on elbow alignment and balance - Your top priority</p>
                       </div>
                     </div>
-                    <Button size="sm" variant="secondary">
+                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
                       Add to Plan
                     </Button>
                   </div>
-                ))}
+                  <div className="bg-blue-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="text-2xl">⚡</div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white">Balance Training</h4>
+                        <p className="text-sm text-gray-200">Improve shooting stance stability - Critical improvement</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
+                      Add to Plan
+                    </Button>
+                  </div>
+                  <div className="bg-green-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="text-2xl">🎯</div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white">Release Technique</h4>
+                        <p className="text-sm text-gray-200">Perfect your follow-through motion - Essential skill</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
+                      Add to Plan
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
