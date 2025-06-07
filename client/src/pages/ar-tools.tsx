@@ -186,7 +186,15 @@ export default function ARTools() {
   const { toast } = useToast();
 
   // WebSocket integration
-  const { isConnected, currentResult } = useWebSocketAnalysis();
+  const { isConnected, currentResult, connect, disconnect } = useWebSocketAnalysis();
+
+  // Connect to AI server on component mount
+  useEffect(() => {
+    connect();
+    return () => {
+      disconnect();
+    };
+  }, [connect, disconnect]);
 
   // Get sport configuration
   const sportConfig = getSportAnalysisConfig(userPrimarySport);
