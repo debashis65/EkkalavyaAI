@@ -176,8 +176,20 @@ const getSportAnalysisConfig = (sport: string) => {
   return sportConfigs[sport as keyof typeof sportConfigs] || sportConfigs.basketball;
 };
 
-export default function ARTools() {
-  const [userPrimarySport, setUserPrimarySport] = useState<string>("basketball"); // This would come from user auth
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'coach' | 'athlete';
+  name: string;
+  primarySport?: string;
+}
+
+interface ARToolsProps {
+  user?: User;
+}
+
+export default function ARTools({ user }: ARToolsProps = {}) {
+  const [userPrimarySport, setUserPrimarySport] = useState<string>(user?.primarySport || "basketball");
   const [selectedAnalysisType, setSelectedAnalysisType] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -198,6 +210,43 @@ export default function ARTools() {
 
   // Get sport configuration
   const sportConfig = getSportAnalysisConfig(userPrimarySport);
+
+  // Get dynamic metrics based on user's sport
+  const getMetricsForSport = (sport: string) => {
+    const metrics = {
+      basketball: [
+        { label: "Release Height", value: "8'2\" (+2\")", color: "text-blue-400" },
+        { label: "Release Angle", value: "42° (Optimal: 45°)", color: "text-yellow-400" },
+        { label: "Elbow Alignment", value: "85% (-3%)", color: "text-yellow-400" },
+        { label: "Balance", value: "78% (-2%)", color: "text-red-400" },
+        { label: "Follow Through", value: "82% (-4%)", color: "text-green-400", span: true }
+      ],
+      swimming: [
+        { label: "Stroke Rate", value: "32 SPM (+2)", color: "text-blue-400" },
+        { label: "Body Position", value: "88% (Optimal)", color: "text-green-400" },
+        { label: "Kick Timing", value: "76% (-4%)", color: "text-yellow-400" },
+        { label: "Breathing Pattern", value: "Every 3rd (+1)", color: "text-blue-400" },
+        { label: "Efficiency Index", value: "84% (+2%)", color: "text-green-400", span: true }
+      ],
+      tennis: [
+        { label: "Racquet Speed", value: "95 mph (+3)", color: "text-blue-400" },
+        { label: "Contact Point", value: "92% (Good)", color: "text-green-400" },
+        { label: "Follow Through", value: "78% (-5%)", color: "text-yellow-400" },
+        { label: "Footwork", value: "85% (+1%)", color: "text-blue-400" },
+        { label: "Shot Accuracy", value: "81% (-2%)", color: "text-yellow-400", span: true }
+      ],
+      archery: [
+        { label: "Anchor Point", value: "96% (Consistent)", color: "text-green-400" },
+        { label: "Draw Length", value: "28.5\" (Optimal)", color: "text-green-400" },
+        { label: "Release Timing", value: "82% (-3%)", color: "text-yellow-400" },
+        { label: "Bow Arm Stability", value: "89% (+2%)", color: "text-blue-400" },
+        { label: "Arrow Grouping", value: "7.2\" radius", color: "text-blue-400", span: true }
+      ]
+    };
+    return metrics[sport as keyof typeof metrics] || metrics.basketball;
+  };
+  
+  const currentMetrics = getMetricsForSport(userPrimarySport);
 
   // Initialize analysis type
   useEffect(() => {
@@ -397,28 +446,14 @@ export default function ARTools() {
                 <p className="text-gray-400">{sportConfig.analysisTypes[0]} Analysis</p>
               </div>
 
-              {/* Metrics Grid */}
+              {/* Dynamic Metrics Grid - Changes based on user's sport */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-right">
-                <div>
-                  <div className="text-sm text-gray-400">Release Height:</div>
-                  <div className="text-lg font-semibold text-blue-400">8'2" (+2")</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">Release Angle:</div>
-                  <div className="text-lg font-semibold text-yellow-400">42° (Optimal: 45°)</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">Elbow Alignment:</div>
-                  <div className="text-lg font-semibold text-yellow-400">85% (-3%)</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-400">Balance:</div>
-                  <div className="text-lg font-semibold text-red-400">78% (-2%)</div>
-                </div>
-                <div className="sm:col-span-2">
-                  <div className="text-sm text-gray-400">Follow Through:</div>
-                  <div className="text-lg font-semibold text-green-400">82% (-4%)</div>
-                </div>
+                {currentMetrics.map((metric, index) => (
+                  <div key={index} className={metric.span ? "sm:col-span-2" : ""}>
+                    <div className="text-sm text-gray-400">{metric.label}:</div>
+                    <div className={`text-lg font-semibold ${metric.color}`}>{metric.value}</div>
+                  </div>
+                ))}
               </div>
 
               {/* Video Analysis Area */}
