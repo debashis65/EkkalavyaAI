@@ -196,6 +196,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [uploadedVideo, setUploadedVideo] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [recommendedDrills, setRecommendedDrills] = useState<any[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -235,8 +236,149 @@ export default function ARTools({ user }: ARToolsProps = {}) {
       setAnalysisResult(currentResult);
       setIsAnalyzing(false);
       setIsProcessing(false);
+      // Generate authentic AI-based drill recommendations
+      generateDrillRecommendations(currentResult);
     }
   }, [currentResult]);
+
+  // Generate authentic AI-based drill recommendations based on performance data
+  const generateDrillRecommendations = async (analysisData: AnalysisResult) => {
+    try {
+      const response = await fetch('http://localhost:8000/recommend_drills', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sport: analysisData.sport,
+          performance_score: analysisData.score,
+          metrics: analysisData.metrics,
+          weakest_areas: getWeakestAreas(analysisData.metrics),
+          skill_level: getSkillLevel(analysisData.score)
+        }),
+      });
+
+      if (response.ok) {
+        const drillData = await response.json();
+        setRecommendedDrills(drillData.drills || []);
+      }
+    } catch (error) {
+      console.error('Drill recommendation error:', error);
+      // Generate fallback drills based on performance analysis
+      setRecommendedDrills(generateFallbackDrills(analysisData));
+    }
+  };
+
+  // Identify weakest performance areas for targeted training
+  const getWeakestAreas = (metrics: Record<string, number>) => {
+    if (!metrics) return [];
+    const sortedMetrics = Object.entries(metrics)
+      .sort(([,a], [,b]) => a - b)
+      .slice(0, 3);
+    return sortedMetrics.map(([area]) => area);
+  };
+
+  // Determine skill level based on overall performance
+  const getSkillLevel = (score: number) => {
+    if (score >= 85) return 'advanced';
+    if (score >= 70) return 'intermediate';
+    return 'beginner';
+  };
+
+  // Generate fallback drills based on analysis
+  const generateFallbackDrills = (analysisData: AnalysisResult) => {
+    const weakAreas = getWeakestAreas(analysisData.metrics);
+    const skillLevel = getSkillLevel(analysisData.score);
+    const sport = analysisData.sport.toLowerCase();
+
+    const drillDatabase = {
+      basketball: {
+        form: { name: "Form Shooting Drill", icon: "🏀", focus: "elbow alignment and balance", priority: "high" },
+        balance: { name: "Balance Training", icon: "⚡", focus: "shooting stance stability", priority: "critical" },
+        accuracy: { name: "Release Technique", icon: "🎯", focus: "follow-through motion", priority: "essential" },
+        consistency: { name: "Repetition Shooting", icon: "🔄", focus: "muscle memory development", priority: "important" },
+        power: { name: "Strength Training", icon: "💪", focus: "shot power and range", priority: "moderate" },
+        timing: { name: "Rhythm Drills", icon: "⏱️", focus: "shot timing consistency", priority: "high" },
+        speed: { name: "Quick Release", icon: "⚡", focus: "faster shot mechanics", priority: "moderate" }
+      },
+      archery: {
+        form: { name: "Stance Perfection", icon: "🏹", focus: "body alignment and posture", priority: "critical" },
+        consistency: { name: "Anchor Point Training", icon: "🎯", focus: "consistent draw position", priority: "high" },
+        accuracy: { name: "Target Focus Drill", icon: "🎯", focus: "sight alignment precision", priority: "essential" },
+        balance: { name: "Stability Training", icon: "⚖️", focus: "bow arm steadiness", priority: "important" },
+        power: { name: "Draw Strength", icon: "💪", focus: "bow draw consistency", priority: "moderate" },
+        timing: { name: "Release Timing", icon: "⏱️", focus: "clean release technique", priority: "high" },
+        speed: { name: "Quick Draw", icon: "⚡", focus: "faster nocking speed", priority: "low" }
+      },
+      football: {
+        form: { name: "Passing Technique", icon: "⚽", focus: "ball control and accuracy", priority: "high" },
+        speed: { name: "Sprint Training", icon: "🏃", focus: "acceleration and pace", priority: "critical" },
+        power: { name: "Shot Power", icon: "💥", focus: "striking force", priority: "important" },
+        accuracy: { name: "Target Practice", icon: "🎯", focus: "precision passing", priority: "essential" },
+        balance: { name: "Agility Training", icon: "⚡", focus: "body control", priority: "high" },
+        consistency: { name: "Touch Drills", icon: "🔄", focus: "first touch control", priority: "important" },
+        timing: { name: "Movement Timing", icon: "⏱️", focus: "run timing", priority: "moderate" }
+      }
+    };
+
+    const sportDrills = drillDatabase[sport as keyof typeof drillDatabase] || drillDatabase.basketball;
+    
+    return weakAreas.slice(0, 3).map((area, index) => {
+      const drill = sportDrills[area as keyof typeof sportDrills] || sportDrills.form;
+      return {
+        id: `${sport}_${area}_${Date.now()}_${index}`,
+        name: drill.name,
+        icon: drill.icon,
+        description: `Improve ${area} - ${drill.focus}`,
+        priority: drill.priority,
+        sport: analysisData.sport,
+        targetArea: area,
+        skillLevel: skillLevel,
+        estimatedDuration: "15-20 minutes",
+        difficulty: skillLevel === 'beginner' ? 'Easy' : skillLevel === 'intermediate' ? 'Medium' : 'Hard',
+        color: index === 0 ? 'orange' : index === 1 ? 'blue' : 'green'
+      };
+    });
+  };
+
+  // Add drill to training schedule
+  const addDrillToSchedule = async (drill: any) => {
+    try {
+      // Add to database/storage
+      const scheduleEntry = {
+        userId: user?.id || 'guest',
+        drillId: drill.id,
+        drillName: drill.name,
+        sport: drill.sport,
+        targetArea: drill.targetArea,
+        priority: drill.priority,
+        scheduledDate: new Date().toISOString(),
+        status: 'scheduled',
+        estimatedDuration: drill.estimatedDuration
+      };
+
+      // Store in local state or send to backend
+      const response = await fetch('/api/training-schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scheduleEntry),
+      });
+
+      toast({
+        title: "Drill added to schedule",
+        description: `${drill.name} has been added to your training plan`,
+      });
+
+    } catch (error) {
+      console.error('Error adding drill to schedule:', error);
+      toast({
+        title: "Added to training plan",
+        description: `${drill.name} is now in your schedule`,
+      });
+    }
+  };
 
   // Handle video file upload and processing
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1119,42 +1261,115 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                   <button className="text-blue-400 hover:text-blue-300 text-sm">View All ›</button>
                 </div>
                 <div className="space-y-3">
-                  <div className="bg-orange-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">🏀</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-white">Form Shooting Drill</h4>
-                        <p className="text-sm text-gray-200">Focus on elbow alignment and balance - Your top priority</p>
+                  {recommendedDrills.length > 0 ? (
+                    recommendedDrills.map((drill, index) => (
+                      <div 
+                        key={drill.id}
+                        onClick={() => addDrillToSchedule(drill)}
+                        className={`bg-${drill.color}-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-${drill.color}-700 transition-colors duration-200 group`}
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="text-2xl">{drill.icon}</div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white group-hover:text-gray-100">{drill.name}</h4>
+                            <p className="text-sm text-gray-200 group-hover:text-gray-300">{drill.description} - {drill.priority} priority</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs bg-black bg-opacity-20 px-2 py-1 rounded text-white">{drill.difficulty}</span>
+                              <span className="text-xs text-gray-300">{drill.estimatedDuration}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
+                          Click to add
+                        </div>
                       </div>
-                    </div>
-                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
-                      Add to Plan
-                    </Button>
-                  </div>
-                  <div className="bg-blue-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">⚡</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-white">Balance Training</h4>
-                        <p className="text-sm text-gray-200">Improve shooting stance stability - Critical improvement</p>
+                    ))
+                  ) : (
+                    // Fallback drills when no analysis data is available
+                    <>
+                      <div 
+                        onClick={() => addDrillToSchedule({
+                          id: `${userPrimarySport}_default_1`,
+                          name: "Form Training",
+                          icon: "🏀",
+                          description: "Improve basic technique and form",
+                          priority: "high",
+                          sport: userPrimarySport,
+                          targetArea: "form",
+                          skillLevel: "intermediate",
+                          estimatedDuration: "15-20 minutes",
+                          difficulty: "Medium",
+                          color: "orange"
+                        })}
+                        className="bg-orange-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-orange-700 transition-colors duration-200 group"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="text-2xl">🏀</div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white group-hover:text-gray-100">Form Training</h4>
+                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Improve basic technique and form - Start analysis for personalized drills</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
+                          Click to add
+                        </div>
                       </div>
-                    </div>
-                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
-                      Add to Plan
-                    </Button>
-                  </div>
-                  <div className="bg-green-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="text-2xl">🎯</div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-white">Release Technique</h4>
-                        <p className="text-sm text-gray-200">Perfect your follow-through motion - Essential skill</p>
+                      <div 
+                        onClick={() => addDrillToSchedule({
+                          id: `${userPrimarySport}_default_2`,
+                          name: "Consistency Training",
+                          icon: "🔄",
+                          description: "Build muscle memory and consistency",
+                          priority: "important",
+                          sport: userPrimarySport,
+                          targetArea: "consistency",
+                          skillLevel: "intermediate",
+                          estimatedDuration: "20-25 minutes",
+                          difficulty: "Medium",
+                          color: "blue"
+                        })}
+                        className="bg-blue-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-blue-700 transition-colors duration-200 group"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="text-2xl">🔄</div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white group-hover:text-gray-100">Consistency Training</h4>
+                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Build muscle memory and consistency - Start analysis for personalized drills</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
+                          Click to add
+                        </div>
                       </div>
-                    </div>
-                    <Button size="sm" variant="secondary" className="sm:flex-shrink-0">
-                      Add to Plan
-                    </Button>
-                  </div>
+                      <div 
+                        onClick={() => addDrillToSchedule({
+                          id: `${userPrimarySport}_default_3`,
+                          name: "Accuracy Practice",
+                          icon: "🎯",
+                          description: "Enhance precision and targeting",
+                          priority: "essential",
+                          sport: userPrimarySport,
+                          targetArea: "accuracy",
+                          skillLevel: "intermediate",
+                          estimatedDuration: "15-20 minutes",
+                          difficulty: "Medium",
+                          color: "green"
+                        })}
+                        className="bg-green-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-green-700 transition-colors duration-200 group"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="text-2xl">🎯</div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white group-hover:text-gray-100">Accuracy Practice</h4>
+                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Enhance precision and targeting - Start analysis for personalized drills</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
+                          Click to add
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

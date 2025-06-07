@@ -235,6 +235,23 @@ export const websocketSessions = pgTable("websocket_sessions", {
   endedAt: timestamp("ended_at"),
 });
 
+// Training Schedule for AI-generated drill recommendations
+export const trainingSchedule = pgTable("training_schedule", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  drillName: text("drill_name").notNull(),
+  sport: sportEnum("sport").notNull(),
+  targetArea: text("target_area").notNull(), // form, accuracy, speed, etc.
+  priority: text("priority").notNull(), // high, critical, essential, etc.
+  scheduledDate: timestamp("scheduled_date").notNull(),
+  status: text("status").default("scheduled"), // scheduled, completed, skipped
+  estimatedDuration: text("estimated_duration"),
+  difficulty: text("difficulty"), // Easy, Medium, Hard
+  drillData: text("drill_data"), // JSON string with full drill details
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Subscription Plans table
 export const subscriptionPlans = pgTable("subscription_plans", {
   id: serial("id").primaryKey(),
