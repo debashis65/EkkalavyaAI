@@ -1298,90 +1298,17 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                       </div>
                     ))
                   ) : (
-                    // Fallback drills when no analysis data is available
-                    <>
-                      <div 
-                        onClick={() => addDrillToSchedule({
-                          id: `${userPrimarySport}_default_1`,
-                          name: "Form Training",
-                          icon: "🏀",
-                          description: "Improve basic technique and form",
-                          priority: "high",
-                          sport: userPrimarySport,
-                          targetArea: "form",
-                          skillLevel: "intermediate",
-                          estimatedDuration: "15-20 minutes",
-                          difficulty: "Medium",
-                          color: "orange"
-                        })}
-                        className="bg-orange-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-orange-700 transition-colors duration-200 group"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">🏀</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-white group-hover:text-gray-100">Form Training</h4>
-                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Improve basic technique and form - Start analysis for personalized drills</p>
-                          </div>
-                        </div>
-                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
-                          Click to add
-                        </div>
-                      </div>
-                      <div 
-                        onClick={() => addDrillToSchedule({
-                          id: `${userPrimarySport}_default_2`,
-                          name: "Consistency Training",
-                          icon: "🔄",
-                          description: "Build muscle memory and consistency",
-                          priority: "important",
-                          sport: userPrimarySport,
-                          targetArea: "consistency",
-                          skillLevel: "intermediate",
-                          estimatedDuration: "20-25 minutes",
-                          difficulty: "Medium",
-                          color: "blue"
-                        })}
-                        className="bg-blue-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-blue-700 transition-colors duration-200 group"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">🔄</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-white group-hover:text-gray-100">Consistency Training</h4>
-                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Build muscle memory and consistency - Start analysis for personalized drills</p>
-                          </div>
-                        </div>
-                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
-                          Click to add
-                        </div>
-                      </div>
-                      <div 
-                        onClick={() => addDrillToSchedule({
-                          id: `${userPrimarySport}_default_3`,
-                          name: "Accuracy Practice",
-                          icon: "🎯",
-                          description: "Enhance precision and targeting",
-                          priority: "essential",
-                          sport: userPrimarySport,
-                          targetArea: "accuracy",
-                          skillLevel: "intermediate",
-                          estimatedDuration: "15-20 minutes",
-                          difficulty: "Medium",
-                          color: "green"
-                        })}
-                        className="bg-green-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-green-700 transition-colors duration-200 group"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">🎯</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-white group-hover:text-gray-100">Accuracy Practice</h4>
-                            <p className="text-sm text-gray-200 group-hover:text-gray-300">Enhance precision and targeting - Start analysis for personalized drills</p>
-                          </div>
-                        </div>
-                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
-                          Click to add
-                        </div>
-                      </div>
-                    </>
+                    // Show message when no analysis data is available - NO FALLBACK DRILLS
+                    <div className="bg-gray-800 rounded-lg p-6 text-center">
+                      <div className="text-4xl mb-3">🎯</div>
+                      <h4 className="text-lg font-semibold text-white mb-2">Start Your Analysis</h4>
+                      <p className="text-gray-300 text-sm mb-4">
+                        Upload and analyze your performance video to get personalized drill recommendations based on your actual skills and weaknesses.
+                      </p>
+                      <p className="text-blue-400 text-xs">
+                        Authentic drill recommendations require real performance data
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
