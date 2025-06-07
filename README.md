@@ -1,6 +1,6 @@
 # Ekalavya Sports Training Platform
 
-A modern web application for connecting athletes with coaches for sports training, performance analysis, and skill development.
+A modern web application for connecting athletes and para-athletes with coaches for sports training, performance analysis, and skill development.
 
 ## Features
 
