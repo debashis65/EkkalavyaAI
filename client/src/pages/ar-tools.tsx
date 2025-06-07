@@ -58,11 +58,12 @@ export default function ARTools({ user }: ARToolsProps = {}) {
       try {
         const response = await fetch('http://localhost:8000/health');
         setIsConnected(response.ok);
-      } catch {
+      } catch (error) {
+        console.log('AI backend connection check failed:', error);
         setIsConnected(false);
       }
     };
-    checkConnection();
+    checkConnection().catch(err => console.log('Connection check error:', err));
   }, []);
 
   // Generate 8 essential metrics from analysis result
@@ -202,51 +203,61 @@ export default function ARTools({ user }: ARToolsProps = {}) {
       video.src = URL.createObjectURL(file);
       
       video.onloadedmetadata = async () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d')!;
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        const frames: string[] = [];
-        const frameCount = Math.min(10, Math.floor(video.duration));
-        
-        for (let i = 0; i < frameCount; i++) {
-          video.currentTime = (video.duration / frameCount) * i;
-          await new Promise(resolve => video.onseeked = resolve);
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
           
-          ctx.drawImage(video, 0, 0);
-          frames.push(canvas.toDataURL('image/jpeg', 0.8));
-        }
-        
-        const response = await fetch('/api/analyze-video', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sport: userPrimarySport,
-            analysis_type: 'video_upload',
-            frames,
-            timestamp: new Date().toISOString(),
-            user_id: user?.id || 'anonymous',
-            filename: file.name
-          }),
-        });
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          
+          const frames: string[] = [];
+          const frameCount = Math.min(10, Math.floor(video.duration));
+          
+          for (let i = 0; i < frameCount; i++) {
+            video.currentTime = (video.duration / frameCount) * i;
+            await new Promise(resolve => video.onseeked = resolve);
+            
+            ctx.drawImage(video, 0, 0);
+            frames.push(canvas.toDataURL('image/jpeg', 0.8));
+          }
+          
+          const response = await fetch('/api/analyze-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sport: userPrimarySport,
+              analysis_type: 'video_upload',
+              frames,
+              timestamp: new Date().toISOString(),
+              user_id: user?.id || 'anonymous',
+              filename: file.name
+            }),
+          });
 
-        if (!response.ok) {
-          throw new Error('Analysis failed');
-        }
+          if (!response.ok) {
+            throw new Error('Analysis failed');
+          }
 
-        const analysisData = await response.json();
-        setAnalysisResult(analysisData);
-        
-        URL.revokeObjectURL(video.src);
-        
-        toast({
-          title: "Video Processed",
-          description: `Analysis complete for ${file.name}`
-        });
-        
-        setIsAnalyzing(false);
+          const analysisData = await response.json();
+          setAnalysisResult(analysisData);
+          
+          URL.revokeObjectURL(video.src);
+          
+          toast({
+            title: "Video Processed",
+            description: `Analysis complete for ${file.name}`
+          });
+          
+          setIsAnalyzing(false);
+        } catch (uploadError) {
+          console.log('Video upload processing error:', uploadError);
+          setIsAnalyzing(false);
+          toast({
+            title: "Processing Error",
+            description: "Failed to analyze video file",
+            variant: "destructive"
+          });
+        }
       };
     } catch (error) {
       setIsAnalyzing(false);

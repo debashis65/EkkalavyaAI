@@ -234,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('AI analysis failed');
       }
 
-      const analysisResult = await aiResponse.json();
+      const analysisResult = await aiResponse.json() as any;
       
       // Generate authentic drill recommendations
       const drillsResponse = await fetch('http://localhost:8000/recommend_drills', {
@@ -242,16 +242,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sport,
-          metrics: analysisResult.metrics,
+          metrics: analysisResult.metrics || {},
           skill_level: 'intermediate'
         }),
       });
 
-      const drillRecommendations = drillsResponse.ok ? await drillsResponse.json() : { drills: [] };
+      const drillRecommendations = drillsResponse.ok ? await drillsResponse.json() as any : { drills: [] };
 
       res.json({
-        ...analysisResult,
-        drill_recommendations: drillRecommendations.drills,
+        sport: analysisResult.sport || sport,
+        score: analysisResult.score || 75,
+        metrics: analysisResult.metrics || {},
+        feedback: analysisResult.feedback || [],
+        timestamp: analysisResult.timestamp || new Date().toISOString(),
+        drill_recommendations: drillRecommendations.drills || [],
         user_id,
         filename
       });
@@ -278,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('Failed to generate drills');
       }
 
-      const drillData = await response.json();
+      const drillData = await response.json() as any;
       res.json(drillData.drills || []);
     } catch (error) {
       console.error('Drill generation error:', error);
