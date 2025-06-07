@@ -37,94 +37,89 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { isConnected, sendAnalysisData } = useWebSocketAnalysis();
+  const { 
+    isConnected, 
+    isAnalyzing, 
+    currentResult, 
+    startAnalysis, 
+    connect, 
+    startCamera,
+    videoRef: wsVideoRef,
+    canvasRef
+  } = useWebSocketAnalysis();
 
   const userPrimarySport = user?.primarySport || 'basketball';
 
+  // Connect to WebSocket on component mount and use real analysis results
   useEffect(() => {
-    // Set realistic basketball analysis data
-    setAnalysisResult({
-      sport: 'basketball',
-      analysis_type: 'shooting_form',
-      score: 78,
-      feedback: [
-        'Strong shooting foundation with consistent form',
-        'Follow-through needs slight adjustment for better arc',
-        'Footwork positioning shows good balance',
-        'Release timing demonstrates good muscle memory'
-      ],
-      metrics: {
-        'Form Consistency': 78,
-        'Shot Arc': 72,
-        'Release Point': 85,
-        'Follow Through': 76,
-        'Balance': 82,
-        'Footwork': 79,
-        'Shooting Speed': 74,
-        'Accuracy': 80
-      },
-      timestamp: new Date().toISOString()
-    });
-  }, []);
+    connect();
+  }, [connect]);
 
-  const handleVideoUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (currentResult) {
+      setAnalysisResult(currentResult);
+    }
+  }, [currentResult]);
+
+  const handleVideoUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setUploadedVideo(url);
-      toast({
-        title: "Video uploaded successfully",
-        description: "Ready for AI analysis",
-      });
+      
+      // Send video to AI backend for analysis
+      try {
+        const response = await fetch('http://localhost:8000/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sport: userPrimarySport,
+            analysis_type: 'video_analysis',
+            user_id: user?.id || 'anonymous'
+          }),
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          setAnalysisResult(result);
+          toast({
+            title: "Video analysis complete",
+            description: "AI has analyzed your performance",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Video uploaded successfully",
+          description: "Ready for AI analysis",
+        });
+      }
     }
-  }, [toast]);
+  }, [toast, userPrimarySport, user?.id]);
 
   const handleStartAnalysis = useCallback(async () => {
+    if (!isConnected) {
+      connect();
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
     try {
-      // Smart Analyze works without requiring video upload
+      await startCamera();
+      startAnalysis(parseInt(user?.id || '1'), userPrimarySport, 'live_form_analysis');
+      
       toast({
         title: "Smart Analysis started",
         description: "AI is analyzing your live movement...",
       });
-
-      // Simulate real-time analysis
-      setTimeout(() => {
-        setAnalysisResult({
-          sport: userPrimarySport,
-          analysis_type: 'live_analysis',
-          score: 82,
-          feedback: [
-            'Excellent form consistency detected',
-            'Optimal release timing captured',
-            'Strong balance and positioning',
-            'Recommend focus on follow-through refinement'
-          ],
-          metrics: {
-            'Form Consistency': 82,
-            'Shot Arc': 78,
-            'Release Point': 88,
-            'Follow Through': 74,
-            'Balance': 85,
-            'Footwork': 81,
-            'Shooting Speed': 77,
-            'Accuracy': 83
-          },
-          timestamp: new Date().toISOString()
-        });
-
-        toast({
-          title: "Smart Analysis complete",
-          description: "Live performance analysis ready",
-        });
-      }, 2000);
     } catch (error) {
       toast({
         title: "Analysis failed",
-        description: "Please try again",
+        description: "Please allow camera access",
         variant: "destructive",
       });
     }
-  }, [userPrimarySport, toast]);
+  }, [isConnected, connect, startCamera, startAnalysis, userPrimarySport, user?.id, toast]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -319,46 +314,34 @@ export default function ARToolsMobile({ user }: ARToolsProps = {}) {
                 <Trophy className="h-5 w-5 text-yellow-400" />
                 <h3 className="text-lg font-semibold text-white">AI-Generated Recommended Drills</h3>
               </div>
-              <div className="space-y-3">
-                {[
-                  {
-                    name: "Arc Improvement Drill",
-                    focus: "Shot Arc Enhancement",
-                    needsWork: analysisResult?.metrics['Shot Arc'] && analysisResult.metrics['Shot Arc'] < 75
-                  },
-                  {
-                    name: "Follow-Through Practice",
-                    focus: "Release Consistency",
-                    needsWork: analysisResult?.metrics['Follow Through'] && analysisResult.metrics['Follow Through'] < 80
-                  },
-                  {
-                    name: "Balance Training",
-                    focus: "Shooting Stability",
-                    needsWork: analysisResult?.metrics['Balance'] && analysisResult.metrics['Balance'] < 85
-                  }
-                ].map((drill, index) => {
-                  const needsImprovement = drill.needsWork;
-                  return (
-                    <div key={index} className={`p-3 rounded-lg border ${needsImprovement ? 'bg-red-900/20 border-red-500' : 'bg-gray-900/50 border-gray-600'}`}>
+              {analysisResult?.drills ? (
+                <div className="space-y-3">
+                  {analysisResult.drills.map((drill, index) => (
+                    <div key={index} className={`p-3 rounded-lg border ${drill.priority === 'high' ? 'bg-red-900/20 border-red-500' : 'bg-gray-900/50 border-gray-600'}`}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="text-white font-medium">{drill.name}</h4>
-                          <p className="text-gray-400 text-sm mt-1">Focus: {drill.focus}</p>
+                          <p className="text-gray-400 text-sm mt-1">{drill.description}</p>
                         </div>
-                        {needsImprovement && (
+                        {drill.priority === 'high' && (
                           <Badge variant="destructive" className="bg-red-600 text-white text-xs">
                             Priority
                           </Badge>
                         )}
                       </div>
                       <div className="flex gap-4 text-xs text-gray-400 mt-2">
-                        <span>🎯 Focus: {drill.focus}</span>
-                        <span>📈 Priority: {needsImprovement ? "High" : "Medium"}</span>
+                        <span>⏱️ Duration: {drill.duration}</span>
+                        <span>📈 Difficulty: {drill.difficulty}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-400 py-4">
+                  <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>Start analysis to get personalized drill recommendations</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
