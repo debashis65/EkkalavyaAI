@@ -1,5 +1,6 @@
-import { BarChart3, Calendar, Users, Dumbbell, Camera, User, Settings, MessageSquare } from "lucide-react";
+import { BarChart3, Calendar, Users, Dumbbell, Camera, User, Settings, MessageSquare, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface User {
   id: string;
@@ -16,6 +17,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: SidebarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const playerNavItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -37,8 +40,40 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
 
   const navItems = user.role === 'athlete' ? playerNavItems : coachNavItems;
 
+  const handleNavClick = (tabId: string) => {
+    setActiveTab(tabId);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="w-64 bg-primary text-white min-h-screen flex flex-col">
+    <>
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          variant="secondary"
+          size="sm"
+          className="bg-primary text-white hover:bg-primary/90"
+        >
+          {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:static lg:translate-x-0 z-40
+        w-64 bg-primary text-white min-h-screen flex flex-col
+        transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center gap-3">
@@ -58,7 +93,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 mb-2 rounded-lg text-left transition-colors ${
                 activeTab === item.id 
                   ? 'bg-secondary text-white shadow-lg' 
@@ -92,6 +127,7 @@ export default function Sidebar({ user, activeTab, setActiveTab, onLogout }: Sid
           Logout
         </Button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

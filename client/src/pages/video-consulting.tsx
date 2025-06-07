@@ -60,108 +60,109 @@ export default function VideoConsulting() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Video Consulting</h1>
-            <p className="text-gray-600 mt-2">Manage your virtual coaching sessions</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-3 sm:p-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Video Consulting</h1>
+            <p className="text-gray-600 text-sm mb-4">Manage your virtual coaching sessions</p>
+            <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
+              <Video className="h-4 w-4 mr-2" />
+              Schedule New Call
+            </Button>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Video className="h-4 w-4 mr-2" />
-            Schedule New Call
-          </Button>
-        </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Video className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">12</div>
-              <div className="text-sm text-gray-600">This Week</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Clock className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">24h</div>
-              <div className="text-sm text-gray-600">Total Hours</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">18</div>
-              <div className="text-sm text-gray-600">Active Students</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 text-center">
-              <MessageSquare className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">4.9</div>
-              <div className="text-sm text-gray-600">Avg Rating</div>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Video className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-gray-900">12</div>
+                <div className="text-xs text-gray-600">This Week</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Clock className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-gray-900">24h</div>
+                <div className="text-xs text-gray-600">Total Hours</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Users className="h-6 w-6 text-orange-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-gray-900">18</div>
+                <div className="text-xs text-gray-600">Active Students</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <MessageSquare className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+                <div className="text-xl font-bold text-gray-900">4.9</div>
+                <div className="text-xs text-gray-600">Avg Rating</div>
+              </CardContent>
+            </Card>
+          </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6">
-          <Button 
-            variant={activeTab === "upcoming" ? "default" : "outline"}
-            onClick={() => setActiveTab("upcoming")}
-          >
-            Upcoming Calls
-          </Button>
-          <Button 
-            variant={activeTab === "recent" ? "default" : "outline"}
-            onClick={() => setActiveTab("recent")}
-          >
-            Recent Calls
-          </Button>
-        </div>
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6">
+            <Button 
+              variant={activeTab === "upcoming" ? "default" : "outline"}
+              onClick={() => setActiveTab("upcoming")}
+              className="flex-1 sm:flex-none"
+            >
+              Upcoming Calls
+            </Button>
+            <Button 
+              variant={activeTab === "recent" ? "default" : "outline"}
+              onClick={() => setActiveTab("recent")}
+              className="flex-1 sm:flex-none"
+            >
+              Recent Calls
+            </Button>
+          </div>
 
         {/* Upcoming Calls */}
         {activeTab === "upcoming" && (
           <div className="space-y-4">
             {upcomingCalls.map((call) => (
               <Card key={call.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                         <AvatarFallback className="bg-blue-600 text-white">
                           {call.student.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{call.student}</h3>
-                        <p className="text-sm text-gray-600">{call.sport} • {call.type}</p>
-                        <div className="flex items-center gap-4 mt-1">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">{call.student}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 truncate">{call.sport} • {call.type}</p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
                           <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">{call.time}</span>
+                            <Calendar className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">{call.time}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">{call.duration}</span>
+                            <Clock className="h-3 w-3 text-gray-400" />
+                            <span className="text-xs text-gray-600">{call.duration}</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
                       <Badge 
-                        className={call.status === 'confirmed' ? 'bg-green-600' : 'bg-yellow-600'}
+                        className={`${call.status === 'confirmed' ? 'bg-green-600' : 'bg-yellow-600'} text-xs shrink-0`}
                       >
                         {call.status}
                       </Badge>
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                        <Video className="h-4 w-4 mr-1" />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs flex-1">
+                        <Video className="h-3 w-3 mr-1" />
                         Join Call
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <Phone className="h-4 w-4 mr-1" />
+                      <Button size="sm" variant="outline" className="text-xs flex-1">
+                        <Phone className="h-3 w-3 mr-1" />
                         Audio Only
                       </Button>
                     </div>
@@ -177,31 +178,29 @@ export default function VideoConsulting() {
           <div className="space-y-4">
             {recentCalls.map((call) => (
               <Card key={call.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                         <AvatarFallback className="bg-gray-600 text-white">
                           {call.student.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{call.student}</h3>
-                        <p className="text-sm text-gray-600">{call.sport}</p>
-                        <div className="flex items-center gap-4 mt-1">
-                          <span className="text-sm text-gray-600">{call.date}</span>
-                          <span className="text-sm text-gray-600">{call.duration}</span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">{call.student}</h3>
+                        <p className="text-xs sm:text-sm text-gray-600 truncate">{call.sport}</p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+                          <span className="text-xs text-gray-600">{call.date}</span>
+                          <span className="text-xs text-gray-600">{call.duration}</span>
                           <div className="flex items-center gap-1">
-                            <span className="text-sm text-yellow-600">{"★".repeat(call.rating)}</span>
+                            <span className="text-xs text-yellow-600">{"★".repeat(call.rating)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right max-w-xs">
-                        <p className="text-sm text-gray-600">{call.notes}</p>
-                      </div>
-                      <Button size="sm" variant="outline">
+                    <div className="space-y-2">
+                      <p className="text-xs sm:text-sm text-gray-600">{call.notes}</p>
+                      <Button size="sm" variant="outline" className="text-xs w-full">
                         View Recording
                       </Button>
                     </div>
@@ -228,21 +227,24 @@ export default function VideoConsulting() {
                 <p className="text-sm text-gray-400">Test your camera and microphone</p>
               </div>
             </div>
-            <div className="flex justify-center gap-4 mt-4">
-              <Button className="bg-green-600 hover:bg-green-700">
+            <div className="space-y-3 mt-4">
+              <Button className="bg-green-600 hover:bg-green-700 w-full">
                 <Video className="h-4 w-4 mr-2" />
                 Start Video
               </Button>
-              <Button variant="outline">
-                <Phone className="h-4 w-4 mr-2" />
-                Audio Only
-              </Button>
-              <Button variant="outline">
-                Test Equipment
-              </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Audio Only
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  Test Equipment
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

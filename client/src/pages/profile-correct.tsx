@@ -25,15 +25,15 @@ export default function Profile({ user }: ProfileProps) {
   const userInitials = displayName.split(' ').map(n => n[0]).join('');
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header with Profile Info */}
-        <div className="bg-accent rounded-t-lg p-6 text-white relative">
-          <div className="absolute top-4 right-4">
+        <div className="bg-accent rounded-t-lg p-4 sm:p-6 text-white relative">
+          <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-white hover:bg-orange-400"
+              className="text-white hover:bg-white/20"
               onClick={() => setShowEditModal(true)}
             >
               <Settings className="w-4 h-4" />
@@ -41,18 +41,18 @@ export default function Profile({ user }: ProfileProps) {
           </div>
           
           <div className="flex items-center gap-4">
-            <Avatar className="w-16 h-16 bg-white text-orange-500 text-xl font-bold">
+            <Avatar className="w-12 h-12 sm:w-16 sm:h-16 bg-white text-primary text-lg sm:text-xl font-bold">
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold">{displayName}</h1>
-              <p className="text-orange-100">17 yrs • Forward • Swimming</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{displayName}</h1>
+              <p className="text-white/80 text-sm sm:text-base">17 yrs • Forward • Swimming</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 fill-current" />
-                  <span className="ml-1">Top 5% in Tier 2</span>
+                  <span className="ml-1 text-sm sm:text-base">Top 5% in Tier 2</span>
                 </div>
-                <Badge variant="secondary" className="bg-orange-400 text-white">Elite</Badge>
+                <Badge variant="secondary" className="bg-primary text-white">Elite</Badge>
               </div>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function Profile({ user }: ProfileProps) {
         {/* Tabs Navigation */}
         <Tabs defaultValue="performance" className="bg-white rounded-b-lg shadow-sm">
           <TabsList className="w-full justify-start border-b bg-transparent">
-            <TabsTrigger value="performance" className="text-orange-600 data-[state=active]:border-b-2 data-[state=active]:border-orange-600">
+            <TabsTrigger value="performance" className="text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary">
               Performance
             </TabsTrigger>
             <TabsTrigger value="training">Training</TabsTrigger>
@@ -69,7 +69,7 @@ export default function Profile({ user }: ProfileProps) {
             <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="performance" className="p-6">
+          <TabsContent value="performance" className="p-4 sm:p-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               {/* Left Column - Real-Time Tracking & Sprint Training */}
@@ -89,7 +89,7 @@ export default function Profile({ user }: ProfileProps) {
                         <span className="font-bold">78.3</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-orange-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                        <div className="bg-primary h-2 rounded-full" style={{ width: '78%' }}></div>
                       </div>
                       <div className="text-xs text-gray-500">
                         Current sprint time improved by 0.3 seconds
@@ -120,7 +120,7 @@ export default function Profile({ user }: ProfileProps) {
                         <span className="text-sm">Habit Score</span>
                         <span className="font-bold">142 pts</span>
                       </div>
-                      <Button size="sm" className="w-full bg-red-500 hover:bg-red-600 text-white">
+                      <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-white">
                         Advanced Metrics
                       </Button>
                     </div>
@@ -147,7 +147,7 @@ export default function Profile({ user }: ProfileProps) {
                           <span className="font-bold">85.7%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-orange-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+                          <div className="bg-primary h-2 rounded-full" style={{ width: '85%' }}></div>
                         </div>
                       </div>
                       
@@ -165,13 +165,13 @@ export default function Profile({ user }: ProfileProps) {
                       <div className="bg-gray-100 rounded-lg p-4 mt-4">
                         <div className="flex items-center justify-center h-32">
                           <div className="text-center">
-                            <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+                            <div className="w-16 h-16 bg-primary rounded-full mx-auto mb-2 flex items-center justify-center">
                               <span className="text-white font-bold">AI</span>
                             </div>
                             <p className="text-sm text-gray-600">Motion Analysis</p>
                           </div>
                         </div>
-                        <Button size="sm" className="w-full mt-3 bg-red-500 hover:bg-red-600 text-white">
+                        <Button size="sm" className="w-full mt-3 bg-primary hover:bg-primary/90 text-white">
                           View Analysis
                         </Button>
                       </div>

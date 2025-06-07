@@ -126,34 +126,34 @@ export default function CoachProfile() {
         />
       </Helmet>
 
-      <div className="bg-secondary p-3 flex items-center justify-between shadow">
+      <div className="bg-secondary p-3 sm:p-4 flex items-center justify-between shadow">
         <div className="flex items-center">
-          <button className="md:hidden mr-2 text-white">
-            <i className="fas fa-arrow-left"></i>
+          <button className="mr-2 sm:mr-3 text-white">
+            <i className="fas fa-arrow-left text-sm sm:text-base"></i>
           </button>
-          <h1 className="text-white font-medium">Coach Profile</h1>
+          <h1 className="text-white font-medium text-sm sm:text-base">Coach Profile</h1>
         </div>
         <div>
-          <button className="text-white flex items-center justify-center h-8 w-8">
-            <i className="fas fa-comments"></i>
+          <button className="text-white flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10">
+            <i className="fas fa-comments text-sm sm:text-base"></i>
           </button>
         </div>
       </div>
 
-      <div className="bg-white p-6 flex flex-col items-center">
-        <Avatar className="w-24 h-24 border-2 border-secondary-400">
-          <AvatarFallback className="text-xl bg-secondary/20 text-secondary">
+      <div className="bg-white p-4 sm:p-6 flex flex-col items-center">
+        <Avatar className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 border-2 border-secondary-400">
+          <AvatarFallback className="text-lg sm:text-xl bg-secondary/20 text-secondary">
             {getInitials(coach.name)}
           </AvatarFallback>
         </Avatar>
-        <div className="w-4 h-4 bg-success rounded-full -mt-3 border-2 border-white"></div>
-        <h2 className="text-xl font-semibold mt-2">{coach.name}</h2>
+        <div className="w-3 h-3 sm:w-4 sm:h-4 bg-success rounded-full -mt-2 sm:-mt-3 border-2 border-white"></div>
+        <h2 className="text-lg sm:text-xl font-semibold mt-2">{coach.name}</h2>
         <div className="flex items-center mt-1">
           <div className="flex">
             {Array.from({ length: 5 }).map((_, i) => (
               <i
                 key={i}
-                className={`fas fa-star ${
+                className={`fas fa-star text-xs sm:text-sm ${
                   i < Math.floor(coach.rating || 0)
                     ? "text-yellow-400"
                     : i < (coach.rating || 0)
@@ -163,30 +163,30 @@ export default function CoachProfile() {
               ></i>
             ))}
           </div>
-          <span className="ml-2 text-sm">
+          <span className="ml-2 text-xs sm:text-sm">
             {coach.rating?.toFixed(1)} ({coach.students})
           </span>
         </div>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm sm:text-base text-center">
           {coach.sports.map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" & ")} Coach • Elite Level
         </p>
 
-        <div className="flex justify-center space-x-6 mt-3 text-sm">
-          <div className="flex items-center">
+        <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-6 mt-3 text-xs sm:text-sm">
+          <div className="flex items-center justify-center">
             <i className="far fa-clock text-secondary mr-1"></i>
             <span>{coach.experience}</span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <i className="fas fa-users text-secondary mr-1"></i>
-            <span>{coach.students} Athletes</span>
+            <span>{coach.students} Athletes Coached</span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <i className="fas fa-certificate text-secondary mr-1"></i>
-            <span>Certified</span>
+            <span>International Certified</span>
           </div>
         </div>
 
-        <Button className="mt-4 bg-secondary text-white hover:bg-secondary/90">
+        <Button className="mt-4 bg-secondary text-white hover:bg-secondary/90 w-full sm:w-auto px-6 py-2">
           Book Session
         </Button>
       </div>

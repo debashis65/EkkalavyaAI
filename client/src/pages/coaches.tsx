@@ -145,16 +145,16 @@ export default function Coaches() {
         <meta name="description" content="Discover and connect with top sports coaches and mentors specialized in various disciplines. View ratings, experience, and book training sessions." />
       </Helmet>
 
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Find a Coach</h1>
-          <Button>
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold">Find a Coach</h1>
+          <Button size="sm" className="w-full sm:w-auto">
             <i className="fas fa-sliders-h mr-2"></i> Advanced Filters
           </Button>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+        <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="relative">
             <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
             <Input
               className="pl-10"
@@ -163,9 +163,9 @@ export default function Coaches() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Select value={sportFilter} onValueChange={setSportFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filter by sport" />
               </SelectTrigger>
               <SelectContent>
@@ -178,7 +178,7 @@ export default function Coaches() {
               </SelectContent>
             </Select>
             <Select defaultValue="rating">
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -205,13 +205,13 @@ export default function Coaches() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredCoaches.map((coach) => (
             <CoachCard key={coach.id} coach={coach} />
           ))}
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <CoachLeaderboard coaches={coaches} />
           <CoachReviews
             reviews={reviews}

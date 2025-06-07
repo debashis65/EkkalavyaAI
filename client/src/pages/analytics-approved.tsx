@@ -26,31 +26,31 @@ export default function AnalyticsApproved({ user }: AnalyticsProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - Secondary color #046A38 */}
-      <div className="bg-secondary text-white p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-              <span className="text-primary font-bold text-lg">E</span>
+      {/* Header - Mobile-responsive */}
+      <div className="bg-secondary text-white p-4 sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center">
+              <span className="text-primary font-bold text-sm sm:text-lg">E</span>
             </div>
-            <h1 className="text-2xl font-bold">Ekalavya</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">Ekalavya</h1>
           </div>
-          <div className="flex items-center gap-6">
-            <MessageSquare className="w-7 h-7" />
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <User className="w-6 h-6" />
+          <div className="flex items-center gap-3 sm:gap-6">
+            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
             </div>
           </div>
         </div>
         
         <div>
-          <h2 className="text-2xl mb-2">Welcome back, {displayName}</h2>
-          <p className="text-white/80 text-lg">Track your performance and achievements</p>
+          <h2 className="text-lg sm:text-xl lg:text-2xl mb-1 sm:mb-2">Welcome back, {displayName}</h2>
+          <p className="text-white/80 text-sm sm:text-base lg:text-lg">Track your performance and achievements</p>
         </div>
       </div>
 
-      <div className="p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
         
         {/* Recent Tournament Results */}
         <Card>
@@ -77,19 +77,19 @@ export default function AnalyticsApproved({ user }: AnalyticsProps) {
           </CardContent>
         </Card>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-6">
+        {/* Stats Grid - Mobile responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           
           {/* Coach */}
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <User className="h-6 w-6 text-red-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                  <User className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Coach</p>
-                  <p className="text-lg font-semibold text-gray-900">Guru Drona</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm text-gray-600">Coach</p>
+                  <p className="text-sm sm:text-lg font-semibold text-gray-900 truncate">Guru Drona</p>
                   <p className="text-xs text-gray-500">Since 2020</p>
                 </div>
               </div>

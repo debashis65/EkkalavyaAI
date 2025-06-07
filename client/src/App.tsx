@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import Login from "@/pages/login-fixed";
 import CoachDashboard from "@/components/CoachDashboard";
 import PlayerDashboard from "@/components/PlayerDashboard";
-import Sidebar from "@/components/layout/Sidebar";
+import Sidebar from "@/components/layout/SidebarNav";
 import AnalyticsApproved from "@/pages/analytics-approved";
 import CoachAnalytics from "@/pages/coach-analytics";
 import Schedule from "@/pages/schedule";
@@ -113,8 +113,10 @@ function App() {
               setActiveTab={setActiveTab}
               onLogout={handleLogout}
             />
-            <div className="flex-1">
-              {renderContent()}
+            <div className="flex-1 lg:ml-0">
+              <div className="pt-16 lg:pt-0">
+                {renderContent()}
+              </div>
             </div>
           </div>
         </TooltipProvider>

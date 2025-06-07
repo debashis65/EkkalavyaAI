@@ -69,18 +69,23 @@ export default function ARTools() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="bg-white p-4 flex items-center justify-between text-black">
-        <div className="flex items-center gap-3">
+      {/* Header - Mobile responsive with CTA effect */}
+      <div className="bg-gradient-to-r from-white to-blue-50 p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-black gap-3 sm:gap-0 border-b-2 border-blue-100">
+        <div className="flex items-center gap-2 sm:gap-3">
           <img 
             src="/logo.jpeg" 
             alt="Ekalavya AI Logo" 
-            className="w-8 h-8 object-contain rounded bg-white p-1"
+            className="w-6 h-6 sm:w-8 sm:h-8 object-contain rounded bg-white p-1 shadow-sm"
           />
-          <Camera className="w-6 h-6" />
-          <h1 className="text-xl font-semibold">AI-Powered Motion Analysis</h1>
+          <div className="p-1.5 sm:p-2 bg-blue-100 rounded-full">
+            <Camera className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-gray-800">AI-Powered Motion Analysis</h1>
+            <p className="text-xs sm:text-sm text-blue-600 font-medium">Real-time performance insights</p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <input
             ref={fileInputRef}
             type="file"
@@ -91,18 +96,20 @@ export default function ARTools() {
           <Button 
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
-            className="border-gray-300 text-black hover:bg-gray-100"
+            size="sm"
+            className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 flex-1 sm:flex-none transition-all duration-200 shadow-sm"
           >
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Upload Video
           </Button>
           <Button 
             onClick={startRealTimeAnalysis}
             disabled={isAnalyzing}
-            className="text-white hover:opacity-90" 
+            size="sm"
+            className="text-white hover:opacity-90 flex-1 sm:flex-none shadow-lg transition-all duration-200 transform hover:scale-105" 
             style={{ backgroundColor: '#06036D' }}
           >
-            {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
+            {isAnalyzing ? 'Analyzing...' : 'Start Live'}
           </Button>
         </div>
       </div>
@@ -126,74 +133,79 @@ function BasketballAnalysis({ isAnalyzing, setIsAnalyzing, activeTab, setActiveT
   setActiveTab: (tab: string) => void; 
 }) {
   return (
-    <div className="flex">
-      {/* Main Video Area */}
-      <div className="flex-1 p-6">
-        <div className="bg-gray-800 rounded-lg h-96 flex items-center justify-center mb-6 relative">
-          {/* Player Name */}
-          <div className="absolute top-4 left-4 text-white">
-            <h3 className="font-semibold">Player: Marcus Johnson</h3>
-            <p className="text-sm text-gray-300">Jump Shot Analysis</p>
+    <div className="flex flex-col lg:flex-row">
+      {/* Main Video Area - Mobile responsive */}
+      <div className="flex-1 p-3 sm:p-4 lg:p-6">
+        <div className="bg-gray-800 rounded-lg h-64 sm:h-80 lg:h-96 flex items-center justify-center mb-4 sm:mb-6 relative">
+          {/* Player Name - Mobile responsive */}
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4 text-white">
+            <h3 className="text-sm sm:text-base font-semibold">Player: Marcus Johnson</h3>
+            <p className="text-xs sm:text-sm text-gray-300">Jump Shot Analysis</p>
           </div>
 
-          {/* Analysis Metrics Overlay */}
-          <div className="absolute top-4 right-4 text-right">
-            <div className="space-y-1 text-sm">
+          {/* Analysis Metrics Overlay - Mobile responsive */}
+          <div className="absolute top-2 sm:top-4 right-2 sm:right-4 text-right">
+            <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm">
               <div>Release Height: <span className="text-green-400">8'2" (+2")</span></div>
               <div>Release Angle: <span className="text-yellow-400">42° (Optimal: 45°)</span></div>
               <div>Elbow Alignment: <span className="text-red-400">85% (-3%)</span></div>
-              <div>Balance: <span className="text-green-400">78% (-2%)</span></div>
-              <div>Follow Through: <span className="text-red-400">82% (-4%)</span></div>
+              <div className="hidden sm:block">Balance: <span className="text-green-400">78% (-2%)</span></div>
+              <div className="hidden sm:block">Follow Through: <span className="text-red-400">82% (-4%)</span></div>
             </div>
           </div>
 
-          {/* Skeleton overlay placeholder */}
-          <div className="text-gray-400 text-center">
-            <Camera className="w-16 h-16 mx-auto mb-4" />
-            <p>Basketball Motion Analysis</p>
-            <p className="text-sm">Upload video or start live analysis</p>
+          {/* Skeleton overlay placeholder - Mobile responsive */}
+          <div className="text-gray-400 text-center px-4">
+            <Camera className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-4" />
+            <p className="text-sm sm:text-base">Basketball Motion Analysis</p>
+            <p className="text-xs sm:text-sm">Upload video or start live analysis</p>
           </div>
 
-          {/* Feedback Popup */}
+          {/* Feedback Popup - Mobile responsive */}
           {isAnalyzing && (
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-              <div className="bg-orange-600 text-white px-4 py-2 rounded-lg">
+            <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2">
+              <div className="bg-orange-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm">
                 Elbow angle needs adjustment
               </div>
             </div>
           )}
         </div>
 
-        {/* Video Controls */}
-        <div className="flex items-center justify-center gap-4 mb-6">
+        {/* Video Controls - Improved layout */}
+        <div className="flex flex-col items-center justify-center gap-3 mb-4 sm:mb-6">
+          {/* Start Analysis - Full width */}
           <Button
-            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
+            className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 w-full text-base font-semibold"
             onClick={() => setIsAnalyzing(!isAnalyzing)}
           >
             <Play className="w-4 h-4" />
             {isAnalyzing ? "00:04 / 00:13" : "Start Analysis"}
           </Button>
-          <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2">
-            <Upload className="w-4 h-4" />
-            Upload Video
-          </Button>
-          <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2">
-            <Download className="w-4 h-4" />
-            Export Data
-          </Button>
+          
+          {/* Upload and Export - Side by side */}
+          <div className="flex gap-3 w-full">
+            <Button className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 flex-1 text-sm">
+              <Upload className="w-3 h-3" />
+              Upload Video
+            </Button>
+            <Button className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 flex-1 text-sm">
+              <Download className="w-3 h-3" />
+              Export Data
+            </Button>
+          </div>
         </div>
 
-        {/* Analysis Tabs */}
-        <div className="border-b border-gray-700 mb-4">
-          <div className="flex gap-6">
+        {/* Analysis Tabs - Mobile responsive */}
+        <div className="border-b border-gray-700 mb-3 sm:mb-4">
+          <div className="flex gap-3 sm:gap-6 overflow-x-auto">
             <button 
-              className={`pb-2 border-b-2 ${activeTab === 'shooting' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              className={`pb-2 border-b-2 whitespace-nowrap text-sm sm:text-base ${activeTab === 'shooting' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
               onClick={() => setActiveTab('shooting')}
             >
               Shooting
             </button>
             <button 
-              className={`pb-2 border-b-2 ${activeTab === 'dribbling' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
+              className={`pb-2 border-b-2 whitespace-nowrap text-sm sm:text-base ${activeTab === 'dribbling' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-400 hover:text-white'}`}
               onClick={() => setActiveTab('dribbling')}
             >
               Dribbling

@@ -26,21 +26,21 @@ export default function CoachProfile({ user }: CoachProfileProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Orange Background */}
+      {/* Header with Orange Background - Mobile-first */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-6">
-            <Avatar className="w-24 h-24 border-4 border-white">
-              <AvatarFallback className="bg-white text-orange-600 text-2xl font-bold">
+        <div className="px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+            <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-white">
+              <AvatarFallback className="bg-white text-orange-600 text-xl sm:text-2xl font-bold">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold">{displayName}</h1>
-              <p className="text-orange-100 text-lg">Basketball & Tennis Coach</p>
-              <div className="flex items-center gap-4 mt-2">
+            <div className="flex-1 text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold">{displayName}</h1>
+              <p className="text-orange-100 text-base sm:text-lg">Basketball & Tennis Coach</p>
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-2">
                 <div className="flex items-center gap-1">
-                  <Star className="h-5 w-5 text-yellow-300 fill-current" />
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-300 fill-current" />
                   <span className="font-semibold">4.9</span>
                   <span className="text-orange-100">(127 reviews)</span>
                 </div>
@@ -50,52 +50,52 @@ export default function CoachProfile({ user }: CoachProfileProps) {
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold">₹1,200/hr</div>
-              <div className="text-orange-100">Starting price</div>
+            <div className="text-center sm:text-right mt-4 sm:mt-0">
+              <div className="text-xl sm:text-2xl font-bold">₹1,200/hr</div>
+              <div className="text-orange-100 text-sm">Starting price</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {/* Quick Stats - Mobile-first */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
               <Card>
-                <CardContent className="p-4 text-center">
-                  <Users className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">150+</div>
-                  <div className="text-sm text-gray-600">Students</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 mx-auto mb-2" />
+                  <div className="text-lg sm:text-2xl font-bold">150+</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Students</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <Clock className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">2000+</div>
-                  <div className="text-sm text-gray-600">Hours</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 mx-auto mb-2" />
+                  <div className="text-lg sm:text-2xl font-bold">2000+</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Hours</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <Trophy className="h-6 w-6 text-yellow-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">8</div>
-                  <div className="text-sm text-gray-600">Years Exp</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 mx-auto mb-2" />
+                  <div className="text-lg sm:text-2xl font-bold">8</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Years Exp</div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-4 text-center">
-                  <Calendar className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold">95%</div>
-                  <div className="text-sm text-gray-600">Response Rate</div>
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 mx-auto mb-2" />
+                  <div className="text-lg sm:text-2xl font-bold">95%</div>
+                  <div className="text-xs sm:text-sm text-gray-600">Response Rate</div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex gap-4 mb-6 border-b">
+            {/* Navigation Tabs - Mobile-first */}
+            <div className="flex gap-2 sm:gap-4 mb-6 border-b overflow-x-auto">
               {[
                 { id: "overview", label: "Overview" },
                 { id: "experience", label: "Experience" },
@@ -105,7 +105,7 @@ export default function CoachProfile({ user }: CoachProfileProps) {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                  className={`px-3 sm:px-4 py-2 font-medium border-b-2 transition-colors text-sm sm:text-base whitespace-nowrap ${
                     activeTab === tab.id
                       ? "border-orange-500 text-orange-600"
                       : "border-transparent text-gray-600 hover:text-gray-900"
@@ -226,7 +226,7 @@ export default function CoachProfile({ user }: CoachProfileProps) {
                   <CardTitle>Available Time Slots</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-7 gap-2 text-center text-sm">
+                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 text-center text-xs sm:text-sm">
                     {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                       <div key={day} className="font-medium p-2">{day}</div>
                     ))}
@@ -242,15 +242,15 @@ export default function CoachProfile({ user }: CoachProfileProps) {
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Sidebar - Mobile-first */}
+          <div className="space-y-4 sm:space-y-6">
             <Card>
-              <CardContent className="p-6">
-                <Button className="w-full bg-orange-600 hover:bg-orange-700 mb-3">
+              <CardContent className="p-4 sm:p-6">
+                <Button className="w-full bg-orange-600 hover:bg-orange-700 mb-3 text-sm sm:text-base">
                   <Calendar className="h-4 w-4 mr-2" />
                   Book Session
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full text-sm sm:text-base">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Send Message
                 </Button>
@@ -259,19 +259,19 @@ export default function CoachProfile({ user }: CoachProfileProps) {
 
             <Card>
               <CardHeader>
-                <CardTitle>Session Packages</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Session Packages</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <div className="space-y-3">
                   <div className="p-3 border rounded-lg">
-                    <div className="font-medium">Single Session</div>
-                    <div className="text-2xl font-bold text-orange-600">₹1,200</div>
-                    <div className="text-sm text-gray-600">1 hour training</div>
+                    <div className="font-medium text-sm sm:text-base">Single Session</div>
+                    <div className="text-xl sm:text-2xl font-bold text-orange-600">₹1,200</div>
+                    <div className="text-xs sm:text-sm text-gray-600">1 hour training</div>
                   </div>
                   <div className="p-3 border rounded-lg bg-orange-50">
-                    <div className="font-medium">Monthly Package</div>
-                    <div className="text-2xl font-bold text-orange-600">₹4,000</div>
-                    <div className="text-sm text-gray-600">4 sessions (Save ₹800)</div>
+                    <div className="font-medium text-sm sm:text-base">Monthly Package</div>
+                    <div className="text-xl sm:text-2xl font-bold text-orange-600">₹4,000</div>
+                    <div className="text-xs sm:text-sm text-gray-600">4 sessions (Save ₹800)</div>
                     <Badge className="bg-orange-600 text-white text-xs mt-1">Best Value</Badge>
                   </div>
                 </div>
