@@ -290,45 +290,180 @@ export default function ARTools({ user }: ARToolsProps = {}) {
       ];
     }
     
-    // Show loading state when no real analysis available - Always 8 metrics
-    const loadingMetrics = {
-      basketball: [
-        { label: "Shot Release", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Arc Trajectory", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Follow Through", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Shooting Stance", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Ball Rotation", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Release Timing", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Target Accuracy", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
-      ],
-      archery: [
-        { label: "Anchor Point", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Draw Length", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Release Timing", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Bow Stability", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Arrow Grouping", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Sight Alignment", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Follow Through", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
-      ],
-      football: [
-        { label: "Pass Accuracy", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Sprint Speed", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Ball Control", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Shooting Power", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Tactical Position", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Dribbling", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Defensive Actions", value: "Analyzing...", color: "text-gray-400" },
-        { label: "Overall Score", value: "Start analysis", color: "text-gray-400" }
-      ],
-      cricket: [
-        { label: "Bat Speed", value: "105 km/h (+8)", color: "text-blue-400" },
-        { label: "Shot Timing", value: "82% (-2%)", color: "text-yellow-400" },
-        { label: "Bowling Speed", value: "138 km/h (Fast)", color: "text-green-400" },
-        { label: "Field Position", value: "91% accuracy", color: "text-green-400" },
-        { label: "Strike Rate", value: "126.4 (+12)", color: "text-blue-400", span: true }
-      ],
+    // Only show metrics when real analysis data is available
+    if (!analysisResult) {
+      return [];
+    }
+    
+    // Default 8 essential metrics when no sport-specific data
+    return [
+      { label: "Technical Form", value: "No data", color: "text-gray-500" },
+      { label: "Power Output", value: "No data", color: "text-gray-500" },
+      { label: "Consistency", value: "No data", color: "text-gray-500" },
+      { label: "Timing", value: "No data", color: "text-gray-500" },
+      { label: "Balance", value: "No data", color: "text-gray-500" },
+      { label: "Accuracy", value: "No data", color: "text-gray-500" },
+      { label: "Speed", value: "No data", color: "text-gray-500" },
+      { label: "Overall Score", value: "No analysis", color: "text-gray-500" }
+    ];
+  };
+
+  // Real-time camera and video processing
+  const startCamera = async () => {
+    try {
+      setIsAnalyzing(true);
+      
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 1280, height: 720 },
+        audio: false
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        
+        toast({
+          title: "Camera Started",
+          description: "Click Start Analysis to begin real-time processing"
+        });
+      }
+    } catch (error) {
+      setIsAnalyzing(false);
+      toast({
+        title: "Camera Error",
+        description: "Unable to access camera. Please check permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const processVideo = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    try {
+      setIsAnalyzing(true);
+      
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      const ctx = canvas.getContext('2d')!;
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      
+      const frameData = canvas.toDataURL('image/jpeg', 0.8);
+      
+      const response = await fetch('/api/analyze-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sport: userPrimarySport,
+          analysis_type: selectedAnalysisType,
+          frames: [frameData],
+          timestamp: new Date().toISOString(),
+          user_id: user?.id || 'anonymous'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
+
+      const analysisData = await response.json();
+      setAnalysisResult(analysisData);
+      
+      toast({
+        title: "Analysis Complete",
+        description: `${userPrimarySport} analysis completed successfully`
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis Error",
+        description: "Failed to process video frame",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select a valid video file",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      
+      const video = document.createElement('video');
+      video.src = URL.createObjectURL(file);
+      
+      video.onloadedmetadata = async () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const frames: string[] = [];
+        const frameCount = Math.min(10, Math.floor(video.duration));
+        
+        for (let i = 0; i < frameCount; i++) {
+          video.currentTime = (video.duration / frameCount) * i;
+          await new Promise(resolve => video.onseeked = resolve);
+          
+          ctx.drawImage(video, 0, 0);
+          frames.push(canvas.toDataURL('image/jpeg', 0.8));
+        }
+        
+        const response = await fetch('/api/analyze-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sport: userPrimarySport,
+            analysis_type: selectedAnalysisType,
+            frames,
+            timestamp: new Date().toISOString(),
+            user_id: user?.id || 'anonymous',
+            filename: file.name
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Analysis failed');
+        }
+
+        const analysisData = await response.json();
+        setAnalysisResult(analysisData);
+        
+        URL.revokeObjectURL(video.src);
+        
+        toast({
+          title: "Video Processed",
+          description: `Analysis complete for ${file.name}`
+        });
+        
+        setIsAnalyzing(false);
+      };
+    } catch (error) {
+      setIsAnalyzing(false);
+      toast({
+        title: "Upload Error",
+        description: "Failed to process video file",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Get current metrics from real analysis data only
+  const currentMetrics = getMetricsForSport(userPrimarySport);
       swimming: [
         { label: "Stroke Rate", value: "32 SPM (+2)", color: "text-blue-400" },
         { label: "Body Position", value: "88% (Optimal)", color: "text-green-400" },
