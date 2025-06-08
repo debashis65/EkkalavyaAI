@@ -951,7 +951,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         <meta name="description" content={sportConfig.description} />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-gray-900 text-white w-full max-w-full overflow-x-hidden">
         {/* Mobile Header */}
         <div className="lg:hidden bg-orange-600 p-4">
           <div className="flex items-center justify-between">
@@ -969,7 +969,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex w-full max-w-full">
           {/* Desktop Sidebar Navigation */}
           <div className="hidden lg:flex w-64 bg-orange-600 flex-col min-h-screen">
             {/* Logo */}
@@ -1034,7 +1034,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-w-0 w-full">
             {/* Desktop Header */}
             <div className="hidden lg:block bg-gray-800 px-6 py-4 border-b border-gray-700">
               <div className="flex items-center justify-between">
@@ -1069,7 +1069,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 p-4 lg:p-6">
+            <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden">
               {/* Mobile AI Connection Status */}
               <div className="lg:hidden mb-4">
                 <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border px-3 py-2`}>
@@ -1084,14 +1084,14 @@ export default function ARTools({ user }: ARToolsProps = {}) {
 
               {/* Player Header - Dynamic based on logged-in user */}
               <div className="mb-4">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2">
+                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 break-words">
                   Realtime Sports Connect AI Analysis
                 </h2>
-                <p className="text-gray-400">Player: {user?.name || 'Unknown Player'} | {sportConfig.analysisTypes[0]} Analysis</p>
+                <p className="text-sm sm:text-base text-gray-400 break-words">Player: {user?.name || 'Unknown Player'} | {sportConfig.analysisTypes[0]} Analysis</p>
               </div>
 
               {/* Video Analysis Area - Mobile First (Top Priority) */}
-              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-64 md:h-72 lg:h-80 border-2 border-dashed border-gray-600 relative">
+              <div className="bg-gray-800 rounded-lg mb-6 flex items-center justify-center h-64 md:h-72 lg:h-80 border-2 border-dashed border-gray-600 relative w-full max-w-full">
                 {isAnalyzing || uploadedVideo || isProcessing ? (
                   <>
                     <video
