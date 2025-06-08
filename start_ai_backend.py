@@ -19,13 +19,20 @@ def start_backend():
     os.chdir('ai_backend')
     
     # Start the FastAPI server
-    subprocess.run([
+    port = os.environ.get('PORT', '8000')
+    reload_flag = "--reload" if os.environ.get('NODE_ENV') != 'production' else ""
+    
+    cmd = [
         sys.executable, "-m", "uvicorn", 
         "main:app", 
         "--host", "0.0.0.0", 
-        "--port", "8000", 
-        "--reload"
-    ])
+        "--port", port
+    ]
+    
+    if reload_flag:
+        cmd.append(reload_flag)
+        
+    subprocess.run(cmd)
 
 if __name__ == "__main__":
     start_backend()
