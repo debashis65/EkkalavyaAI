@@ -951,9 +951,9 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         <meta name="description" content={sportConfig.description} />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-900 text-white w-full max-w-full overflow-x-hidden">
+      <div className="min-h-screen bg-gray-900 text-white">
         {/* Mobile Header */}
-        <div className="lg:hidden bg-orange-600 p-4">
+        <div className="lg:hidden bg-orange-600 p-4 w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
@@ -969,7 +969,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
           </div>
         </div>
 
-        <div className="flex w-full max-w-full">
+        <div className="flex w-full">
           {/* Desktop Sidebar Navigation */}
           <div className="hidden lg:flex w-64 bg-orange-600 flex-col min-h-screen">
             {/* Logo */}
@@ -1034,7 +1034,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col min-w-0 w-full">
+          <div className="flex-1 flex flex-col min-w-0">
             {/* Desktop Header */}
             <div className="hidden lg:block bg-gray-800 px-6 py-4 border-b border-gray-700">
               <div className="flex items-center justify-between">
@@ -1069,7 +1069,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 p-3 sm:p-4 lg:p-6 overflow-x-hidden">
+            <div className="flex-1 p-4 lg:p-6">
               {/* Mobile AI Connection Status */}
               <div className="lg:hidden mb-4">
                 <Alert className={`${isConnected ? 'border-green-500 bg-green-900/20' : 'border-orange-500 bg-orange-900/20'} border px-3 py-2`}>
@@ -1113,10 +1113,10 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                     )}
                   </>
                 ) : (
-                  <div className="text-center">
+                  <div className="text-center px-2">
                     <Camera className="h-12 lg:h-16 w-12 lg:w-16 text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg lg:text-xl font-semibold text-white mb-2">{userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Motion Analysis</h3>
-                    <p className="text-gray-400 text-sm lg:text-base">Upload video or start live analysis</p>
+                    <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-white mb-2 break-words leading-tight">{userPrimarySport.charAt(0).toUpperCase() + userPrimarySport.slice(1)} Motion Analysis</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm lg:text-base break-words">Upload video or start live analysis</p>
                   </div>
                 )}
                 <canvas ref={canvasRef} className="hidden" />
