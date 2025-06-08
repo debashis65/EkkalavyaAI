@@ -37,12 +37,10 @@ services:
     region: ohio
     buildCommand: |
       pip install --upgrade pip
-      pip install fastapi uvicorn[standard] python-multipart pydantic
-      pip install opencv-python mediapipe numpy scipy
-      pip install tensorflow torch torchvision scikit-learn
-      pip install ahrs filterpy scikit-image pandas matplotlib seaborn plotly
-      pip install Pillow imageio librosa soundfile xgboost lightgbm
-      pip install albumentations aiofiles websockets structlog
+      pip install --no-cache-dir fastapi uvicorn[standard] python-multipart pydantic
+      pip install --no-cache-dir opencv-python-headless mediapipe numpy scipy
+      pip install --no-cache-dir scikit-learn pandas
+      pip install --no-cache-dir Pillow aiofiles websockets
     startCommand: python start_ai_backend.py
     healthCheckPath: /health
     envVars:
