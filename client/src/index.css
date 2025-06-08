@@ -196,3 +196,13 @@
 .tab-inactive {
   @apply border-b-2 border-transparent text-muted-foreground;
 }
+
+/* Hide scrollbars while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

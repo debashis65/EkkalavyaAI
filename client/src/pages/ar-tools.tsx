@@ -951,7 +951,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
         <meta name="description" content={sportConfig.description} />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-900 text-white">
+      <div className="min-h-screen bg-gray-900 text-white max-w-screen overflow-x-hidden">
         {/* Mobile Header */}
         <div className="lg:hidden bg-orange-600 p-4 w-full">
           <div className="flex items-center justify-between">
@@ -1195,7 +1195,7 @@ export default function ARTools({ user }: ARToolsProps = {}) {
 
               {/* Real-time Analysis Tabs with AI Feedback */}
               <div className="mb-6">
-                <div className="flex gap-2 lg:gap-4 mb-4 border-b border-gray-700 overflow-x-auto">
+                <div className="flex gap-2 lg:gap-4 mb-4 border-b border-gray-700 overflow-x-auto scrollbar-hide">
                   {sportConfig.analysisTypes.map((analysisType, index) => (
                     <button
                       key={analysisType}
