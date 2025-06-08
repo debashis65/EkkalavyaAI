@@ -1084,8 +1084,8 @@ export default function ARTools({ user }: ARToolsProps = {}) {
 
               {/* Player Header - Dynamic based on logged-in user */}
               <div className="mb-4">
-                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 break-words">
-                  Realtime Sports Connect AI Analysis
+                <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 break-words leading-tight">
+                  <span className="block sm:inline">Realtime Sports Connect</span> <span className="block sm:inline">AI Analysis</span>
                 </h2>
                 <p className="text-sm sm:text-base text-gray-400 break-words">Player: {user?.name || 'Unknown Player'} | {sportConfig.analysisTypes[0]} Analysis</p>
               </div>
