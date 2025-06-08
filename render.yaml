@@ -33,14 +33,14 @@ services:
   - type: web
     name: ekkalavya-ai-backend
     env: python
-    plan: starter
+    plan: standard
     region: ohio
     buildCommand: |
       pip install --upgrade pip
-      pip install --no-cache-dir fastapi uvicorn[standard] python-multipart pydantic
-      pip install --no-cache-dir opencv-python-headless mediapipe numpy scipy
-      pip install --no-cache-dir scikit-learn pandas
-      pip install --no-cache-dir Pillow aiofiles websockets
+      pip install --no-cache-dir --break-system-packages fastapi uvicorn[standard] python-multipart pydantic
+      pip install --no-cache-dir --break-system-packages opencv-python-headless mediapipe numpy scipy
+      pip install --no-cache-dir --break-system-packages tensorflow==2.13.0 torch torchvision scikit-learn
+      pip install --no-cache-dir --break-system-packages pandas Pillow aiofiles websockets
     startCommand: python start_ai_backend.py
     healthCheckPath: /health
     envVars:
@@ -48,6 +48,8 @@ services:
         value: 8000
       - key: PYTHONPATH
         value: /opt/render/project/src
+      - key: TF_CPP_MIN_LOG_LEVEL
+        value: "2"
 
 databases:
   - name: ekkalavya-sports-db
