@@ -1130,9 +1130,9 @@ export default function ARTools({ user }: ARToolsProps = {}) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-6">
+              <div className="flex flex-col gap-2 sm:gap-3 mb-6">
                 <Button 
-                  className="bg-orange-600 hover:bg-orange-700 flex-1 sm:flex-none" 
+                  className="bg-orange-600 hover:bg-orange-700 w-full" 
                   onClick={startCameraAnalysis}
                   disabled={isAnalyzing || isProcessing}
                 >
@@ -1141,21 +1141,21 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                     {isAnalyzing ? 'Analyzing...' : 'Start Analysis'}
                   </span>
                 </Button>
-                <div className="flex gap-3 flex-1 sm:flex-none">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <Button 
                     variant="outline" 
-                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1"
+                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isAnalyzing || isProcessing}
                   >
-                    <Upload className="h-4 w-4 mr-2" />
-                    <span className="font-medium">
-                      {isProcessing ? 'Processing...' : 'Upload Video'}
+                    <Upload className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="font-medium text-xs sm:text-sm">
+                      {isProcessing ? 'Processing...' : 'Upload'}
                     </span>
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white flex-1"
+                    className="bg-gray-800 border-orange-500 text-orange-400 hover:bg-orange-900 hover:text-white"
                     onClick={() => {
                       if (analysisResult) {
                         const dataStr = JSON.stringify(analysisResult, null, 2);
@@ -1169,8 +1169,8 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                     }}
                     disabled={!analysisResult}
                   >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    <span className="font-medium">Export Data</span>
+                    <BarChart3 className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="font-medium text-xs sm:text-sm">Export</span>
                   </Button>
                 </div>
               </div>
@@ -1178,13 +1178,13 @@ export default function ARTools({ user }: ARToolsProps = {}) {
               {/* Real-time AI Metrics Grid - 8 Essential Metrics for Coaching (Mobile First - Below Video) */}
               <div className="mb-6">
                 <h3 className="text-lg font-bold text-white mb-4">Performance Metrics</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
                   {currentMetrics.slice(0, 8).map((metric: any, index: number) => (
-                    <div key={index} className={`bg-gray-800 p-3 md:p-4 rounded-lg ${index === 7 ? 'col-span-2 md:col-span-4' : ''}`}>
-                      <div className="text-xs md:text-sm text-gray-400 mb-1">{metric.label}</div>
-                      <div className={`text-sm md:text-lg font-bold ${metric.color}`}>{metric.value}</div>
+                    <div key={index} className={`bg-gray-800 p-2 sm:p-3 md:p-4 rounded-lg ${index === 7 ? 'col-span-2 md:col-span-4' : ''}`}>
+                      <div className="text-xs sm:text-xs md:text-sm text-gray-400 mb-1 truncate">{metric.label}</div>
+                      <div className={`text-xs sm:text-sm md:text-lg font-bold ${metric.color} leading-tight`}>{metric.value}</div>
                       {analysisResult && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-gray-500 mt-1 hidden sm:block">
                           Updated {new Date(analysisResult.timestamp).toLocaleTimeString()}
                         </div>
                       )}
@@ -1279,20 +1279,20 @@ export default function ARTools({ user }: ARToolsProps = {}) {
                       <div 
                         key={drill.id}
                         onClick={() => addDrillToSchedule(drill)}
-                        className={`bg-${drill.color}-600 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 cursor-pointer hover:bg-${drill.color}-700 transition-colors duration-200 group`}
+                        className={`bg-${drill.color}-600 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 cursor-pointer hover:bg-${drill.color}-700 transition-colors duration-200 group`}
                       >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">{drill.icon}</div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-white group-hover:text-gray-100">{drill.name}</h4>
-                            <p className="text-sm text-gray-200 group-hover:text-gray-300">{drill.description} - {drill.priority} priority</p>
-                            <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1">
+                          <div className="text-xl sm:text-2xl flex-shrink-0">{drill.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-white group-hover:text-gray-100 text-sm sm:text-base truncate">{drill.name}</h4>
+                            <p className="text-xs sm:text-sm text-gray-200 group-hover:text-gray-300 line-clamp-2">{drill.description} - {drill.priority} priority</p>
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1">
                               <span className="text-xs bg-black bg-opacity-20 px-2 py-1 rounded text-white">{drill.difficulty}</span>
                               <span className="text-xs text-gray-300">{drill.estimatedDuration}</span>
                             </div>
                           </div>
                         </div>
-                        <div className="text-xs text-white bg-black bg-opacity-20 px-3 py-1 rounded sm:flex-shrink-0">
+                        <div className="text-xs text-white bg-black bg-opacity-20 px-2 sm:px-3 py-1 rounded self-start sm:self-center sm:flex-shrink-0">
                           Click to add
                         </div>
                       </div>
