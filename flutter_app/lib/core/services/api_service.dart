@@ -7,8 +7,8 @@ class ApiService {
   final Dio _dio;
   final FlutterSecureStorage _storage;
   
-  static const String baseUrl = 'https://ekkalavya-sports-ai.replit.app';
-  static const String aiBackendUrl = 'https://ekkalavya-ai-backend.replit.app';
+  static const String baseUrl = 'https://ekkalavyasportsai-replit.replit.app';
+  static const String aiBackendUrl = 'https://ekkalavyasportsai-replit.replit.app';
 
   ApiService(this._dio, this._storage) {
     _dio.options.baseUrl = baseUrl;
