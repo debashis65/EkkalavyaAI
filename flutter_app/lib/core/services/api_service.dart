@@ -7,8 +7,8 @@ class ApiService {
   final Dio _dio;
   final FlutterSecureStorage _storage;
   
-  static const String baseUrl = 'https://ekkalavyasportsai-replit.replit.app';
-  static const String aiBackendUrl = 'https://ekkalavyasportsai-replit.replit.app';
+  static const String baseUrl = 'https://ekkalavya-sports-ai.onrender.com';
+  static const String aiBackendUrl = 'https://ekkalavya-ai-backend.onrender.com';
 
   ApiService(this._dio, this._storage) {
     _dio.options.baseUrl = baseUrl;
@@ -168,6 +168,33 @@ class ApiService {
   Future<Map<String, dynamic>> saveAnalysisResult(Map<String, dynamic> analysis) async {
     try {
       final response = await _dio.post('/api/performance/save', data: analysis);
+      return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getPlayerAchievements(String userId) async {
+    try {
+      final response = await _dio.get('/api/achievements/$userId');
+      return List<Map<String, dynamic>>.from(response.data);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> getPlayerDashboard(String userId) async {
+    try {
+      final response = await _dio.get('/api/player/dashboard/$userId');
+      return response.data;
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> getSkillProgression(String userId, String sport) async {
+    try {
+      final response = await _dio.get('/api/player/skills/$userId/$sport');
       return response.data;
     } catch (e) {
       throw _handleError(e);

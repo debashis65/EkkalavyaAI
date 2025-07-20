@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ekkalavya_sports_ai/core/providers/auth_provider.dart';
+import 'package:ekkalavya_sports_ai/core/providers/api_provider.dart';
 import 'package:ekkalavya_sports_ai/core/theme/app_theme.dart';
 import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart';
 import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/bottom_nav_bar.dart';
+import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/skill_progression_radar.dart';
+import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/achievement_badges.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class PlayerDashboard extends ConsumerStatefulWidget {
@@ -16,6 +19,42 @@ class PlayerDashboard extends ConsumerStatefulWidget {
 
 class _PlayerDashboardState extends ConsumerState<PlayerDashboard> {
   int _selectedIndex = 0;
+  Map<String, dynamic>? _dashboardData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      final apiService = ref.read(apiServiceProvider);
+      final user = ref.read(authProvider).user;
+      
+      if (user != null) {
+        final performanceData = await apiService.getPerformanceHistory(
+          userId: user.id,
+          limit: 10,
+        );
+        
+        final achievementsData = await apiService.getPlayerAchievements(user.id);
+        
+        setState(() {
+          _dashboardData = {
+            'performance': performanceData,
+            'achievements': achievementsData,
+          };
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +86,27 @@ class _PlayerDashboardState extends ConsumerState<PlayerDashboard> {
             _QuickActionsSection(),
             
             const SizedBox(height: 24),
+            
+            // Skill Progression Radar Chart (Connected to Backend)
+            if (user != null) ...[
+              SkillProgressionRadar(
+                userId: user.id,
+                sport: 'basketball', // TODO: Get from user preferences
+                showAnimation: true,
+              ),
+              
+              const SizedBox(height: 24),
+            ],
+            
+            // Achievement Badges (Connected to Backend)
+            if (user != null) ...[
+              AchievementBadges(
+                userId: user.id,
+                maxDisplay: 4,
+              ),
+              
+              const SizedBox(height: 24),
+            ],
             
             // Performance Overview
             _PerformanceOverview(),
