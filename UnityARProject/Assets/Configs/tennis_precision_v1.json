@@ -1,0 +1,27 @@
+{
+  "id": "tennis_precision_v1",
+  "sport": "tennis",
+  "requirements": {
+    "min_plane_m": [12.0, 8.0]
+  },
+  "layout": {
+    "pattern": "baseline",
+    "dx_m": 2.0,
+    "dy_m": 1.0,
+    "count": 6,
+    "start_y_m": 1.0
+  },
+  "tolerance_m": {
+    "easy": 0.35,
+    "medium": 0.25,
+    "hard": 0.15,
+    "expert": 0.08
+  },
+  "difficulty": "medium",
+  "weights": {
+    "precision": 0.7,
+    "pace": 0.2,
+    "streak": 0.1
+  },
+  "pace_target_hz": 1.8
+}

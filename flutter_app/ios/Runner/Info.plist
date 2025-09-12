@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>$(DEVELOPMENT_LANGUAGE)</string>
+        <key>CFBundleDisplayName</key>
+        <string>Ekkalavya Sports AI</string>
+        <key>CFBundleExecutable</key>
+        <string>$(EXECUTABLE_NAME)</string>
+        <key>CFBundleIdentifier</key>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>ekkalavya_sports_ai</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>$(FLUTTER_BUILD_NAME)</string>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleVersion</key>
+        <string>$(FLUTTER_BUILD_NUMBER)</string>
+        <key>LSRequiresIPhoneOS</key>
+        <true/>
+        <key>UILaunchStoryboardName</key>
+        <string>LaunchScreen</string>
+        <key>UIMainStoryboardFile</key>
+        <string>Main</string>
+        <key>UISupportedInterfaceOrientations</key>
+        <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationLandscapeLeft</string>
+                <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UISupportedInterfaceOrientations~ipad</key>
+        <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationPortraitUpsideDown</string>
+                <string>UIInterfaceOrientationLandscapeLeft</string>
+                <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UIViewControllerBasedStatusBarAppearance</key>
+        <false/>
+        <key>NSCameraUsageDescription</key>
+        <string>EkkalavyaAR uses the camera for augmented reality tracking of sports movements and court positioning with professional-grade precision.</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>EkkalavyaAR uses the microphone to detect audio cues from ball bounces for enhanced tracking accuracy and real-time feedback.</string>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>This app needs photo library access to save and share training videos and analysis results.</string>
+        <key>NSMotionUsageDescription</key>
+        <string>This app needs motion sensor access for advanced sports movement analysis.</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>This app needs location access to find nearby coaches and training facilities.</string>
+        <key>CADisableMinimumFrameDurationOnPhone</key>
+        <true/>
+        <key>UIApplicationSupportsIndirectInputEvents</key>
+        <true/>
+        
+        <!-- ARKit Requirements -->
+        <key>UIRequiredDeviceCapabilities</key>
+        <array>
+                <string>arkit</string>
+        </array>
+        
+        <!-- Unity AR Configuration -->
+        <key>UnitySplashScreen</key>
+        <false/>
+        <key>UnityAutoRotation</key>
+        <true/>
+        <key>MetalForceDisableVertexBufferOffset</key>
+        <false/>
+</dict>
+</plist>

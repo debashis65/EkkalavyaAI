@@ -1,0 +1,456 @@
+Goal: Create a Unity (2022 LTS) + AR Foundation project that scans a real flat space, lays down a regulation-accurate basketball half-court overlay, spawns dribble target markers (green/red feedback), tracks ball bounces using vision + audio fusion, localizes each bounce on the plane, compares to the active target with a tolerance radius, and scores the session. Provide full code, sample assets, and verified build settings for Android (ARCore) and iOS (ARKit). No placeholders, no TODOs.
+
+
+---
+
+0) Project & Packages
+
+Unity version: 2022.3 LTS (exact version in README).
+
+Packages (manifest.json):
+
+com.unity.xr.arfoundation 5.x
+
+com.unity.xr.arcore 5.x
+
+com.unity.xr.arkit 5.x
+
+com.unity.inputsystem 1.x
+
+com.unity.mathematics **1.x`
+
+
+Scenes:
+
+Assets/Scenes/DribblePrecision.unity (set as Build index 0)
+
+
+Sample assets (import or generate programmatically):
+
+Assets/Textures/arena_floor_albedo.png (512–1024px)
+
+Assets/Materials/ArenaFloor.mat (PBR)
+
+Assets/Fonts/Inter-Regular.ttf
+
+Assets/Audio/cheer_short.ogg, Assets/Audio/bounce_click.ogg (short, royalty-free)
+
+
+Ensure no missing references and no compile warnings.
+
+
+
+---
+
+1) Features (End-to-End)
+
+1. Plane Scan & Bounds
+
+Detect a horizontal plane (ground).
+
+Visualize detected plane mesh during scan (transparent grid), then lock when user taps “Use this area.”
+
+Compute a convex hull and usable rectangle min 6m × 4m if available; otherwise auto-select micro layout.
+
+
+
+2. Two-Point Baseline Calibration
+
+Prompt: “Walk to Baseline A” → tap; then “Walk to Baseline B” → tap.
+
+Build a court coordinate frame:
+
+Origin O = A (world space).
+
+X axis = normalized (B − A).
+
+Z axis = plane normal.
+
+Y axis = Z × X.
+
+
+Persist transform T_world_court in a Scriptable runtime object.
+
+
+
+3. Half-Court Overlay (Parametric)
+
+Draw true-to-scale (meters) vector lines: baseline, sidelines, center line, 3-point arc, free-throw line & circle, key/paint.
+
+Materials are thin, unlit meshes with sub-pixel crispness at 2–5m distance.
+
+Auto-fit to available plane bounds; if small area, switch to micro-court maintaining real meter units where possible.
+
+
+
+4. Dribble Precision Drill
+
+Load drill config JSON at Assets/Configs/bb_dribble_precision_v1.json (provided below).
+
+Spawn markers (billboard discs) alternating left/right across the lane, y-step spacing per config.
+
+Each marker has a tolerance radius (per difficulty). Active marker pulsing ring; completed ones dim.
+
+
+
+5. Ball Tracking & Bounce Detection
+
+Vision path: region-of-interest motion/roundness tracker (no paid plugins, no TODOs):
+
+Downscale camera texture to e.g. 256–320px width for speed.
+
+HSV/orange band + circularity score (Hough-like without external libs).
+
+Kalman filter on 2D screen coords; predict when occluded for ≤300 ms.
+
+
+Audio fusion:
+
+Microphone stream, band-pass 200–2000 Hz, onset detector with adaptive threshold.
+
+When audio peak within ±50 ms of predicted ground contact (from vertical motion sign change), raise BounceEvent.
+
+
+Bounce localization:
+
+Take last confident ball pixel; raycast through AR camera to the locked plane; get world P_bounce.
+
+Transform to court local: p_c = courtPose.InverseTransformPoint(P_bounce).
+
+Use (x = p_c.x, y = p_c.z) for 2D court coords.
+
+
+
+
+6. Hit Testing & Scoring
+
+For current target t_i, error e = distance(p_c, t_i).
+
+Hit if e ≤ radius_i; flash green, haptic pulse, increment score.
+
+Miss: red flash + on-screen delta distance.
+
+Session score = weighted precision (60%) + pace (30%) + streak (10%).
+
+Live HUD: current score, marker index/total, left/right cue, pace meter.
+
+
+
+7. Review Screen
+
+After session end, show:
+
+Heatmap of bounce points relative to targets.
+
+% on-target, avg error (cm), cadence (Hz), L/R distribution.
+
+
+Save JSON session log to Application.persistentDataPath/sessions/….
+
+
+
+
+
+---
+
+2) Concrete Data Contracts (provide real files)
+
+A) Drill config: Assets/Configs/bb_dribble_precision_v1.json
+
+{
+  "id": "bb_dribble_precision_v1",
+  "sport": "basketball",
+  "requirements": { "min_plane_m": [3.0, 4.0] },
+  "layout": { "pattern": "zigzag", "dx_m": 1.5, "dy_m": 1.5, "count": 8, "start_y_m": 1.0 },
+  "tolerance_m": { "easy": 0.20, "medium": 0.15, "hard": 0.10 },
+  "difficulty": "medium",
+  "weights": { "precision": 0.6, "pace": 0.3, "streak": 0.1 },
+  "pace_target_hz": 2.2
+}
+
+B) Session log schema (write one file per session):
+
+{
+  "ts_unix": 1725520000,
+  "device": { "model": "auto", "platform": "auto" },
+  "calibration": {
+    "origin_world": [0,0,0],
+    "x_axis_world": [1,0,0],
+    "z_axis_world": [0,1,0]
+  },
+  "drill_id": "bb_dribble_precision_v1",
+  "events": [
+    {
+      "t_ms": 1234,
+      "bounce_world": [1.2, 0.0, 2.6],
+      "bounce_court_xy": [1.2, 2.6],
+      "target_index": 3,
+      "error_m": 0.12,
+      "hit": true
+    }
+  ],
+  "summary": {
+    "score": 87,
+    "hit_pct": 0.72,
+    "avg_error_m": 0.14,
+    "pace_hz": 2.05,
+    "streak_max": 6
+  }
+}
+
+
+---
+
+3) Code Files (create with full implementations)
+
+Create these exact files (names and namespaces as below). No TODOs, no stubs. Each class compiles and is wired in the Scene.
+
+1. Assets/Scripts/AR/ARBootstrap.cs
+
+Initializes ARSession/ARSessionOrigin, references ARPlaneManager, ARRaycastManager, ARCameraManager, AROcclusionManager.
+
+Handles permission prompts (camera, mic).
+
+
+
+2. Assets/Scripts/AR/PlaneScanController.cs
+
+Visualizes planes (mesh overlay).
+
+“Use this area” button → locks selected plane, hides others, computes convex hull and usable rect.
+
+
+
+3. Assets/Scripts/Calibration/TwoPointCalibration.cs
+
+Guides user through Baseline A/B taps via raycast.
+
+Computes courtPose (position + rotation) as defined.
+
+Public getter Transform CourtTransform.
+
+
+
+4. Assets/Scripts/Court/CourtGenerator.cs
+
+Generates parametric half-court meshes at real scale (NBA/FIBA constants).
+
+Supports micro-court fallback.
+
+Materials and line thickness controlled via inspector.
+
+
+
+5. Assets/Scripts/Drill/DrillConfig.cs
+
+Serializable DTOs to load JSON.
+
+Loader for bb_dribble_precision_v1.json.
+
+
+
+6. Assets/Scripts/Drill/MarkerSpawner.cs
+
+Spawns alternating left/right markers using dx_m, dy_m, count, start_y_m.
+
+Marker prefab: Assets/Prefabs/DrillMarker.prefab (create it).
+
+Exposes API: GetActiveTarget(), AdvanceTargetOnHit().
+
+
+
+7. Assets/Scripts/Tracking/BallTracker.cs
+
+Grabs camera image, downsamples, HSV threshold for common orange bands with auto-gain fallback.
+
+Circularity score (edge density + radial variance).
+
+Kalman filter for (u,v); predicts during occlusion.
+
+Event: OnBallScreenPoint(Vector2 pixelUV, float confidence) at ~30–60 Hz.
+
+
+
+8. Assets/Scripts/Tracking/AudioBounceDetector.cs
+
+Microphone capture (clip looping).
+
+Real-time band-pass (biquad) 200–2000 Hz.
+
+Onset detection with adaptive noise floor; event OnAudioBounce(int tMs).
+
+
+
+9. Assets/Scripts/Tracking/BounceFusion.cs
+
+Consumes BallTracker stream; estimates vertical phase (simple finite difference).
+
+When predicted ground contact within window ±50 ms of audio peak, emits OnBounce(Vector2 pixelUV, long tMs).
+
+
+
+10. Assets/Scripts/AR/BounceLocalizer.cs
+
+On bounce: raycast from pixelUV to locked plane via ARRaycastManager.
+
+Converts to court XY using courtPose; raises OnBounceCourt(Vector2 courtXY, Vector3 worldPoint).
+
+
+
+11. Assets/Scripts/Scoring/DrillScoring.cs
+
+Computes error to active target, tolerance from config difficulty.
+
+Hit/miss, score accumulation (precision/pace/streak).
+
+Public summary accessor.
+
+
+
+12. Assets/Scripts/UI/HUDController.cs
+
+Shows score, active marker #, pace meter, green/red pulses, haptics on hit (Android/iOS).
+
+Start/End session buttons.
+
+
+
+13. Assets/Scripts/Review/SessionReview.cs
+
+Renders heatmap over court (GPU instanced quads with alpha based on density).
+
+Writes session JSON to disk; provides “Share JSON” for debugging.
+
+
+
+14. Assets/Prefabs/DrillMarker.prefab
+
+Billboard circle with inner fill ring (shader graph Unlit).
+
+Script DrillMarker.cs animates ring fill and green/red pulse on hit.
+
+
+
+15. Assets/Scripts/Utils/Kalman2D.cs, Assets/Scripts/Utils/MathHelpers.cs, Assets/Scripts/Utils/AudioDSP.cs
+
+Self-contained math/DSP utilities. No external dependencies.
+
+
+
+
+Wire the scene so a first-time user can: open app → scan plane → calibrate A/B → court appears → tap “Start Drill” → markers spawn → bounce is detected and scored → “End” shows review heatmap + stats.
+
+
+---
+
+4) Constants (use exact values, no TODOs)
+
+Hoop height: 3.048 m
+
+Key (paint) dimensions: NBA standard
+
+Free throw line: 4.57 m from baseline
+
+3-pt arc: 6.75 m (FIBA) or 7.24 m (NBA). Use FIBA 6.75 m for global applicability.
+
+Default difficulty: medium, tolerance 0.15 m
+
+Pace target: 2.2 Hz (adjustable)
+
+
+
+---
+
+5) Platform Build Settings
+
+Android:
+
+Target API 33+, Min API 24+.
+
+Enable ARCore, camera, mic permissions.
+
+IL2CPP, ARM64.
+
+Graphics: Vulkan + OpenGLES3 (fallback).
+
+Optimize frame pacing.
+
+
+iOS:
+
+Requires ARKit, camera + mic usage descriptions (write proper strings).
+
+Metal, ARM64.
+
+Background audio disabled, mic during session enabled.
+
+
+
+---
+
+6) QA Checklist (must pass before finishing)
+
+No compile warnings.
+
+First-run flow < 30 seconds from app open to drill start.
+
+Stable ≥ 30 FPS on mid-range Android (e.g., Snapdragon 7-series).
+
+Bounce detection works in:
+
+Good light (vision + audio fuse),
+
+Low light (audio still triggers with widened tolerance).
+
+
+Heatmap and session JSON saved and reloadable.
+
+
+
+---
+
+7) README.md (must include)
+
+Exact Unity version + package versions.
+
+Step-by-step setup, scene path, and play instructions.
+
+Android/iOS build guides (permissions, ARCore/ARKit toggles).
+
+Troubleshooting (small space, low light, occlusion).
+
+Notes on accuracy and how to tune HSV thresholds if the ball is not orange.
+
+How to change difficulty and drill layout via JSON.
+
+
+
+---
+
+8) Deliverables
+
+Full Unity project committed in the repo.
+
+All scripts & prefabs listed above present and referenced.
+
+bb_dribble_precision_v1.json included and loaded at runtime.
+
+Sample screenshots (PNG) of scan, court overlay, active drill, review screen.
+
+Zipped build outputs folder optional (Builds/Android/…, Builds/iOS/…) if CI is added.
+
+
+
+---
+
+Important: Do not use paid assets or closed-source libraries. Don’t insert placeholders or TODOs. Every class must be fully implemented and referenced. Default scene must be playable end-to-end.
+
+
+---
+
+9) (Optional) CI
+
+If time permits, add a simple GitHub Action YAML to validate compilation with Unity Builder (free). Otherwise skip CI.
+
+
+---

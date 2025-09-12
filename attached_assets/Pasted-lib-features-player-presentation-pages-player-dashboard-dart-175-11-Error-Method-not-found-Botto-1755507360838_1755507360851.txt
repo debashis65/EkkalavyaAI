@@ -1,0 +1,67 @@
+lib/features/player/presentation/pages/player_dashboard.dart:175:11: Error: Method not found: 'BottomNavItem'.
+          BottomNavItem(icon: Icons.dashboard, label: 'Dashboard'),
+          ^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:176:11: Error: Method not found: 'BottomNavItem'.
+          BottomNavItem(icon: Icons.camera_alt, label: 'AR Analysis'),
+          ^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:177:11: Error: Method not found: 'BottomNavItem'.
+          BottomNavItem(icon: Icons.analytics, label: 'Analytics'),
+          ^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:178:11: Error: Method not found: 'BottomNavItem'.
+          BottomNavItem(icon: Icons.person, label: 'Profile'),
+          ^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:155:28: Error: The method 'BottomNavBar' isn't defined for the class '_PlayerDashboardState'.    
+ - '_PlayerDashboardState' is from 'package:ekkalavya_sports_ai/features/player/presentation/pages/player_dashboard.dart' ('lib/features/player/presentation/pages/player_dashboard.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BottomNavBar'.
+      bottomNavigationBar: BottomNavBar(
+                           ^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:155:7: Error: Duplicated named argument 'bottomNavigationBar'.
+      bottomNavigationBar: BottomNavBar(
+      ^^^^^^^^^^^^^^^^^^^
+lib/features/player/presentation/pages/schedule_page.dart:353:7: Error: No named parameter with the name 'bottomNavigationBar'.
+      bottomNavigationBar: BottomNavbar(currentRoute: '/player/schedule'),
+      ^^^^^^^^^^^^^^^^^^^
+/C:/flutter/packages/flutter/lib/src/material/dialog.dart:1457:12: Context: Found this candidate, but the arguments don't match.
+Future<T?> showDialog<T>({
+           ^^^^^^^^^^
+lib/features/player/presentation/pages/coaches_page.dart:567:7: Error: No named parameter with the name 'bottomNavigationBar'.
+      bottomNavigationBar: BottomNavbar(currentRoute: '/player/coaches'),
+      ^^^^^^^^^^^^^^^^^^^
+/C:/flutter/packages/flutter/lib/src/material/dialog.dart:1457:12: Context: Found this candidate, but the arguments don't match.
+Future<T?> showDialog<T>({
+           ^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:835:7: Error: No named parameter with the name 'bottomNavigationBar'.
+      bottomNavigationBar: BottomNavbar(currentRoute: '/coach/students'),
+      ^^^^^^^^^^^^^^^^^^^
+/C:/flutter/packages/flutter/lib/src/material/dialog.dart:1457:12: Context: Found this candidate, but the arguments don't match.
+Future<T?> showDialog<T>({
+           ^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:879:7: Error: No named parameter with the name 'bottomNavigationBar'.
+      bottomNavigationBar: BottomNavbar(currentRoute: '/coach/video-consultation'),
+      ^^^^^^^^^^^^^^^^^^^
+/C:/flutter/packages/flutter/lib/src/widgets/gesture_detector.dart:237:3: Context: Found this candidate, but the arguments don't match.
+  GestureDetector({
+  ^^^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command 'C:\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 2m 57s
+Running Gradle task 'assembleDebug'...                            179.2s
+Gradle task assembleDebug failed with exit code 1
+PS C:\Users\User\Desktop\EkkalavyaSportsAI (4)\EkkalavyaSportsAI\flutter_app> flutter clean
+Deleting build...                                                   18ms
+Deleting .dart_tool...                                              11ms
+Deleting ephemeral...                                                4ms
+Deleting Generated.xcconfig...                                       3ms
+Deleting flutter_export_environment.sh...         
