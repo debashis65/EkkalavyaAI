@@ -1,0 +1,462 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: ekalavya-database
+    databaseName: ekalavya_sports_ai
+    user: ekalavya_user
+    plan: free
+    region: oregon
+
+  # Python AI Backend - FastAPI with MediaPipe
+  - type: web
+    name: ekalavya-ai-backend
+    env: python3
+    region: oregon
+    plan: free
+    buildCommand: |
+      cd ai_backend
+      pip install --upgrade pip setuptools wheel
+      pip install --no-cache-dir -r requirements.txt
+      python -c "import cv2, mediapipe, numpy; print('✅ Computer Vision libraries loaded')"
+    startCommand: cd ai_backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHONPATH
+        value: /opt/render/project/src/ai_backend
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: ENVIRONMENT
+        value: production
+      - key: MEDIAPIPE_MODEL_COMPLEXITY
+        value: 2
+      - key: POSE_DETECTION_CONFIDENCE
+        value: 0.7
+      - key: TRACKING_CONFIDENCE
+        value: 0.5
+      - key: SPORTS_SUPPORTED
+        value: 54
+      - key: PARA_SPORTS_ENABLED
+        value: true
+      - key: REAL_TIME_ANALYSIS
+        value: true
+    healthCheckPath: /health
+
+  # Main Web Application - Node.js + React
+  - type: web
+    name: ekalavya-web-platform
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: |
+      npm ci --include=dev
+      npm run build
+      npm prune --omit=dev
+      echo "✅ Web platform built successfully"
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ekalavya-database
+          property: connectionString
+      - key: AI_BACKEND_URL
+        fromService:
+          type: web
+          name: ekalavya-ai-backend
+          property: host
+      - key: PORT
+        value: 5000
+      - key: APP_NAME
+        value: Ekalavya Sports AI
+      - key: APP_VERSION
+        value: 2.0.0
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: SPORTS_SUPPORTED
+        value: 54
+      - key: UNITY_AR_ENABLED
+        value: true
+      - key: FLUTTER_INTEGRATION
+        value: true
+    healthCheckPath: /api/health
+
+  # Flutter Mobile API Service
+  - type: web
+    name: ekalavya-mobile-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci
+    startCommand: node -e "
+      const express = require('express');
+      const app = express();
+      const port = process.env.PORT || 8080;
+      
+      app.use(express.json());
+      
+      // Mobile health check
+      app.get('/mobile/health', (req, res) => {
+        res.json({ status: 'ok', service: 'mobile-api', timestamp: new Date() });
+      });
+      
+      // Unity AR session endpoints
+      app.post('/mobile/unity-ar/session', (req, res) => {
+        const { sport, userId, sessionId } = req.body;
+        res.json({ 
+          success: true, 
+          sessionId,
+          sport,
+          deepLink: \`ekkalavya://unity_ar?sport=\${sport}&sessionId=\${sessionId}&user=\${userId}\`
+        });
+      });
+      
+      // Flutter-specific endpoints
+      app.get('/mobile/sports/list', (req, res) => {
+        res.json({ 
+          sports: Array.from({length: 54}, (_, i) => \`sport_\${i+1}\`),
+          categories: ['Ball Sports', 'Track & Field', 'Para Sports', 'Water Sports', 'Combat Sports']
+        });
+      });
+      
+      app.listen(port, '0.0.0.0', () => {
+        console.log(\`Mobile API running on port \${port}\`);
+      });
+    "
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ekalavya-database
+          property: connectionString
+      - key: AI_BACKEND_URL
+        fromService:
+          type: web
+          name: ekalavya-ai-backend
+          property: host
+      - key: WEB_PLATFORM_URL
+        fromService:
+          type: web
+          name: ekalavya-web-platform
+          property: host
+      - key: PORT
+        value: 8080
+    healthCheckPath: /mobile/health
+
+databases:
+  - name: ekalavya-database
+    databaseName: ekalavya_sports_ai
+    user: ekalavya_user
+    plan: free
+    region: oregon
+
+# Environment Variable Groups for Shared Configuration
+envVarGroups:
+  - name: shared-config
+    envVars:
+      - key: APP_NAME
+        value: Ekalavya Sports AI
+      - key: APP_VERSION
+        value: 2.0.0
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+
+  # Professional Sports AI Configuration
+  - name: ai-config
+    envVars:
+      - key: MEDIAPIPE_MODEL_COMPLEXITY
+        value: 2
+      - key: POSE_DETECTION_CONFIDENCE
+        value: 0.7
+      - key: TRACKING_CONFIDENCE
+        value: 0.5
+      - key: SPORTS_SUPPORTED
+        value: 54
+      - key: PARA_SPORTS_ENABLED
+        value: true
+      - key: REAL_TIME_ANALYSIS
+        value: true
+      - key: BIOMECHANICAL_TOOLS
+        value: "OpenSim,BTK,YOLO,ST-GCN,DeepPoseKit"
+      - key: UNITY_AR_ENABLED
+        value: true
+      - key: FLUTTER_DEEP_LINKING
+        value: true
+
+# Health Check Configuration
+healthChecks:
+  - service: ekalavya-ai-backend
+    path: /health
+    intervalSeconds: 30
+    timeoutSeconds: 10
+    
+  - service: ekalavya-web-platform
+    path: /api/health
+    intervalSeconds: 30
+    timeoutSeconds: 10
+    
+  - service: ekalavya-mobile-api
+    path: /mobile/health
+    intervalSeconds: 30
+    timeoutSeconds: 10
+
+# Auto-Scaling Configuration
+scaling:
+  - service: ekalavya-ai-backend
+    minInstances: 1
+    maxInstances: 3
+    targetCPU: 70
+    targetMemory: 80
+    
+  - service: ekalavya-web-platform
+    minInstances: 1
+    maxInstances: 5
+    targetCPU: 80
+    targetMemory: 85
+
+  - service: ekalavya-mobile-api
+    minInstances: 1
+    maxInstances: 2
+    targetCPU: 75
+    targetMemory: 80
+
+# Performance Optimization
+optimization:
+  - service: ekalavya-ai-backend
+    settings:
+      worker_processes: 1
+      worker_connections: 1000
+      keepalive_timeout: 65
+      max_requests: 1000
+      
+  - service: ekalavya-web-platform
+    settings:
+      node_options: "--max-old-space-size=1024"
+      compression: true
+      static_cache: 1d
+      
+  - service: ekalavya-mobile-api
+    settings:
+      node_options: "--max-old-space-size=512"
+      compression: true
+
+# Advanced Monitoring & Alerting
+monitoring:
+  metrics:
+    enabled: true
+    retention: 30d
+    dashboards:
+      - name: sports-ai-performance
+        charts:
+          - pose_detection_latency
+          - analysis_accuracy_rate
+          - user_session_duration
+          - unity_ar_engagement
+  
+  logging:
+    level: info
+    format: json
+    aggregation: true
+    
+  alerts:
+    - name: high_error_rate
+      condition: error_rate > 5%
+      notification: email
+      services: [ekalavya-ai-backend, ekalavya-web-platform]
+      
+    - name: slow_response_time
+      condition: response_time > 2s
+      notification: email
+      services: [ekalavya-ai-backend]
+      
+    - name: high_cpu_usage
+      condition: cpu_usage > 85%
+      notification: email
+      services: [ekalavya-ai-backend, ekalavya-web-platform]
+      
+    - name: unity_ar_failures
+      condition: unity_ar_session_failure_rate > 10%
+      notification: email
+      services: [ekalavya-mobile-api]
+
+# Security Configuration
+security:
+  headers:
+    - name: X-Content-Type-Options
+      value: nosniff
+    - name: X-Frame-Options
+      value: DENY
+    - name: X-XSS-Protection
+      value: "1; mode=block"
+    - name: Strict-Transport-Security
+      value: "max-age=31536000; includeSubDomains"
+  
+  cors:
+    allowOrigins: 
+      - "*.replit.app"
+      - "*.onrender.com"
+      - "*.ekalavyasports.ai"
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+    allowHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-Unity-Session"]
+    credentials: true
+
+# Backup & Disaster Recovery
+backup:
+  database:
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    retention: 7d
+    encryption: true
+  
+  application_data:
+    schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+    retention: 4w
+    include_patterns:
+      - "user_sessions/*"
+      - "analysis_results/*"
+      - "unity_ar_data/*"
+
+# Post-Deploy Hooks
+hooks:
+  postDeploy:
+    - name: database-migration
+      command: npm run db:push
+      service: ekalavya-web-platform
+      
+    - name: ai-model-verification
+      command: python -c "import mediapipe, cv2; print('✅ AI models ready')"
+      service: ekalavya-ai-backend
+      
+    - name: mobile-api-test
+      command: curl -f $RENDER_EXTERNAL_URL/mobile/health || exit 1
+      service: ekalavya-mobile-api
+      
+    - name: unity-ar-endpoint-test
+      command: curl -f $RENDER_EXTERNAL_URL/mobile/sports/list || exit 1
+      service: ekalavya-mobile-api
+
+# Regional Configuration for Global Reach
+regions:
+  primary: oregon
+  fallback: virginia
+  cdn_regions:
+    - us-west
+    - us-east
+    - europe
+
+# Custom Domains (when available)
+domains:
+  - service: ekalavya-web-platform
+    domain: app.ekalavyasports.ai
+    
+  - service: ekalavya-ai-backend
+    domain: api.ekalavyasports.ai
+    
+  - service: ekalavya-mobile-api
+    domain: mobile.ekalavyasports.ai
+
+# Resource Management
+resources:
+  limits:
+    cpu: 1.0
+    memory: 1Gi
+    storage: 2Gi
+    bandwidth: 100GB
+  
+  requests:
+    cpu: 0.25
+    memory: 512Mi
+
+# Development and Staging Environments
+environments:
+  staging:
+    branch: develop
+    services:
+      - ekalavya-ai-backend-staging
+      - ekalavya-web-platform-staging
+      - ekalavya-mobile-api-staging
+      - ekalavya-database-staging
+    scaling:
+      minInstances: 1
+      maxInstances: 2
+    
+  production:
+    branch: main
+    services:
+      - ekalavya-ai-backend
+      - ekalavya-web-platform
+      - ekalavya-mobile-api
+      - ekalavya-database
+
+# Professional Features Configuration
+features:
+  - name: real-computer-vision
+    enabled: true
+    description: "MediaPipe pose detection for 54+ sports"
+    service: ekalavya-ai-backend
+    
+  - name: para-sports-support
+    enabled: true
+    description: "Specialized analysis for Paralympic sports"
+    service: ekalavya-ai-backend
+    
+  - name: unity-ar-integration
+    enabled: true
+    description: "Native Unity AR with Flutter deep linking"
+    service: ekalavya-mobile-api
+    
+  - name: real-time-feedback
+    enabled: true
+    description: "Live WebSocket analysis streaming"
+    service: ekalavya-web-platform
+    
+  - name: multi-platform-sync
+    enabled: true
+    description: "Web + Flutter mobile data synchronization"
+    services: [ekalavya-web-platform, ekalavya-mobile-api]
+    
+  - name: coach-athlete-ecosystem
+    enabled: true
+    description: "Complete training management system"
+    services: [ekalavya-web-platform, ekalavya-mobile-api]
+
+# Deployment Strategy
+deployment:
+  strategy: rolling
+  maxUnavailable: 1
+  maxSurge: 1
+  progressDeadline: 600s
+  rollback:
+    enabled: true
+    on_failure: true
+
+# Advanced Caching Strategy
+caching:
+  - service: ekalavya-web-platform
+    static_assets:
+      cache_control: "public, max-age=31536000"
+      patterns: ["*.js", "*.css", "*.png", "*.jpg", "*.svg"]
+      
+  - service: ekalavya-ai-backend
+    api_responses:
+      cache_control: "public, max-age=300"
+      patterns: ["/sports/configs", "/models/metadata"]
+
+# Load Testing Configuration  
+loadTesting:
+  sports_analysis:
+    endpoint: /analyze
+    concurrent_users: 50
+    duration: 5m
+    success_rate: 95%
+    
+  unity_ar_sessions:
+    endpoint: /mobile/unity-ar/session
+    concurrent_users: 25
+    duration: 3m
+    success_rate: 98%

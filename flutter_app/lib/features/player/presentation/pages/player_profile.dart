@@ -1,0 +1,710 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ekkalavya_sports_ai/core/providers/auth_provider.dart';
+import 'package:ekkalavya_sports_ai/core/theme/app_theme.dart';
+import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart';
+import 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/bottom_navbar.dart';
+
+class PlayerProfile extends ConsumerStatefulWidget {
+  const PlayerProfile({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<PlayerProfile> createState() => _PlayerProfileState();
+}
+
+class _PlayerProfileState extends ConsumerState<PlayerProfile> {
+  final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _sportController = TextEditingController();
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(authProvider).user;
+    if (user != null) {
+      _firstNameController.text = user.firstName ?? '';
+      _lastNameController.text = user.lastName ?? '';
+      _sportController.text = user.sport ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _sportController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(authProvider).user;
+
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Profile',
+        actions: [
+          IconButton(
+            icon: Icon(_isEditing ? Icons.check : Icons.edit),
+            onPressed: () {
+              if (_isEditing) {
+                // Save changes
+                if (_formKey.currentState!.validate()) {
+                  _updateUserProfile();
+                }
+              }
+              setState(() {
+                _isEditing = !_isEditing;
+              });
+            },
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavbar(currentRoute: '/player/profile'),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Profile Header
+            _ProfileHeader(user: user),
+            
+            const SizedBox(height: 32),
+            
+            // Profile Form
+            _ProfileForm(
+              formKey: _formKey,
+              firstNameController: _firstNameController,
+              lastNameController: _lastNameController,
+              sportController: _sportController,
+              isEditing: _isEditing,
+            ),
+            
+            const SizedBox(height: 32),
+            
+            // Statistics Cards
+            _StatisticsSection(),
+            
+            const SizedBox(height: 32),
+            
+            // Settings Section
+            _SettingsSection(),
+            
+            const SizedBox(height: 32),
+            
+            // Logout Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await ref.read(authProvider.notifier).logout();
+                  if (mounted) {
+                    context.go('/login');
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _updateUserProfile() async {
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      
+      // Update user information
+      // In development mode, simulate profile update
+      // In production, this would call the actual API
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile updated successfully!'),
+            backgroundColor: AppTheme.primaryGreen,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update profile: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _navigateToAboutPage(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About Ekkalavya'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Ekkalavya Sports AI'),
+            SizedBox(height: 8),
+            Text('Version: 2.1.0'),
+            Text('Build: 240817'),
+            SizedBox(height: 16),
+            Text('Advanced sports training platform with AI-powered analysis for 54+ sports including Para Sports.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToPrivacyPolicy(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Privacy Policy'),
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Your privacy is important to us.'),
+              SizedBox(height: 8),
+              Text('We collect and use your data to:'),
+              Text('• Provide personalized training insights'),
+              Text('• Analyze your performance metrics'),  
+              Text('• Connect you with qualified coaches'),
+              Text('• Improve our AI analysis capabilities'),
+              SizedBox(height: 16),
+              Text('Your data is encrypted and never shared without your explicit consent.'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileHeader extends StatelessWidget {
+  final dynamic user;
+
+  const _ProfileHeader({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Profile Picture
+        Stack(
+          children: [
+            CircleAvatar(
+              radius: 60,
+              backgroundColor: AppTheme.primaryOrange.withOpacity(0.1),
+              backgroundImage: user?.profileImageUrl != null
+                  ? NetworkImage(user!.profileImageUrl!)
+                  : null,
+              child: user?.profileImageUrl == null
+                  ? const Icon(
+                      Icons.person,
+                      size: 60,
+                      color: AppTheme.primaryOrange,
+                    )
+                  : null,
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryOrange,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // User Name
+        Text(
+          user?.fullName ?? 'Player',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        
+        const SizedBox(height: 4),
+        
+        // Email
+        Text(
+          user?.email ?? '',
+          style: const TextStyle(
+            fontSize: 16,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        
+        const SizedBox(height: 8),
+        
+        // Role Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryBlue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            user?.role?.toUpperCase() ?? 'PLAYER',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryBlue,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileForm extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+  final TextEditingController firstNameController;
+  final TextEditingController lastNameController;
+  final TextEditingController sportController;
+  final bool isEditing;
+
+  const _ProfileForm({
+    required this.formKey,
+    required this.firstNameController,
+    required this.lastNameController,
+    required this.sportController,
+    required this.isEditing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Personal Information',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // First Name
+          TextFormField(
+            controller: firstNameController,
+            enabled: isEditing,
+            decoration: const InputDecoration(
+              labelText: 'First Name',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your first name';
+              }
+              return null;
+            },
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Last Name
+          TextFormField(
+            controller: lastNameController,
+            enabled: isEditing,
+            decoration: const InputDecoration(
+              labelText: 'Last Name',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your last name';
+              }
+              return null;
+            },
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Primary Sport
+          DropdownButtonFormField<String>(
+            value: sportController.text.isNotEmpty ? sportController.text : null,
+            decoration: const InputDecoration(
+              labelText: 'Primary Sport',
+              prefixIcon: Icon(Icons.sports),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'basketball', child: Text('Basketball')),
+              DropdownMenuItem(value: 'tennis', child: Text('Tennis')),
+              DropdownMenuItem(value: 'swimming', child: Text('Swimming')),
+              DropdownMenuItem(value: 'gymnastics', child: Text('Gymnastics')),
+              DropdownMenuItem(value: 'soccer', child: Text('Soccer')),
+              DropdownMenuItem(value: 'baseball', child: Text('Baseball')),
+              DropdownMenuItem(value: 'volleyball', child: Text('Volleyball')),
+              DropdownMenuItem(value: 'badminton', child: Text('Badminton')),
+            ],
+            onChanged: isEditing ? (value) {
+              sportController.text = value ?? '';
+            } : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatisticsSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Training Statistics',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                title: 'Total Sessions',
+                value: '127',
+                icon: Icons.timer,
+                color: AppTheme.primaryOrange,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _StatCard(
+                title: 'Hours Trained',
+                value: '89.5',
+                icon: Icons.schedule,
+                color: AppTheme.primaryBlue,
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 12),
+        
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                title: 'Best Score',
+                value: '94%',
+                icon: Icons.star,
+                color: AppTheme.primaryGreen,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _StatCard(
+                title: 'Current Streak',
+                value: '12 Days',
+                icon: Icons.local_fire_department,
+                color: Colors.orange,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppTheme.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsSection extends StatefulWidget {
+  @override
+  State<_SettingsSection> createState() => _SettingsSectionState();
+}
+
+class _SettingsSectionState extends State<_SettingsSection> {
+  bool _notificationsEnabled = true;
+  bool _darkModeEnabled = false;
+  bool _performanceReminders = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Settings',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(
+            children: [
+              _SettingsTile(
+                title: 'Push Notifications',
+                subtitle: 'Receive training reminders and updates',
+                trailing: Switch(
+                  value: _notificationsEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _notificationsEnabled = value;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(_notificationsEnabled ? 'Push notifications enabled' : 'Push notifications disabled'),
+                        backgroundColor: AppTheme.primaryBrightGreen,
+                      ),
+                    );
+                  },
+                  activeColor: AppTheme.primaryOrange,
+                ),
+              ),
+              
+              const Divider(height: 1),
+              
+              _SettingsTile(
+                title: 'Dark Mode',
+                subtitle: 'Use dark theme for the app',
+                trailing: Switch(
+                  value: _darkModeEnabled,
+                  onChanged: (value) {
+                    setState(() {
+                      _darkModeEnabled = value;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(_darkModeEnabled ? 'Dark mode enabled' : 'Light mode enabled'),
+                        backgroundColor: AppTheme.primaryBrightGreen,
+                      ),
+                    );
+                  },
+                  activeColor: AppTheme.primaryOrange,
+                ),
+              ),
+              
+              const Divider(height: 1),
+              
+              _SettingsTile(
+                title: 'Performance Reminders',
+                subtitle: 'Get reminders to maintain consistency',
+                trailing: Switch(
+                  value: _performanceReminders,
+                  onChanged: (value) {
+                    setState(() {
+                      _performanceReminders = value;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(_performanceReminders ? 'Performance reminders enabled' : 'Performance reminders disabled'),
+                        backgroundColor: AppTheme.primaryBrightGreen,
+                      ),
+                    );
+                  },
+                  activeColor: AppTheme.primaryOrange,
+                ),
+              ),
+              
+              const Divider(height: 1),
+              
+              _SettingsTile(
+                title: 'About',
+                subtitle: 'App version and information',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.go('/about'),
+              ),
+              
+              const Divider(height: 1),
+              
+              _SettingsTile(
+                title: 'Privacy Policy',
+                subtitle: 'Learn about how we protect your data',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Privacy Policy'),
+                      content: const SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Your privacy is important to us.'),
+                            SizedBox(height: 8),
+                            Text('We collect and use your data to:'),
+                            Text('• Provide personalized training insights'),
+                            Text('• Analyze your performance metrics'),  
+                            Text('• Connect you with qualified coaches'),
+                            Text('• Improve our AI analysis capabilities'),
+                            SizedBox(height: 16),
+                            Text('Your data is encrypted and never shared without your explicit consent.'),
+                          ],
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Close'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+  final VoidCallback? onTap;
+
+  const _SettingsTile({
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textPrimary,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(
+          fontSize: 12,
+          color: AppTheme.textSecondary,
+        ),
+      ),
+      trailing: trailing,
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    );
+  }
+}

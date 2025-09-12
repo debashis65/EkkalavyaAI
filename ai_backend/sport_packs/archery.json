@@ -1,0 +1,150 @@
+{
+  "sport": "archery",
+  "version": "1.0.0",
+  "category": "target",
+  "description": "Professional archery training configuration with authentic court dimensions and rules",
+  "created_date": "2025-09-09T05:27:59.946946",
+  "surface": {
+    "width_m": 15.0,
+    "height_m": 70.0,
+    "landmarks": [
+      "boundary",
+      "target"
+    ],
+    "center_line": false,
+    "zones": {
+      "target_outer": {
+        "center_x": 70,
+        "center_y": 7.5,
+        "radius": 0.61
+      },
+      "target_inner": {
+        "center_x": 70,
+        "center_y": 7.5,
+        "radius": 0.305
+      }
+    }
+  },
+  "objects": [
+    {
+      "name": "bow",
+      "type": "equipment",
+      "size_m": {
+        "length": 1.7
+      },
+      "detection_config": {
+        "confidence_threshold": 0.8
+      }
+    },
+    {
+      "name": "target",
+      "type": "target",
+      "size_m": {
+        "diameter": 1.22
+      },
+      "detection_config": {
+        "confidence_threshold": 0.9
+      }
+    }
+  ],
+  "teams": {
+    "count": 1,
+    "players_per_team": 1,
+    "positions": [],
+    "formations": {}
+  },
+  "actions": [
+    {
+      "name": "basic_movement",
+      "category": "fundamental",
+      "biomechanics": {},
+      "success_criteria": {
+        "form": 70
+      },
+      "common_errors": [
+        "poor_balance",
+        "incorrect_timing"
+      ]
+    }
+  ],
+  "rules": {
+    "offside": false,
+    "time_violations": {},
+    "area_violations": [],
+    "contact_rules": {},
+    "scoring_rules": {}
+  },
+  "value_model": {
+    "model_type": "basic_performance",
+    "parameters": {
+      "base_score": 100
+    },
+    "weight_factors": {
+      "technique": 0.6,
+      "execution": 0.4
+    },
+    "normalization": {
+      "min_score": 0,
+      "max_score": 100
+    }
+  },
+  "overlays": [
+    {
+      "name": "performance_feedback",
+      "type": "text",
+      "style": {
+        "color": "green",
+        "size": "medium",
+        "position": "top_right"
+      },
+      "triggers": [
+        "action_complete"
+      ],
+      "data_requirements": [
+        "performance_score"
+      ]
+    },
+    {
+      "name": "form_analysis",
+      "type": "skeleton",
+      "style": {
+        "color": "blue",
+        "thickness": 3
+      },
+      "triggers": [
+        "pose_detected"
+      ],
+      "data_requirements": [
+        "joint_positions"
+      ]
+    }
+  ],
+  "detection_models": {
+    "pose": "mediapipe_pose",
+    "object": "yolo_v8",
+    "ball": "archery_ball_detector",
+    "player": "person_detector"
+  },
+  "difficulty_levels": {
+    "easy": {
+      "tolerance": 0.3,
+      "feedback_frequency": "high",
+      "assistance_level": "maximum"
+    },
+    "medium": {
+      "tolerance": 0.2,
+      "feedback_frequency": "medium",
+      "assistance_level": "moderate"
+    },
+    "hard": {
+      "tolerance": 0.1,
+      "feedback_frequency": "low",
+      "assistance_level": "minimal"
+    },
+    "expert": {
+      "tolerance": 0.05,
+      "feedback_frequency": "minimal",
+      "assistance_level": "none"
+    }
+  }
+}

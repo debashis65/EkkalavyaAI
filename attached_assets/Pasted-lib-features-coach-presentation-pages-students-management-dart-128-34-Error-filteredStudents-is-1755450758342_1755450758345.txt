@@ -1,0 +1,230 @@
+lib/features/coach/presentation/pages/students_management.dart:128:34: Error: '_filteredStudents' is already declared in this scope.
+  List<Map<String, dynamic>> get _filteredStudents {
+                                 ^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:18:30: Context: Previous declaration of '_filteredStudents'.
+  List<Map<String, dynamic>> _filteredStudents = [];
+                             ^^^^^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_dashboard.dart:65:15: Error: The method 'CustomAppBar' isn't defined for the class '_PlayerDashboardState'.     
+ - '_PlayerDashboardState' is from 'package:ekkalavya_sports_ai/features/player/presentation/pages/player_dashboard.dart'
+ ('lib/features/player/presentation/pages/player_dashboard.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomAppBar'.
+      appBar: CustomAppBar(
+              ^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_profile.dart:46:15: Error: The method 'CustomAppBar' isn't defined for the class '_PlayerProfileState'.
+ - '_PlayerProfileState' is from 'package:ekkalavya_sports_ai/features/player/presentation/pages/player_profile.dart'
+ ('lib/features/player/presentation/pages/player_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomAppBar'.
+      appBar: CustomAppBar(
+              ^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_profile.dart:126:26: Error: The method 'updateProfile' isn't defined for the class 'AuthNotifier'.
+ - 'AuthNotifier' is from 'package:ekkalavya_sports_ai/core/providers/auth_provider.dart' ('lib/core/providers/auth_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'updateProfile'.
+      await authNotifier.updateProfile(
+                         ^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_profile.dart:607:19: Error: The method '_navigateToAboutPage' isn't defined for the class
+'_SettingsSectionState'.
+ - '_SettingsSectionState' is from 'package:ekkalavya_sports_ai/features/player/presentation/pages/player_profile.dart'
+ ('lib/features/player/presentation/pages/player_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_navigateToAboutPage'.
+                  _navigateToAboutPage(context);
+                  ^^^^^^^^^^^^^^^^^^^^
+lib/features/player/presentation/pages/player_profile.dart:618:19: Error: The method '_navigateToPrivacyPolicy' isn't defined for the class
+'_SettingsSectionState'.
+ - '_SettingsSectionState' is from 'package:ekkalavya_sports_ai/features/player/presentation/pages/player_profile.dart'
+ ('lib/features/player/presentation/pages/player_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_navigateToPrivacyPolicy'.
+                  _navigateToPrivacyPolicy(context);
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/player/presentation/pages/performance_analytics.dart:21:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(title: 'Performance Analytics'),
+                    ^^^^^^^^^^^^
+lib/features/player/presentation/pages/training_page.dart:18:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(
+                    ^^^^^^^^^^^^
+lib/features/player/presentation/pages/schedule_page.dart:20:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(
+                    ^^^^^^^^^^^^
+lib/features/player/presentation/pages/coaches_page.dart:25:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(
+                    ^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_dashboard.dart:26:15: Error: The method 'CustomAppBar' isn't defined for the class '_CoachDashboardState'.        
+ - '_CoachDashboardState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_dashboard.dart'
+ ('lib/features/coach/presentation/pages/coach_dashboard.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomAppBar'.
+      appBar: CustomAppBar(
+              ^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_dashboard.dart:745:15: Error: The method '_startVideoSession' isn't defined for the class '_UpcomingSessions'.    
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_dashboard.dart'
+ ('lib/features/coach/presentation/pages/coach_dashboard.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_startVideoSession'.
+              _startVideoSession(context, student);
+              ^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_dashboard.dart:745:34: Error: The getter 'context' isn't defined for the class '_UpcomingSessions'.
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_dashboard.dart'
+ ('lib/features/coach/presentation/pages/coach_dashboard.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'context'.
+              _startVideoSession(context, student);
+                                 ^^^^^^^
+lib/features/coach/presentation/pages/coach_dashboard.dart:745:43: Error: The getter 'student' isn't defined for the class '_UpcomingSessions'.
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_dashboard.dart'
+ ('lib/features/coach/presentation/pages/coach_dashboard.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'student'.
+              _startVideoSession(context, student);
+                                          ^^^^^^^
+lib/features/coach/presentation/pages/coach_profile.dart:53:15: Error: The method 'CustomAppBar' isn't defined for the class '_CoachProfileState'.
+ - '_CoachProfileState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_profile.dart'
+ ('lib/features/coach/presentation/pages/coach_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomAppBar'.
+      appBar: CustomAppBar(
+              ^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_profile.dart:139:26: Error: The method 'updateProfile' isn't defined for the class 'AuthNotifier'.
+ - 'AuthNotifier' is from 'package:ekkalavya_sports_ai/core/providers/auth_provider.dart' ('lib/core/providers/auth_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'updateProfile'.
+      await authNotifier.updateProfile(
+                         ^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_profile.dart:694:19: Error: The method '_editAvailability' isn't defined for the class '_ProfessionalDetails'.    
+ - '_ProfessionalDetails' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_profile.dart'
+ ('lib/features/coach/presentation/pages/coach_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_editAvailability'.
+                  _editAvailability(context);
+                  ^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_profile.dart:849:19: Error: The method '_navigateToPrivacySettings' isn't defined for the class
+'_SettingsSectionState'.
+ - '_SettingsSectionState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_profile.dart'
+ ('lib/features/coach/presentation/pages/coach_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_navigateToPrivacySettings'.
+                  _navigateToPrivacySettings(context);
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/coach_profile.dart:860:19: Error: The method '_navigateToHelp' isn't defined for the class '_SettingsSectionState'.     
+ - '_SettingsSectionState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/coach_profile.dart'
+ ('lib/features/coach/presentation/pages/coach_profile.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_navigateToHelp'.
+                  _navigateToHelp(context);
+                  ^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:23:5: Error: The method '_loadStudentsData' isn't defined for the class
+'_StudentsManagementState'.
+ - '_StudentsManagementState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/students_management.dart'
+ ('lib/features/coach/presentation/pages/students_management.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_loadStudentsData'.
+    _loadStudentsData();
+    ^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:35:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(title: 'Students Management'),
+                    ^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:108:26: Error: Can't use '_filteredStudents' because it is declared more than once.
+              itemCount: _filteredStudents.length,
+                         ^
+lib/features/coach/presentation/pages/students_management.dart:111:33: Error: Can't use '_filteredStudents' because it is declared more than once.
+                final student = _filteredStudents[index];
+                                ^
+lib/features/coach/presentation/pages/students_management.dart:52:21: Error: The method '_performSearch' isn't defined for the class
+'_StudentsManagementState'.
+ - '_StudentsManagementState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/students_management.dart'
+ ('lib/features/coach/presentation/pages/students_management.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_performSearch'.
+                    _performSearch(value);
+                    ^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:501:23: Error: The method '_sendMessageToStudent' isn't defined for the class '_StudentCard'.  
+ - '_StudentCard' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/students_management.dart'
+ ('lib/features/coach/presentation/pages/students_management.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_sendMessageToStudent'.
+                      _sendMessageToStudent(student);
+                      ^^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:753:15: Error: The method '_generateDetailedReport' isn't defined for the class '_StudentCard'.
+ - '_StudentCard' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/students_management.dart'
+ ('lib/features/coach/presentation/pages/students_management.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_generateDetailedReport'.
+              _generateDetailedReport(student);
+              ^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/students_management.dart:810:15: Error: The method '_scheduleSession' isn't defined for the class '_StudentCard'.       
+ - '_StudentCard' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/students_management.dart'
+ ('lib/features/coach/presentation/pages/students_management.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_scheduleSession'.
+              _scheduleSession(student);
+              ^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:68:21: Error: Couldn't find constructor 'CustomAppBar'.
+      appBar: const CustomAppBar(title: 'Video Consultation'),
+                    ^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:453:19: Error: The method '_toggleScreenSharing' isn't defined for the class
+'_VideoConsultationState'.
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_toggleScreenSharing'.
+                  _toggleScreenSharing();
+                  ^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:551:15: Error: The method '_toggleRealtimeAnalysis' isn't defined for the class
+'_VideoConsultationState'.
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_toggleRealtimeAnalysis'.
+              _toggleRealtimeAnalysis();
+              ^^^^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:580:15: Error: The method '_saveConsultationNotes' isn't defined for the class
+'_VideoConsultationState'.
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_saveConsultationNotes'.
+              _saveConsultationNotes();
+              ^^^^^^^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:591:7: Error: The setter '_selectedSession' isn't defined for the class
+'_VideoConsultationState'.
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_selectedSession'.
+      _selectedSession = session;
+      ^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:604:7: Error: The setter '_selectedSession' isn't defined for the class
+'_VideoConsultationState'.
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_selectedSession'.
+      _selectedSession = null;
+      ^^^^^^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:630:22: Error: The getter '_isVideoOff' isn't defined for the class '_VideoConsultationState'.  
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_isVideoOff'.
+      _isVideoOff = !_isVideoOff;
+                     ^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:630:7: Error: The setter '_isVideoOff' isn't defined for the class '_VideoConsultationState'.   
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_isVideoOff'.
+      _isVideoOff = !_isVideoOff;
+      ^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:635:23: Error: The getter '_isVideoOff' isn't defined for the class '_VideoConsultationState'.  
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_isVideoOff'.
+        content: Text(_isVideoOff ? 'Video turned off' : 'Video turned on'),
+                      ^^^^^^^^^^^
+lib/features/coach/presentation/pages/video_consultation.dart:636:26: Error: The getter '_isVideoOff' isn't defined for the class '_VideoConsultationState'.  
+ - '_VideoConsultationState' is from 'package:ekkalavya_sports_ai/features/coach/presentation/pages/video_consultation.dart'
+ ('lib/features/coach/presentation/pages/video_consultation.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_isVideoOff'.
+        backgroundColor: _isVideoOff ? Colors.red : AppTheme.primaryGreen,
+                         ^^^^^^^^^^^
+lib/features/shared/presentation/widgets/custom_app_bar.dart:26:15: Error: The method 'CustomAppBar' isn't defined for the class '_CoachDashboardState'.      
+ - '_CoachDashboardState' is from 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart'
+ ('lib/features/shared/presentation/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomAppBar'.
+      appBar: CustomAppBar(
+              ^^^^^^^^^^^^
+lib/features/shared/presentation/widgets/custom_app_bar.dart:745:15: Error: The method '_startVideoSession' isn't defined for the class '_UpcomingSessions'.  
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart'
+ ('lib/features/shared/presentation/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named '_startVideoSession'.
+              _startVideoSession(context, student);
+              ^^^^^^^^^^^^^^^^^^
+lib/features/shared/presentation/widgets/custom_app_bar.dart:745:34: Error: The getter 'context' isn't defined for the class '_UpcomingSessions'.
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart'
+ ('lib/features/shared/presentation/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'context'.
+              _startVideoSession(context, student);
+                                 ^^^^^^^
+lib/features/shared/presentation/widgets/custom_app_bar.dart:745:43: Error: The getter 'student' isn't defined for the class '_UpcomingSessions'.
+ - '_UpcomingSessions' is from 'package:ekkalavya_sports_ai/features/shared/presentation/widgets/custom_app_bar.dart'
+ ('lib/features/shared/presentation/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'student'.
+              _startVideoSession(context, student);
+                                          ^^^^^^^

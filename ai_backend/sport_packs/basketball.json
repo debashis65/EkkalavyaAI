@@ -1,0 +1,277 @@
+{
+  "sport": "basketball",
+  "version": "1.0.0",
+  "category": "invasion",
+  "description": "Professional basketball training configuration with authentic court dimensions and rules",
+  "created_date": "2025-09-09T05:27:59.935669",
+  "surface": {
+    "width_m": 15.24,
+    "height_m": 28.65,
+    "landmarks": [
+      "boundary",
+      "baseline",
+      "sideline",
+      "center",
+      "center_circle"
+    ],
+    "center_line": true,
+    "zones": {
+      "key_home": {
+        "x1": 0,
+        "y1": 3.66,
+        "x2": 5.8,
+        "y2": 11.58,
+        "width": 5.8,
+        "height": 7.92
+      },
+      "key_away": {
+        "x1": 22.85,
+        "y1": 3.66,
+        "x2": 28.65,
+        "y2": 11.58,
+        "width": 5.799999999999997,
+        "height": 7.92
+      },
+      "center_circle": {
+        "center_x": 14.325,
+        "center_y": 7.62,
+        "radius": 1.83
+      },
+      "ft_circle_home": {
+        "center_x": 5.8,
+        "center_y": 7.62,
+        "radius": 1.83
+      },
+      "ft_circle_away": {
+        "center_x": 22.85,
+        "center_y": 7.62,
+        "radius": 1.83
+      }
+    }
+  },
+  "objects": [
+    {
+      "name": "basketball",
+      "type": "ball",
+      "size_m": {
+        "diameter": 0.239
+      },
+      "detection_config": {
+        "confidence_threshold": 0.7,
+        "color_range": "orange"
+      }
+    },
+    {
+      "name": "hoop",
+      "type": "goal",
+      "size_m": {
+        "diameter": 0.457,
+        "height": 3.048
+      },
+      "detection_config": {
+        "confidence_threshold": 0.8
+      }
+    }
+  ],
+  "teams": {
+    "count": 2,
+    "players_per_team": 5,
+    "positions": [
+      {
+        "name": "point_guard",
+        "number": 1,
+        "role": "playmaker"
+      },
+      {
+        "name": "shooting_guard",
+        "number": 2,
+        "role": "scorer"
+      },
+      {
+        "name": "small_forward",
+        "number": 3,
+        "role": "versatile"
+      },
+      {
+        "name": "power_forward",
+        "number": 4,
+        "role": "inside"
+      },
+      {
+        "name": "center",
+        "number": 5,
+        "role": "post"
+      }
+    ],
+    "formations": {}
+  },
+  "actions": [
+    {
+      "name": "shooting",
+      "category": "offensive",
+      "biomechanics": {
+        "key_joints": [
+          "right_shoulder",
+          "right_elbow",
+          "right_wrist"
+        ],
+        "optimal_angles": {
+          "elbow": 90,
+          "wrist_snap": 15
+        }
+      },
+      "success_criteria": {
+        "form_score": 80,
+        "follow_through": 0.8
+      },
+      "common_errors": [
+        "low_elbow",
+        "inconsistent_follow_through",
+        "poor_balance"
+      ]
+    },
+    {
+      "name": "dribbling",
+      "category": "ball_handling",
+      "biomechanics": {
+        "key_joints": [
+          "right_wrist",
+          "left_wrist"
+        ],
+        "rhythm_analysis": true
+      },
+      "success_criteria": {
+        "consistency": 0.9,
+        "control": 0.8
+      },
+      "common_errors": [
+        "palm_dribbling",
+        "looking_at_ball",
+        "poor_rhythm"
+      ]
+    }
+  ],
+  "rules": {
+    "offside": true,
+    "time_violations": {
+      "shot_clock": 24,
+      "3_seconds": 3,
+      "5_seconds": 5
+    },
+    "area_violations": [
+      "lane_violation",
+      "backcourt_violation"
+    ],
+    "contact_rules": {},
+    "scoring_rules": {
+      "field_goal": 2,
+      "three_pointer": 3,
+      "free_throw": 1
+    }
+  },
+  "value_model": {
+    "model_type": "shot_quality",
+    "parameters": {
+      "distance_factor": 0.4,
+      "angle_factor": 0.3,
+      "defender_distance": 0.3
+    },
+    "weight_factors": {
+      "form": 0.4,
+      "positioning": 0.3,
+      "timing": 0.3
+    },
+    "normalization": {
+      "min_score": 0,
+      "max_score": 100
+    }
+  },
+  "overlays": [
+    {
+      "name": "performance_feedback",
+      "type": "text",
+      "style": {
+        "color": "green",
+        "size": "medium",
+        "position": "top_right"
+      },
+      "triggers": [
+        "action_complete"
+      ],
+      "data_requirements": [
+        "performance_score"
+      ]
+    },
+    {
+      "name": "form_analysis",
+      "type": "skeleton",
+      "style": {
+        "color": "blue",
+        "thickness": 3
+      },
+      "triggers": [
+        "pose_detected"
+      ],
+      "data_requirements": [
+        "joint_positions"
+      ]
+    },
+    {
+      "name": "shot_arc",
+      "type": "trajectory",
+      "style": {
+        "color": "orange",
+        "dash_pattern": "dashed"
+      },
+      "triggers": [
+        "ball_release"
+      ],
+      "data_requirements": [
+        "ball_trajectory"
+      ]
+    },
+    {
+      "name": "shooting_zone",
+      "type": "heat_map",
+      "style": {
+        "opacity": 0.7,
+        "color_scheme": "hot"
+      },
+      "triggers": [
+        "court_analysis"
+      ],
+      "data_requirements": [
+        "shot_locations",
+        "success_rate"
+      ]
+    }
+  ],
+  "detection_models": {
+    "pose": "mediapipe_pose",
+    "object": "yolo_v8",
+    "ball": "basketball_ball_detector",
+    "player": "person_detector"
+  },
+  "difficulty_levels": {
+    "easy": {
+      "tolerance": 0.3,
+      "feedback_frequency": "high",
+      "assistance_level": "maximum"
+    },
+    "medium": {
+      "tolerance": 0.2,
+      "feedback_frequency": "medium",
+      "assistance_level": "moderate"
+    },
+    "hard": {
+      "tolerance": 0.1,
+      "feedback_frequency": "low",
+      "assistance_level": "minimal"
+    },
+    "expert": {
+      "tolerance": 0.05,
+      "feedback_frequency": "minimal",
+      "assistance_level": "none"
+    }
+  }
+}
