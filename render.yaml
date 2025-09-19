@@ -2,8 +2,8 @@ services:
   # AI Backend - FastAPI with MediaPipe Computer Vision
   - type: web
     name: ekkalavya-ai-backend
-    runtime: python3
-    region: singapore
+    runtime: python
+    region: oregon
     plan: free
     buildCommand: |
       cd ai_backend
@@ -38,7 +38,7 @@ services:
   - type: web
     name: ekkalavya-web-platform
     runtime: node
-    region: singapore
+    region: oregon
     plan: free
     buildCommand: |
       npm ci --include=dev
@@ -90,7 +90,7 @@ services:
   - type: web
     name: ekkalavya-mobile-api
     runtime: node
-    region: singapore
+    region: oregon
     plan: free
     buildCommand: npm ci
     startCommand: |
