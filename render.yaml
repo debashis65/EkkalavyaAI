@@ -3,7 +3,7 @@ services:
   - type: web
     name: ekkalavya-ai-backend
     runtime: python
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: |
       cd ai_backend
@@ -38,12 +38,11 @@ services:
   - type: web
     name: ekkalavya-web-platform
     runtime: node
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: |
       npm ci --include=dev
       npm run build
-      npm prune --omit=dev
       echo "✅ Web platform built successfully"
     startCommand: npm run start
     envVars:
@@ -61,7 +60,7 @@ services:
       - key: PORT
         value: 5000
       - key: APP_NAME
-        value: Ekkalavya Sports Connect
+        value: Ekkalavya Sports AI
       - key: APP_VERSION
         value: 2.0.0
       - key: CORS_ORIGINS
@@ -90,7 +89,7 @@ services:
   - type: web
     name: ekkalavya-mobile-api
     runtime: node
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: npm ci
     startCommand: |
