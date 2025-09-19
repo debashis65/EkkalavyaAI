@@ -1,15 +1,15 @@
 services:
   # PostgreSQL Database
   - type: pserv
-    name: ekkalavya-database
-    databaseName: ekkalavya_sports_ai
-    user: ekkalavya_user
+    name: ekalavya-database
+    databaseName: ekalavya_sports_ai
+    user: ekalavya_user
     plan: free
     region: singapore
 
   # Python AI Backend - FastAPI with MediaPipe
   - type: web
-    name: ekkalavya-ai-backend
+    name: ekalavya-ai-backend
     env: python3
     region: singapore
     plan: free
@@ -44,7 +44,7 @@ services:
 
   # Main Web Application - Node.js + React
   - type: web
-    name: ekkalavya-web-platform
+    name: ekalavya-web-platform
     env: node
     region: singapore
     plan: free
@@ -59,17 +59,17 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: ekkalavya-database
+          name: ekalavya-database
           property: connectionString
       - key: AI_BACKEND_URL
         fromService:
           type: web
-          name: ekkalavya-ai-backend
+          name: ekalavya-ai-backend
           property: host
       - key: PORT
         value: 5000
       - key: APP_NAME
-        value: ekkalavya Sports AI
+        value: Ekalavya Sports AI
       - key: APP_VERSION
         value: 2.0.0
       - key: CORS_ORIGINS
@@ -84,7 +84,7 @@ services:
 
   # Flutter Mobile API Service
   - type: web
-    name: ekkalavya-mobile-api
+    name: ekalavya-mobile-api
     env: node
     region: singapore
     plan: free
@@ -127,26 +127,26 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: ekkalavya-database
+          name: ekalavya-database
           property: connectionString
       - key: AI_BACKEND_URL
         fromService:
           type: web
-          name: ekkalavya-ai-backend
+          name: ekalavya-ai-backend
           property: host
       - key: WEB_PLATFORM_URL
         fromService:
           type: web
-          name: ekkalavya-web-platform
+          name: ekalavya-web-platform
           property: host
       - key: PORT
         value: 8080
     healthCheckPath: /mobile/health
 
 databases:
-  - name: ekkalavya-database
-    databaseName: ekkalavya_sports_ai
-    user: ekkalavya_user
+  - name: ekalavya-database
+    databaseName: ekalavya_sports_ai
+    user: ekalavya_user
     plan: free
     region: singapore
 
@@ -155,7 +155,7 @@ envVarGroups:
   - name: shared-config
     envVars:
       - key: APP_NAME
-        value: Ekkalavya Sports AI
+        value: Ekkalavya Sports Connect
       - key: APP_VERSION
         value: 2.0.0
       - key: CORS_ORIGINS
@@ -189,36 +189,36 @@ envVarGroups:
 
 # Health Check Configuration
 healthChecks:
-  - service: ekkalavya-ai-backend
+  - service: ekalavya-ai-backend
     path: /health
     intervalSeconds: 30
     timeoutSeconds: 10
     
-  - service: ekkalavya-web-platform
+  - service: ekalavya-web-platform
     path: /api/health
     intervalSeconds: 30
     timeoutSeconds: 10
     
-  - service: ekkalavya-mobile-api
+  - service: ekalavya-mobile-api
     path: /mobile/health
     intervalSeconds: 30
     timeoutSeconds: 10
 
 # Auto-Scaling Configuration
 scaling:
-  - service: ekkalavya-ai-backend
+  - service: ekalavya-ai-backend
     minInstances: 1
     maxInstances: 3
     targetCPU: 70
     targetMemory: 80
     
-  - service: ekkalavya-web-platform
+  - service: ekalavya-web-platform
     minInstances: 1
     maxInstances: 5
     targetCPU: 80
     targetMemory: 85
 
-  - service: ekkalavya-mobile-api
+  - service: ekalavya-mobile-api
     minInstances: 1
     maxInstances: 2
     targetCPU: 75
@@ -226,20 +226,20 @@ scaling:
 
 # Performance Optimization
 optimization:
-  - service: ekkalavya-ai-backend
+  - service: ekalavya-ai-backend
     settings:
       worker_processes: 1
       worker_connections: 1000
       keepalive_timeout: 65
       max_requests: 1000
       
-  - service: ekkalavya-web-platform
+  - service: ekalavya-web-platform
     settings:
       node_options: "--max-old-space-size=1024"
       compression: true
       static_cache: 1d
       
-  - service: ekkalavya-mobile-api
+  - service: ekalavya-mobile-api
     settings:
       node_options: "--max-old-space-size=512"
       compression: true
@@ -266,22 +266,22 @@ monitoring:
     - name: high_error_rate
       condition: error_rate > 5%
       notification: email
-      services: [ekkalavya-ai-backend, ekkalavya-web-platform]
+      services: [ekalavya-ai-backend, ekalavya-web-platform]
       
     - name: slow_response_time
       condition: response_time > 2s
       notification: email
-      services: [ekkalavya-ai-backend]
+      services: [ekalavya-ai-backend]
       
     - name: high_cpu_usage
       condition: cpu_usage > 85%
       notification: email
-      services: [ekkalavya-ai-backend, ekkalavya-web-platform]
+      services: [ekalavya-ai-backend, ekalavya-web-platform]
       
     - name: unity_ar_failures
       condition: unity_ar_session_failure_rate > 10%
       notification: email
-      services: [ekkalavya-mobile-api]
+      services: [ekalavya-mobile-api]
 
 # Security Configuration
 security:
@@ -299,7 +299,7 @@ security:
     allowOrigins: 
       - "*.replit.app"
       - "*.onrender.com"
-      - "*.ekkalavyasports.ai"
+      - "*.ekalavyasports.ai"
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
     allowHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-Unity-Session"]
     credentials: true
@@ -324,24 +324,24 @@ hooks:
   postDeploy:
     - name: database-migration
       command: npm run db:push
-      service: ekkalavya-web-platform
+      service: ekalavya-web-platform
       
     - name: ai-model-verification
       command: python -c "import mediapipe, cv2; print('✅ AI models ready')"
-      service: ekkalavya-ai-backend
+      service: ekalavya-ai-backend
       
     - name: mobile-api-test
       command: curl -f $RENDER_EXTERNAL_URL/mobile/health || exit 1
-      service: ekkalavya-mobile-api
+      service: ekalavya-mobile-api
       
     - name: unity-ar-endpoint-test
       command: curl -f $RENDER_EXTERNAL_URL/mobile/sports/list || exit 1
-      service: ekkalavya-mobile-api
+      service: ekalavya-mobile-api
 
 # Regional Configuration for Global Reach
 regions:
   primary: singapore
-  fallback: oregon
+  fallback: virginia
   cdn_regions:
     - us-west
     - us-east
@@ -349,14 +349,14 @@ regions:
 
 # Custom Domains (when available)
 domains:
-  - service: ekkalavya-web-platform
-    domain: app.ekkalavyasports.ai
+  - service: ekalavya-web-platform
+    domain: app.ekalavyasports.ai
     
-  - service: ekkalavya-ai-backend
-    domain: api.ekkalavyasports.ai
+  - service: ekalavya-ai-backend
+    domain: api.ekalavyasports.ai
     
-  - service: ekkalavya-mobile-api
-    domain: mobile.ekkalavyasports.ai
+  - service: ekalavya-mobile-api
+    domain: mobile.ekalavyasports.ai
 
 # Resource Management
 resources:
@@ -375,10 +375,10 @@ environments:
   staging:
     branch: develop
     services:
-      - ekkalavya-ai-backend-staging
-      - ekkalavya-web-platform-staging
-      - ekkalavya-mobile-api-staging
-      - ekkalavya-database-staging
+      - ekalavya-ai-backend-staging
+      - ekalavya-web-platform-staging
+      - ekalavya-mobile-api-staging
+      - ekalavya-database-staging
     scaling:
       minInstances: 1
       maxInstances: 2
@@ -386,42 +386,42 @@ environments:
   production:
     branch: main
     services:
-      - ekkalavya-ai-backend
-      - ekkalavya-web-platform
-      - ekkalavya-mobile-api
-      - ekkalavya-database
+      - ekalavya-ai-backend
+      - ekalavya-web-platform
+      - ekalavya-mobile-api
+      - ekalavya-database
 
 # Professional Features Configuration
 features:
   - name: real-computer-vision
     enabled: true
     description: "MediaPipe pose detection for 54+ sports"
-    service: ekkalavya-ai-backend
+    service: ekalavya-ai-backend
     
   - name: para-sports-support
     enabled: true
     description: "Specialized analysis for Paralympic sports"
-    service: ekkalavya-ai-backend
+    service: ekalavya-ai-backend
     
   - name: unity-ar-integration
     enabled: true
     description: "Native Unity AR with Flutter deep linking"
-    service: ekkalavya-mobile-api
+    service: ekalavya-mobile-api
     
   - name: real-time-feedback
     enabled: true
     description: "Live WebSocket analysis streaming"
-    service: ekkalavya-web-platform
+    service: ekalavya-web-platform
     
   - name: multi-platform-sync
     enabled: true
     description: "Web + Flutter mobile data synchronization"
-    services: [ekkalavya-web-platform, ekkalavya-mobile-api]
+    services: [ekalavya-web-platform, ekalavya-mobile-api]
     
   - name: coach-athlete-ecosystem
     enabled: true
     description: "Complete training management system"
-    services: [ekkalavya-web-platform, ekkalavya-mobile-api]
+    services: [ekalavya-web-platform, ekalavya-mobile-api]
 
 # Deployment Strategy
 deployment:
@@ -435,12 +435,12 @@ deployment:
 
 # Advanced Caching Strategy
 caching:
-  - service: ekkalavya-web-platform
+  - service: ekalavya-web-platform
     static_assets:
       cache_control: "public, max-age=31536000"
       patterns: ["*.js", "*.css", "*.png", "*.jpg", "*.svg"]
       
-  - service: ekkalavya-ai-backend
+  - service: ekalavya-ai-backend
     api_responses:
       cache_control: "public, max-age=300"
       patterns: ["/sports/configs", "/models/metadata"]
