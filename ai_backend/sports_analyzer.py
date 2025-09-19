@@ -39,16 +39,9 @@ app.add_middleware(
 )
 
 # Initialize MediaPipe
-try:
-    mp_pose = mp.solutions.pose
-    mp_hands = mp.solutions.hands
-    mp_drawing = mp.solutions.drawing_utils
-except (AttributeError, ImportError):
-    # Fallback for type checker - still functional
-    import mediapipe as mp
-    mp_pose = mp.solutions.pose
-    mp_hands = mp.solutions.hands
-    mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
 
 # Global pose detector
 pose_detector = mp_pose.Pose(
