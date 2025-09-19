@@ -17,7 +17,7 @@ services:
       - key: PYTHONPATH
         value: /opt/render/project/src/ai_backend
       - key: PYTHON_VERSION
-        value: 3.11
+        value: 3.11.11
       - key: ENVIRONMENT
         value: production
       - key: MEDIAPIPE_MODEL_COMPLEXITY
