@@ -1,12 +1,4 @@
 services:
-  # PostgreSQL Database - Production Grade
-  - type: pserv
-    name: ekkalavya-database
-    databaseName: ekkalavya_sports_ai
-    user: ekkalavya_user
-    plan: free
-    region: singapore
-
   # AI Backend - FastAPI with MediaPipe Computer Vision
   - type: web
     name: ekkalavya-ai-backend
@@ -217,3 +209,9 @@ services:
       - key: ROOM_MODE_ENABLED
         value: true
     healthCheckPath: /mobile/health
+
+databases:
+  - name: ekkalavya-database
+    databaseName: ekkalavya_sports_ai
+    user: ekkalavya_user
+    plan: free
